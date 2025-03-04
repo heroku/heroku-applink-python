@@ -9,4 +9,4 @@ dependencies = [
     "orjson>=3.10.15",
 ]
 [tool.setuptools]
-packages = ["salesforce_sdk"]
+packages = ["salesforce_sdk", "salesforce_sdk.data_api"]
