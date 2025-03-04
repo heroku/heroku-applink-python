@@ -1,5 +1,5 @@
 import asyncio
-import salesforce_sdk as sdk
+import heroku_applink as sdk
 from fastapi import FastAPI, Request
 
 app = FastAPI()

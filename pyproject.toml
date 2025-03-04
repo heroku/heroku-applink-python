@@ -1,5 +1,5 @@
 [project]
-name = "salesforce-sdk"
+name = "heroku_applink"
 version = "0.1.0"
 description = "Simple SDK for Heroku AppLink and Salesforce development"
 readme = "README.md"
@@ -9,4 +9,4 @@ dependencies = [
     "orjson>=3.10.15",
 ]
 [tool.setuptools]
-packages = ["salesforce_sdk", "salesforce_sdk.data_api"]
+packages = ["heroku_applink", "heroku_applink.data_api"]

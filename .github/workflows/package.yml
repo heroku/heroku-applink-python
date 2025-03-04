@@ -33,7 +33,7 @@ jobs:
     - name: Build the artifact in dist/
       run: uv build
     - name: sanity
-      run: uv run --with salesforce_sdk --no-project -- python -c "import salesforce_sdk"
+      run: uv run --with heroku_applink --no-project -- python -c "import heroku_applink"
     - name: Release to Github
       uses: softprops/action-gh-release@v2
       if: startsWith(github.ref, 'refs/tags/')
