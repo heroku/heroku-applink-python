@@ -1,0 +1,12 @@
+[project]
+name = "salesforce-sdk"
+version = "0.1.0"
+description = "Simple SDK for Heroku AppLink and Salesforce development"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "aiohttp>=3.11.12",
+    "orjson>=3.10.15",
+]
+[tool.setuptools]
+packages = ["salesforce_sdk"]
