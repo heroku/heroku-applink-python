@@ -10,7 +10,7 @@ on:
   
 jobs:
   build:
-    runs-on: sfdc-hk-ubuntu-latest
+    runs-on: pub-hk-ubuntu-24.04-ip
     strategy:
       fail-fast: false
       matrix:
