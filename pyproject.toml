@@ -8,5 +8,13 @@ dependencies = [
     "aiohttp>=3.11.12",
     "orjson>=3.10.15",
 ]
+
 [tool.setuptools]
 packages = ["heroku_applink", "heroku_applink.data_api"]
+
+[project.urls]
+Homepage = "https://github.com/heroku/heroku-applink-python"
+Documentation = "https://github.com/heroku/heroku-applink-python"
+Repository = "https://github.com/heroku/heroku-applink-python.git"
+"Bug Tracker" = "https://github.com/heroku/heroku-applink-python/issues"
+Changelog = "https://github.com/heroku/heroku-applink-python/CHANGELOG.md"
