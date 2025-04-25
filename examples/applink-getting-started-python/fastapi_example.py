@@ -1,9 +1,9 @@
 import asyncio
-import heroku_applink as sdk
+from heroku_applink import IntegrationAsgiMiddleware, client_context
 from fastapi import FastAPI, Request
 
 app = FastAPI()
-app.add_middleware(sdk.IntegrationAsgiMiddleware)
+app.add_middleware(IntegrationAsgiMiddleware)
 
 
 @app.get("/")
@@ -13,7 +13,8 @@ def get_root():
 
 @app.get("/accounts")
 def get_accounts():
-    dataapi = sdk.context.get()
+    context = client_context.get()
+    dataapi = context.data_api
     asyncio.run(query_accounts(dataapi))
     return {"Some": "Accounts"}
 

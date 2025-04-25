@@ -1,0 +1,78 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Heroku-Salesforce API
+  description: Sample Heroku app exposing APIs to connected Salesforce and Data Cloud orgs.
+servers:
+  - url: http://127.0.0.1:3000
+paths:
+  /accounts:
+    get:
+      operationId: GetAccounts
+      description: Returns list of array of Accounts
+      responses:
+        '200':
+          description: Successfully returned a list of Accounts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+  /unitofwork:
+    post:
+      operationId: UnitOfWork
+      description:
+        Receives a payload containing Account, Contact, and Case details and uses the
+        Unit of Work pattern to assign the corresponding values to to its Record
+        while maintaining the relationships. It then commits the unit of work and
+        returns the Record Id's for each object.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accountName:
+                  type: string
+                lastName:
+                  type: string
+                subject:
+                  type: string
+                callbackUrl:
+                  type: string
+      responses:
+        '201':
+          description: Received UnitOfWork API request
+      callbacks:
+        unitOfWorkResponse:
+          '{$request.body#/callbackUrl}':
+            post:
+              description: Response from /unitofwork API
+              operationId: unitOfWorkResponseCallback
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      type: object
+                      properties:
+                        accountId:
+                          type: string
+                        contactId:
+                          type: string
+                        cases:
+                          type: object
+                          properties:
+                            serviceCaseId:
+                              type: string
+                            followupCaseId:
+                              type: string
+              responses:   # Expected responses to the callback message
+                '200':
+                  description: Your server returns this code if it accepts the callback
