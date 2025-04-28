@@ -43,8 +43,8 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
           else
-            VERSION=$(git describe --tags --abbrev=0)
-            echo "version=${VERSION#v}" >> $GITHUB_OUTPUT
+            # For push events, use a default test version
+            echo "version=1.0.0-test" >> $GITHUB_OUTPUT
           fi
 
       - name: Test Release Creation (Dry Run)
