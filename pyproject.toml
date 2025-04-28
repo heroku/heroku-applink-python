@@ -9,6 +9,13 @@ dependencies = [
     "orjson>=3.10.15",
 ]
 
+[project.optional-dependencies]
+test = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.1",
+    "pytest-cov>=4.1.0",
+]
+
 [tool.setuptools]
 packages = ["heroku_applink", "heroku_applink.data_api"]
 
@@ -18,3 +25,9 @@ Documentation = "https://github.com/heroku/heroku-applink-python"
 Repository = "https://github.com/heroku/heroku-applink-python.git"
 "Bug Tracker" = "https://github.com/heroku/heroku-applink-python/issues"
 Changelog = "https://github.com/heroku/heroku-applink-python/CHANGELOG.md"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "--cov=heroku_applink --cov-report=term-missing"
+asyncio_mode = "auto"
