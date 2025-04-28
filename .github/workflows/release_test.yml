@@ -16,34 +16,41 @@ on:
     branches: [ bj-add-rollout-doc ]
 
 jobs:
+  build:
+    name: Build Package
+    runs-on: pub-hk-ubuntu-24.04-ip
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 
+        uses: actions/setup-python@v3
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+      - name: Install the project
+        run: uv sync --all-extras --dev
+      - name: Build the artifact in dist/
+        run: uv build
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
   test:
     name: Test Release Process
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Get Python version from pyproject.toml
-        id: python_version
-        run: |
-          pip install tomli
-          PYTHON_VERSION=$(python -c "import tomli; print(tomli.load(open('pyproject.toml', 'rb'))['project']['requires-python'].replace('>=', ''))")
-          echo "python_version=$PYTHON_VERSION" >> $GITHUB_OUTPUT
-          echo "Using Python version: $PYTHON_VERSION"
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
         with:
-          python-version: ${{ steps.python_version.outputs.python_version }}
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e ".[dev]"
-          pip install tox
-
-      - name: Run tests
-        run: tox
+          name: dist
+          path: dist/
 
       - name: Get version
         id: get_version
@@ -69,20 +76,12 @@ jobs:
           echo "Would create release: ${{ steps.get_version.outputs.version }}"
           echo "Pre-release status: ${{ github.event.inputs.is_prerelease }}"
           echo "This is a test run - no actual release will be created"
+          echo "Package files that would be included:"
+          ls -la dist/
 
-      - name: Test Documentation Update (Dry Run)
+      - name: Test Package Upload (Dry Run)
         run: |
-          echo "Would update docs version to: ${{ steps.get_version.outputs.version }}"
-          echo "This is a test run - no actual documentation will be updated"
-
-      - name: Test Deployment (Dry Run)
-        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.is_prerelease }}
-        run: |
-          echo "Would deploy to staging"
-          echo "This is a test run - no actual deployment will occur"
-
-      - name: Test Production Deployment (Dry Run)
-        if: ${{ github.event_name == 'workflow_dispatch' && !github.event.inputs.is_prerelease }}
-        run: |
-          echo "Would deploy to production"
-          echo "This is a test run - no actual deployment will occur" 
+          echo "Would upload package to PyPI"
+          echo "Package files:"
+          ls -la dist/
+          echo "This is a test run - no actual upload will occur"
