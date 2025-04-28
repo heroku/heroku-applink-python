@@ -19,6 +19,9 @@ jobs:
   test:
     name: Run Tests and Linting
     uses: ./.github/workflows/run_tests.yml
+    with:
+      python-version: '3.10'
+      os: 'ubuntu-latest'
 
   build:
     name: Build Package
