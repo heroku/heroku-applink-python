@@ -1,0 +1,43 @@
+name: Pipeline
+
+on:
+  push:
+    branches: [ bj-add-rollout-doc ]
+  pull_request:
+    branches: [ bj-add-rollout-doc ]
+
+jobs:
+  test:
+    uses: ./.github/workflows/run_tests.yml
+    with:
+      python-version: '3.10'
+      os: 'ubuntu-latest'
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+        os: [windows-latest, macos-latest, ubuntu-latest]
+
+  build:
+    needs: test
+    uses: ./.github/workflows/build.yml
+    with:
+      python-version: '3.10'
+      os: 'ubuntu-latest'
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+        os: [windows-latest, macos-latest, ubuntu-latest]
+
+  package:
+    needs: build
+    uses: ./.github/workflows/package.yml
+    with:
+      python-version: '3.10'
+      os: 'ubuntu-latest'
+
+  release:
+    needs: package
+    uses: ./.github/workflows/release.yml
+    with:
+      python-version: '3.10'
+      os: 'ubuntu-latest' 

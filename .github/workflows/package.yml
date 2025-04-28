@@ -1,39 +1,48 @@
-name: Package Library
-permissions:
-  contents: write
-  id-token: write
+name: Package
+
 on:
-  push:
-    branches: [ "main" ]
-    tags: 
-      - "*"
-  pull_request:
-    branches: [ "main" ]
-  
+  workflow_call:
+    inputs:
+      python-version:
+        required: true
+        type: string
+      os:
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      python-version:
+        description: 'Python version to package with'
+        required: true
+        type: string
+        default: '3.10'
+      os:
+        description: 'OS to package on'
+        required: true
+        type: string
+        default: 'ubuntu-latest'
+
 jobs:
-  build:
-    runs-on: pub-hk-ubuntu-24.04-ip
+  package:
+    name: Package
+    runs-on: ${{ inputs.os || github.event.inputs.os }}
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python 
-      uses: actions/setup-python@v3
-    - name: Install uv
-      uses: astral-sh/setup-uv@v5
-      with:
-        enable-cache: true
-        cache-dependency-glob: "uv.lock"
-    - name: Install the project
-      run: uv sync --all-extras --dev
-    - name: Build the artifact in dist/
-      run: uv build
-    - name: Release to Github
-      uses: softprops/action-gh-release@v2
-      if: startsWith(github.ref, 'refs/tags/')
-      with:
-          files: | 
-            dist/*.whl
-            dist/*.tar.gz
-    - name: Release to pypi
-      run: uv publish
-      if: startsWith(github.ref, 'refs/tags/')
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ inputs.python-version || github.event.inputs.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version || github.event.inputs.python-version }}
+          
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+          
+      - name: Install the project
+        run: uv sync --all-extras --dev
+        
+      - name: Package
+        run: python -m build
       

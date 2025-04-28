@@ -1,4 +1,4 @@
-name: Run Tests
+name: Build
 
 on:
   workflow_call:
@@ -12,19 +12,19 @@ on:
   workflow_dispatch:
     inputs:
       python-version:
-        description: 'Python version to test with'
+        description: 'Python version to build with'
         required: true
         type: string
         default: '3.10'
       os:
-        description: 'OS to test on'
+        description: 'OS to build on'
         required: true
         type: string
         default: 'ubuntu-latest'
 
 jobs:
-  test:
-    name: Run Tests
+  build:
+    name: Build Package
     runs-on: ${{ inputs.os || github.event.inputs.os }}
     steps:
       - uses: actions/checkout@v4
@@ -43,10 +43,5 @@ jobs:
       - name: Install the project
         run: uv sync --all-extras --dev
         
-      - name: Install tox
-        run: pip install tox
-        
-      - name: Run tox
-        run: |
-          PY_VERSION=$(echo ${{ inputs.python-version || github.event.inputs.python-version }} | tr -d '.')
-          tox -e py$PY_VERSION 
+      - name: Build package
+        run: uv build 
