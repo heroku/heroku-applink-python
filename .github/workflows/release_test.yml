@@ -16,8 +16,13 @@ on:
     branches: [ bj-add-rollout-doc ]
 
 jobs:
+  test:
+    name: Run Tests and Linting
+    uses: ./.github/workflows/run_tests.yml
+
   build:
     name: Build Package
+    needs: test
     runs-on: pub-hk-ubuntu-24.04-ip
     steps:
       - uses: actions/checkout@v4
@@ -38,7 +43,7 @@ jobs:
           name: dist
           path: dist/
 
-  test:
+  release_test:
     name: Test Release Process
     needs: build
     runs-on: ubuntu-latest
