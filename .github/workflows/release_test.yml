@@ -23,10 +23,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Get Python version from pyproject.toml
+        id: python_version
+        run: |
+          pip install tomli
+          PYTHON_VERSION=$(python -c "import tomli; print(tomli.load(open('pyproject.toml', 'rb'))['project']['requires-python'].replace('>=', ''))")
+          echo "python_version=$PYTHON_VERSION" >> $GITHUB_OUTPUT
+          echo "Using Python version: $PYTHON_VERSION"
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: ${{ steps.python_version.outputs.python_version }}
 
       - name: Install dependencies
         run: |
@@ -40,12 +48,21 @@ jobs:
       - name: Get version
         id: get_version
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
           else
-            # For push events, use a default test version
-            echo "version=1.0.0-test" >> $GITHUB_OUTPUT
+            # Check if this is NOT the main branch
+            if [[ "${{ github.ref_name }}" != "main" ]]; then
+              # For non-main branches, use a test version
+              echo "version=0.0.0-test" >> $GITHUB_OUTPUT
+            else
+              # For main branch, use the actual version from pyproject.toml
+              VERSION=$(python -c "import tomli; print(tomli.load(open('pyproject.toml', 'rb'))['project']['version'])")
+              echo "version=$VERSION" >> $GITHUB_OUTPUT
+            fi
           fi
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Version: $(cat $GITHUB_OUTPUT)"
 
       - name: Test Release Creation (Dry Run)
         run: |
