@@ -27,6 +27,8 @@ test = [
     "pytest>=7.0.0",
     "pytest-asyncio>=0.21.0",
     "pytest-cov>=4.0.0",
+    "ruff>=0.0.0", # add ruff for linting/formatting
+    "mypy>=0.0.0", # add mypy for type checking
 ]
 
 [tool.pytest.ini_options]
@@ -34,3 +36,33 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 addopts = "-v --cov=heroku_applink --cov-report=term-missing"
 asyncio_mode = "auto"
+
+[tool.ruff]
+# Ruff configuration
+select = ["E", "W", "F"]  # Enable common errors, warnings, and formatting rules
+fix = true  # Enable automatic fixes for supported issues
+line-length = 88  # Max line length for formatting
+
+[tool.mypy]
+# Mypy configuration for type checking
+files = "heroku_applink, tests"  # Directories or files to check
+strict = true  # Enable all strict type checking options
+disallow_untyped_calls = true  # Disallow calls without type annotations
+disallow_untyped_defs = true  # Disallow function definitions without type annotations
+warn_return_any = true  # Warn about functions returning 'Any'
+
+[tool.tox]
+# Tox configuration for running tests across multiple Python versions
+envlist = py310, py311  # Python versions to test against
+
+[testenv]
+deps =
+    pytest
+    pytest-asyncio
+    pytest-cov
+    mypy
+    ruff
+commands =
+    ruff check .  # Run ruff for linting/formatting
+    mypy .  # Run mypy for type checking
+    pytest  # Run pytest for tests

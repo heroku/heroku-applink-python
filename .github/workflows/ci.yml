@@ -1,0 +1,104 @@
+name: CI Workflow
+
+on:
+  push:
+    branches:
+      - main
+      - "release/*"
+      - "feature/*"
+  pull_request:
+    branches:
+      - main
+      - "release/*"
+      - "feature/*"
+
+jobs:
+  lint:
+    name: Run Linting with Ruff
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[test]
+
+      - name: Run Ruff for Linting
+        run: |
+          ruff check . --fix --exit-zero
+
+  type-check:
+    name: Run Type Checking with Mypy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[test]
+
+      - name: Run Mypy for Type Checking
+        run: |
+          mypy .
+
+  test:
+    name: Run Tests with Tox
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.10, 3.11]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[test]
+
+      - name: Run Tests with Tox
+        run: |
+          tox --env py${{ matrix.python-version }}
+
+  coverage:
+    name: Upload Coverage Report
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[test]
+
+      - name: Upload coverage report
+        run: |
+          pytest --cov=heroku_applink --cov-report=xml
+          curl -s https://codecov.io/bash > codecov
+          bash codecov
