@@ -16,4 +16,3 @@ jobs:
           gh-app-privkey: ${{ secrets.SECURITY_ALERTS_GH_APP_PRIVKEY }}
           webhook-url: ${{ secrets.SECURITY_ALERTS_WEBHOOK_URL }}
           sa-token: ${{ secrets.SECURITY_ALERTS_TOKEN }}
-          
