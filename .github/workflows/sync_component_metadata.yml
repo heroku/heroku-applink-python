@@ -14,7 +14,7 @@ on:
       - ".heroku/components-inventory/*.json"
 jobs:
   action:
-    runs-on: sfdc-hk-ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v3
       - name: Send data to Components Inventory
