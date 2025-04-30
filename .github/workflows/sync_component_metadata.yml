@@ -1,5 +1,6 @@
 name: "Sync component metadata to Components Inventory"
 on:
+  workflow_dispatch:
   push:
     branches:
       - "main"
