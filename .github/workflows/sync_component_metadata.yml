@@ -1,4 +1,4 @@
-name: "Sync component metadata to Components Inventory"
+name: "Send data to Components Inventory"
 on:
   workflow_dispatch:
   push:
