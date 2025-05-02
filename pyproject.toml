@@ -9,6 +9,9 @@ dependencies = [
     "orjson>=3.10.15",
 ]
 
+[dependency-groups]
+doc = ["pdoc3"]
+
 [tool.setuptools]
 packages = ["heroku_applink", "heroku_applink.data_api"]
 
