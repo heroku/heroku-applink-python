@@ -1,104 +1,148 @@
-import sys
-import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../heroku_applink')))
-
+# tests/data_api/test_data_api.py
 import pytest
-from unittest.mock import MagicMock, AsyncMock
-from heroku_applink.data_api import DataAPI, Record, ClientError, UnexpectedRestApiResponsePayload
-from heroku_applink.exceptions import ClientError
-from aiohttp import ClientResponse
-
-
-@pytest.fixture
-def mock_session(mocker):
-    """Fixture to mock aiohttp ClientSession."""
-    return mocker.patch("heroku_applink.data_api.aiohttp.ClientSession", autospec=True)
+import orjson
+import aiohttp
+from unittest.mock import AsyncMock, patch, MagicMock
+from heroku_applink.data_api import DataAPI, Record, RecordQueryResult, UnitOfWork
+from heroku_applink.data_api.exceptions import ClientError, UnexpectedRestApiResponsePayload
 
 @pytest.fixture
-def data_api(mock_session):
-    """Fixture to instantiate the DataAPI class with mock session."""
+def data_api():
     return DataAPI(
         org_domain_url="https://example.salesforce.com",
-        api_version="v52.0",
-        access_token="mock-access-token",
-        session=mock_session(),
+        api_version="v60.0",
+        access_token="token"
     )
 
-
-# Test query method
 @pytest.mark.asyncio
-async def test_query(data_api, mocker):
-    mock_response = {
-        "records": [{"Id": "001B000001Lp1FxIAJ", "Name": "Test Account"}],
-        "done": True,
-        "totalSize": 1,
-    }
+async def test_query(data_api):
+    result = RecordQueryResult(done=True, total_size=1, records=[], next_records_url=None)
+    data_api._execute = AsyncMock(return_value=result)
+    response = await data_api.query("SELECT Id FROM Account")
+    assert response.done
 
-    mocker.patch.object(data_api, "_execute", return_value=mock_response)
-
-    soql_query = "SELECT Id, Name FROM Account"
-    result = await data_api.query(soql_query)
-
-    assert result["records"][0]["Id"] == "001B000001Lp1FxIAJ"
-    assert result["records"][0]["Name"] == "Test Account"
-    assert result["done"] is True
-
-# Test create method
 @pytest.mark.asyncio
-async def test_create(data_api, mocker):
-    record = Record(type="Account", fields={"Name": "Test Account"})
-    mocker.patch.object(data_api, "_execute", return_value="001B000001Lp1FxIAJ")
+async def test_query_more_no_url(data_api):
+    result = RecordQueryResult(done=True, total_size=2, records=[], next_records_url=None)
+    response = await data_api.query_more(result)
+    assert response.total_size == 2
 
-    record_id = await data_api.create(record)
-
-    assert record_id == "001B000001Lp1FxIAJ"
-
-
-# Test update method
 @pytest.mark.asyncio
-async def test_update(data_api, mocker):
-    record = Record(type="Account", fields={"Id": "001B000001Lp1FxIAJ", "Name": "Updated Account"})
-    mocker.patch.object(data_api, "_execute", return_value="001B000001Lp1FxIAJ")
+async def test_create(data_api):
+    record = Record(type="Account", fields={"Name": "Test"})
+    data_api._execute = AsyncMock(return_value="001123")
+    result = await data_api.create(record)
+    assert result == "001123"
 
-    record_id = await data_api.update(record)
-
-    assert record_id == "001B000001Lp1FxIAJ"
-
-
-# Test delete method
 @pytest.mark.asyncio
-async def test_delete(data_api, mocker):
-    mocker.patch.object(data_api, "_execute", return_value="001B000001Lp1FxIAJ")
+async def test_update(data_api):
+    record = Record(type="Account", fields={"Id": "001123", "Name": "Updated"})
+    data_api._execute = AsyncMock(return_value="001123")
+    result = await data_api.update(record)
+    assert result == "001123"
 
-    record_id = await data_api.delete("Account", "001B000001Lp1FxIAJ")
-
-    assert record_id == "001B000001Lp1FxIAJ"
-
-
-# Test commit_unit_of_work method
 @pytest.mark.asyncio
-async def test_commit_unit_of_work(data_api, mocker):
-    unit_of_work = MagicMock()
-    mocker.patch.object(data_api, "_execute", return_value={})
+async def test_update_missing_id():
+    record = Record(type="Account", fields={"Name": "NoId"})
+    from heroku_applink.data_api._requests import UpdateRecordRestApiRequest
+    with pytest.raises(Exception):
+        UpdateRecordRestApiRequest(record)
 
-    result = await data_api.commit_unit_of_work(unit_of_work)
-
-    assert result == {}
-
-
-# Test exception handling on ClientError
 @pytest.mark.asyncio
-async def test_client_error(data_api, mocker):
-    mocker.patch.object(data_api, "_execute", side_effect=ClientError("Client error"))
+async def test_delete(data_api):
+    data_api._execute = AsyncMock(return_value="001123")
+    result = await data_api.delete("Account", "001123")
+    assert result == "001123"
 
-    with pytest.raises(ClientError):
-        await data_api.query("SELECT Id, Name FROM Account")
-
-
-# Test exception handling on UnexpectedRestApiResponsePayload
 @pytest.mark.asyncio
-async def test_unexpected_response(data_api, mocker):
-    mocker.patch.object(data_api, "_execute", side_effect=UnexpectedRestApiResponsePayload("Invalid response"))
+async def test_commit_unit_of_work(data_api):
+    uow = UnitOfWork()
+    ref = uow.register_create(Record(type="Account", fields={"Name": "A"}))
+    data_api._execute = AsyncMock(return_value={ref: "001ABC"})
+    result = await data_api.commit_unit_of_work(uow)
+    assert ref in result
 
-    with pytest.raises(UnexpectedRestApiResponsePayload):
-        await data_api.query("SELECT Id, Name FROM Account")
+@pytest.mark.asyncio
+async def test_unit_of_work_multiple_ops():
+    uow = UnitOfWork()
+    create_ref = uow.register_create(Record(type="Account", fields={"Name": "A"}))
+    update_ref = uow.register_update(Record(type="Account", fields={"Id": "001", "Name": "B"}))
+    delete_ref = uow.register_delete("Account", "001")
+    assert create_ref != update_ref != delete_ref
+
+@pytest.mark.asyncio
+async def test_download_file(data_api):
+    with patch("aiohttp.ClientSession.request", new_callable=AsyncMock) as mock_request:
+        mock_response = MagicMock()
+        mock_response.read = AsyncMock(return_value=b"file-data")
+        mock_request.return_value = mock_response
+        result = await data_api._download_file("/path")
+        assert result == b"file-data"
+
+@pytest.mark.asyncio
+async def test_default_headers(data_api):
+    headers = data_api._default_headers()
+    assert headers["Authorization"] == "Bearer token"
+
+@pytest.mark.asyncio
+async def test_create_session():
+    from heroku_applink.data_api import _create_session
+    session = _create_session()
+    assert isinstance(session, aiohttp.ClientSession)
+    await session.close()
+
+@pytest.mark.asyncio
+async def test_json_serialize():
+    from heroku_applink.data_api import _json_serialize
+    payload = _json_serialize({"key": "value"})
+    assert payload.content_type == "application/json"
+
+@pytest.mark.asyncio
+async def test_execute_client_error(data_api):
+    mock_req = MagicMock()
+    mock_req.url.return_value = "https://fake"
+    mock_req.http_method.return_value = "GET"
+    mock_req.request_body.return_value = None
+    mock_req.process_response = AsyncMock()
+
+    with patch("aiohttp.ClientSession.request", side_effect=aiohttp.ClientError("fail")):
+        with pytest.raises(ClientError):
+            await data_api._execute(mock_req)
+
+@pytest.mark.asyncio
+async def test_execute_with_invalid_json(data_api):
+    mock_req = MagicMock()
+    mock_req.url.return_value = "https://fake"
+    mock_req.http_method.return_value = "GET"
+    mock_req.request_body.return_value = None
+    mock_req.process_response = AsyncMock()
+
+    with patch("aiohttp.ClientSession.request", new_callable=AsyncMock) as mock_request:
+        mock_response = MagicMock()
+        mock_response.read = AsyncMock(return_value=b"not-valid-json")
+        mock_request.return_value = mock_response
+
+        with patch("orjson.loads", side_effect=orjson.JSONDecodeError("fail", "bad", 0)):
+            with pytest.raises(UnexpectedRestApiResponsePayload):
+                await data_api._execute(mock_req)
+
+@pytest.mark.asyncio
+async def test_commit_unit_of_work_with_update_and_delete(data_api):
+    uow = UnitOfWork()
+    update_ref = uow.register_update(Record(type="Account", fields={"Id": "001X", "Name": "Update"}))
+    delete_ref = uow.register_delete("Contact", "003Y")
+    mock_result = {update_ref: "001X", delete_ref: "003Y"}
+
+    data_api._execute = AsyncMock(return_value=mock_result)
+    result = await data_api.commit_unit_of_work(uow)
+    assert result[update_ref] == "001X"
+    assert result[delete_ref] == "003Y"
+
+
+@pytest.mark.asyncio
+async def test_create_session_cleanup():
+    from heroku_applink.data_api import _create_session
+    session = _create_session()
+    assert isinstance(session, aiohttp.ClientSession)
+    await session.close()
+    assert session.closed

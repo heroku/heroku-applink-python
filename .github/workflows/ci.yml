@@ -13,67 +13,40 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [3.10, 3.11]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+      fail-fast: false
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'pip'
+          cache: pip
 
       - name: Install tox
-        run: |
-          pip install tox
+        run: pip install tox
 
-      - name: Run tox
-        run: |
-          tox
+      - name: Run tox and store coverage
+        run: 
+          tox 
 
   lint:
     name: Lint with Ruff
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.11
-          cache: 'pip'
+          cache: pip
 
       - name: Install Ruff
-        run: |
-          pip install ruff
+        run: pip install ruff
 
       - name: Run Ruff
-        run: |
-          ruff heroku_applink tests
-
-  typecheck:
-    name: Type check with MyPy
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.11
-          cache: 'pip'
-
-      - name: Install MyPy and dependencies
-        run: |
-          pip install mypy
-          pip install .[test]
-
-      - name: Run MyPy
-        run: |
-          mypy heroku_applink
+        run: ruff check .

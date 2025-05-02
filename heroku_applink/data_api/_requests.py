@@ -2,8 +2,6 @@ from base64 import standard_b64encode
 from typing import Any, Awaitable, Callable, Generic, Literal, TypeVar, cast
 from urllib.parse import urlencode
 
-"Context > Org > DataAPI"
-
 from .exceptions import (
     InnerSalesforceRestApiError,
     MissingFieldError,
@@ -12,6 +10,8 @@ from .exceptions import (
 )
 from .record import QueriedRecord, Record, RecordQueryResult
 from .reference_id import ReferenceId
+
+"Context > Org > DataAPI"
 
 HttpMethod = Literal["GET", "POST", "PATCH", "DELETE"]
 Json = dict[str, Any] | list[Any]
