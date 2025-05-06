@@ -27,6 +27,7 @@ If it's a feature, explain how it works and any limitations.
 
 - [ ] I’ve added or updated unit tests where necessary
 - [ ] I’ve added or updated documentation
+- [ ] I've run `pdoc3` to generate the documentation
 - [ ] I’ve manually tested the functionality in this PR
 - [ ] This pull request is ready for review
 
