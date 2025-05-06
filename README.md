@@ -17,7 +17,7 @@ from the source code.
 Install the doc dependency group.
 
 ```shell
-$ pip install .\[docs\]
+$ uv sync --group docs
 ```
 
 Generate the documentation.

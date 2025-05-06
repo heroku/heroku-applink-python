@@ -10,7 +10,7 @@ dependencies = [
 ]
 
 [dependency-groups]
-doc = ["pdoc3"]
+docs = ["pdoc3"]
 
 [tool.setuptools]
 packages = ["heroku_applink", "heroku_applink.data_api"]
