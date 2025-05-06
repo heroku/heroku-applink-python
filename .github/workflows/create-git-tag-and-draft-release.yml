@@ -1,0 +1,57 @@
+name: Create Git Tag on Release Branch Merge
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  create-tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    if: github.event.pull_request.merged == true && contains(github.event.pull_request.head.ref, 'release-v')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Git identity
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Extract version from pyproject.toml
+        id: extract_version
+        run: |
+          VERSION=$(grep -Po '^version = "\K[^"]+' pyproject.toml | head -1)
+          echo "Extracted version: $VERSION"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Extract release notes from CHANGELOG.md
+        id: release_notes
+        run: |
+          VERSION="${{ steps.extract_version.outputs.version }}"
+          awk "/^## $VERSION/ {flag=1; next} /^## / {flag=0} flag" CHANGELOG.md > RELEASE_NOTES.md
+          echo 'notes<<EOF' >> $GITHUB_OUTPUT
+          cat RELEASE_NOTES.md >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
+
+      - name: Create Tag and Push
+        run: |
+          VERSION="${{ steps.extract_version.outputs.version }}"
+          git tag -a "v$VERSION" -m "Release v$VERSION"
+          git push origin "v$VERSION"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Draft GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "v${{ steps.extract_version.outputs.version }}"
+          draft: true
+          body: "${{ steps.release_notes.outputs.notes }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

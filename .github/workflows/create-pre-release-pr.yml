@@ -1,0 +1,133 @@
+name: Create Pre-Release Branch
+
+on:
+  workflow_call:
+  workflow_dispatch:
+    inputs:
+      base_branch:
+        description: 'Branch to create pre-release from'
+        required: true
+        default: 'main'
+      bump_type:
+        description: 'Version bump type (major, minor, patch)'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+
+jobs:
+  create-pre-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.base_branch }}
+
+      - name: Check if merge is from pre-release branch
+        id: check_pre_release
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "Manual run: not skipping."
+            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "is_pre_release=false" >> $GITHUB_OUTPUT
+            echo "clean_branch=manual" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          SRC_BRANCH=$(echo "$COMMIT_MSG" | grep -oE 'from [^ ]+' | awk '{print $2}')
+          CLEAN_BRANCH=$(basename "$SRC_BRANCH")
+          echo "Source branch: $CLEAN_BRANCH"
+          echo "clean_branch=$CLEAN_BRANCH" >> $GITHUB_OUTPUT
+          if [[ -z "$CLEAN_BRANCH" ]] || [[ "$CLEAN_BRANCH" != *beta* ]]; then
+            echo "Not a merge from a pre-release branch. Skipping workflow."
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "is_pre_release=false" >> $GITHUB_OUTPUT
+            exit 0
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "is_pre_release=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Extract bump type from source branch or input
+        id: bump_type
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "bump_type=${{ github.event.inputs.bump_type }}" >> $GITHUB_OUTPUT
+          else
+            COMMIT_MSG=$(git log -1 --pretty=%B)
+            SRC_BRANCH=$(echo "$COMMIT_MSG" | grep -oE 'from [^ ]+' | awk '{print $2}')
+            CLEAN_BRANCH=$(basename "$SRC_BRANCH")
+            BUMP_TYPE=$(echo "$CLEAN_BRANCH" | grep -oE '(patch|minor|major)' || echo "patch")
+            echo "Bump type: $BUMP_TYPE"
+            echo "bump_type=$BUMP_TYPE" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Get current version
+        id: current_version
+        run: |
+          CURRENT_VERSION=$(grep -Po '^version = "\K[^"]+' pyproject.toml | head -1)
+          echo "Extracted version: $CURRENT_VERSION"
+          if [[ -z "$CURRENT_VERSION" ]]; then
+            echo "Error: Could not extract version from pyproject.toml"
+            exit 1
+          fi
+          echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Ensure pre-release version in pyproject.toml (manual run)
+        run: |
+          CURRENT_VERSION=$(grep -Po '^version = "\K[^"]+' pyproject.toml | head -1)
+          # If it doesn't already end with 'beta', add it
+          if [[ ! "$CURRENT_VERSION" =~ beta$ ]]; then
+            BETA_VERSION="${CURRENT_VERSION}beta"
+            sed -i "s/^version = \".*\"/version = \"$BETA_VERSION\"/" pyproject.toml
+            echo "Updated version to $BETA_VERSION in pyproject.toml"
+          else
+            echo "Version already includes beta: $CURRENT_VERSION"
+          fi
+
+      - name: Bump version 
+        id: bump_pre_release
+        run: |
+          CURRENT_VERSION=$(grep -Po '^version = "\K[^"]+' pyproject.toml | head -1)
+          # Extract only the numeric part (e.g., 0.3.5) from the version string
+          BASE_VERSION=$(echo "$CURRENT_VERSION" | grep -oE '^[0-9]+\.[0-9]+\.[0-9]+')
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$BASE_VERSION"
+          PATCH=${PATCH:-0}
+          PATCH=$((PATCH + 1))
+          NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+
+      - name: Set branch name with new beta version
+        id: set_branch
+        run: |
+          NEW_VERSION="${{ steps.bump_pre_release.outputs.new_version }}"
+          echo "branch_name=pre-release-v$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create and checkout the new pre-release branch
+        run: |
+          git checkout -b "${{ steps.set_branch.outputs.branch_name }}"
+      - name: Configure Git user
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+      - name: Commit and push changes
+        run: |
+          git commit -m "Pre-release v$(grep -Po '^version = "\K[^"]+' pyproject.toml | head -1)"
+          git push origin "${{ steps.set_branch.outputs.branch_name }}"
+
+      - name: Create PR on GitHub
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          NEW_VERSION=$(grep -Po '^version = "\K[^"]+' pyproject.toml | head -1)
+          PR_BODY=$(cat .github/PULL_REQUEST_TEMPLATE.md | sed "s/{{RELEASE_SUMMARY}}/Pre-release v$NEW_VERSION/")
+          gh pr create \
+            --title "Pre-release v$NEW_VERSION" \
+            --body "$PR_BODY" \
+            --base main \
+            --head "${{ steps.set_branch.outputs.branch_name }}" \
+            --draft

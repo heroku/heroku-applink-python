@@ -1,0 +1,160 @@
+name: Create Release Pull Request
+
+on:
+  # Allow manual trigger, e.g. for testing. This can be changed to a cron job in the future, or some other custom trigger.
+  workflow_dispatch:
+    inputs:
+      bump_type:
+        description: 'Version bump type (major, minor, patch)'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract bump type from source branch or input
+        id: bump_type
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "bump_type=${{ github.event.inputs.bump_type }}" >> $GITHUB_OUTPUT
+          else
+            COMMIT_MSG=$(git log -1 --pretty=%B)
+            SRC_BRANCH=$(echo "$COMMIT_MSG" | grep -oE 'from [^ ]+' | awk '{print $2}')
+            CLEAN_BRANCH=$(basename "$SRC_BRANCH")
+            BUMP_TYPE=$(echo "$CLEAN_BRANCH" | grep -oE '(patch|minor|major)' || echo "patch")
+            echo "Bump type: $BUMP_TYPE"
+            echo "bump_type=$BUMP_TYPE" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Install the project
+        run: uv sync --all-extras --dev
+
+      - name: Install tox
+        run: pip install tox
+
+      - name: Run tox
+        run: tox
+
+      - name: Get current version
+        id: current_version
+        run: |
+          CURRENT_VERSION=$(grep -Po '^version = "\K[^"]+' pyproject.toml | head -1)
+          echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Prepare release version
+        id: release_version
+        run: |
+          CURRENT_VERSION="${{ steps.current_version.outputs.version }}"
+          # Remove 'beta', 'b1', or any pre-release suffix
+          RELEASE_VERSION=$(echo "$CURRENT_VERSION" | sed -E 's/(beta.*|b[0-9]+.*)$//')
+          # Remove trailing dot if present (e.g., 0.3.5.)
+          RELEASE_VERSION=$(echo "$RELEASE_VERSION" | sed 's/\.$//')
+          echo "release_version=$RELEASE_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Update pyproject.toml version
+        run: |
+          RELEASE_VERSION="${{ steps.release_version.outputs.release_version }}"
+          sed -i "s/^version = \".*\"/version = \"$RELEASE_VERSION\"/" pyproject.toml
+
+      - name: Update Changelog
+        run: |
+          NEW_VERSION="${{ steps.release_version.outputs.release_version }}"
+          COMMITS=$(git log --pretty=format:"- %s")
+          if [ -z "$COMMITS" ]; then
+            COMMITS="No new commits."
+          fi
+          {
+            echo "## $NEW_VERSION"
+            echo ""
+            echo "$COMMITS"
+            echo ""
+          } > NEW_CHANGELOG.md
+          awk 'NR==1{print; system("cat NEW_CHANGELOG.md"); next} 1' CHANGELOG.md > CHANGELOG.md.tmp
+          mv CHANGELOG.md.tmp CHANGELOG.md
+          rm NEW_CHANGELOG.md
+          git add CHANGELOG.md
+
+      - name: Configure Github Actions Bot user
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Set branch name
+        id: set_branch
+        run: |
+          RELEASE_VERSION="${{ steps.release_version.outputs.release_version }}"
+          echo "branch_name=release-v$RELEASE_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create and checkout release branch
+        run: |
+          git checkout -b "${{ steps.set_branch.outputs.branch_name }}"
+
+      - name: Add applink file for this release
+        run: |
+          VERSION=$(grep -Po '^version = "\K[^"]+' pyproject.toml | head -1)
+          echo "Release $VERSION" > "releasenotes/heroku_applink_python/v$VERSION"
+          git add "releasenotes/heroku_applink_python/v$VERSION"
+
+      - name: Append release info to README.md
+        run: |
+          VERSION=$(grep -Po '^version = "\K[^"]+' pyproject.toml | head -1)
+          echo "- Released $VERSION" >> README.md
+          git add README.md
+
+      - name: Extract release notes for this version
+        id: release_notes
+        run: |
+          VERSION=$(grep -Po '^version = "\K[^"]+' pyproject.toml | head -1)
+          mkdir -p releasenotes/heroku_applink_python
+          awk "/^## $VERSION/ {flag=1; next} /^## / {flag=0} flag" CHANGELOG.md > "releasenotes/heroku_applink_python/v$VERSION.md"
+          echo "notes_file=releasenotes/heroku_applink_python/v$VERSION.md" >> $GITHUB_OUTPUT
+
+      - name: Append release notes to releasenotes/README.md
+        run: |
+          VERSION=$(grep -Po '^version = "\K[^"]+' pyproject.toml | head -1)
+          mkdir -p releasenotes
+          # Add a heading for the new release
+          echo -e "\n## Release $VERSION\n" >> releasenotes/README.md
+          cat "releasenotes/heroku_applink_python/v$VERSION.md" >> releasenotes/README.md
+          git add releasenotes/README.md "releasenotes/heroku_applink_python/v$VERSION.md"
+
+      - name: Commit and push changes
+        run: |
+          VERSION=$(grep -Po '^version = "\K[^"]+' pyproject.toml | head -1)
+          git add pyproject.toml CHANGELOG.md README.md "releasenotes/heroku_applink_python/v$VERSION" releasenotes/README.md "releasenotes/heroku_applink_python/v$VERSION.md"
+          git commit -m "Release v$VERSION: update pyproject, changelog, applink, and releasenotes" || echo "No changes to commit"
+          git push origin HEAD
+
+      - name: Create PR on GitHub
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          RELEASE_VERSION="${{ steps.release_version.outputs.release_version }}"
+          
+          # Read the PR template and only replace the unique placeholder
+          PR_BODY=$(cat .github/PULL_REQUEST_TEMPLATE.md | sed "s/{{RELEASE_SUMMARY}}/Release version bump from v$RELEASE_VERSION/")
+          
+          gh pr create \
+            --title "Release v$RELEASE_VERSION" \
+            --body "$PR_BODY" \
+            --base main \
+            --head "${{ steps.set_branch.outputs.branch_name }}" \
+            --draft

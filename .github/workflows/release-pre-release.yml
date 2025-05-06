@@ -1,0 +1,35 @@
+name: Release Pre-Release
+
+permissions:
+  contents: write
+  id-token: write
+on:
+  workflow_dispatch:
+jobs:
+  test-pypi-publish:
+    name: Upload release to Test PyPI
+    runs-on: ubuntu-latest
+    environment: 
+      name: testpypi
+
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - name: Set up Python
+        uses: actions/setup-python@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+      - name: Install the project
+        run: uv sync --all-extras --dev
+      - name: Build the artifact in dist/
+        run: |
+          uv build
+          ls -l dist/
+      - name: Publish to TestPyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          verbose: true
