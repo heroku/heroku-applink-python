@@ -67,14 +67,6 @@ jobs:
       - name: Install tox and tox-uv
         run: pip install tox tox-uv
 
-      - name: Cache tox environments
-        uses: actions/cache@v3
-        with:
-          path: .tox
-          key: tox-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('pyproject.toml') }}
-          restore-keys: |
-            tox-${{ runner.os }}-${{ matrix.python-version }}-
-
       - name: Run tox
         run: tox
 
