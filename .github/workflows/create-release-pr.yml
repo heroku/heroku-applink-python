@@ -1,6 +1,9 @@
 name: Create Release Pull Request
 
 on:
+  push:
+    branches:
+      - bj-release-version
   # Allow manual trigger, e.g. for testing. This can be changed to a cron job in the future, or some other custom trigger.
   workflow_dispatch:
     inputs:

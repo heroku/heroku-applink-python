@@ -5,6 +5,9 @@ permissions:
   id-token: write
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - bj-release-version
 jobs:
   test-pypi-publish:
     name: Upload release to Test PyPI
