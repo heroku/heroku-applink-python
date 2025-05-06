@@ -1,9 +1,6 @@
 name: Create Git Tag on Release Branch Merge
 
 on:
-  push:
-    branches:
-      - bj-release-version
   pull_request:
     types: [closed]
     branches:

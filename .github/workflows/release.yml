@@ -5,8 +5,6 @@ permissions:
   id-token: write
 on:
   push:
-    branches:
-    - bj-release-version
     tags:
       - 'v*'
   workflow_dispatch:

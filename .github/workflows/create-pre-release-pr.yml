@@ -1,10 +1,6 @@
 name: Create Pre-Release Branch
 
 on:
-  push:
-    branches:
-      - bj-release-version
-  workflow_call:
   workflow_dispatch:
     inputs:
       base_branch:

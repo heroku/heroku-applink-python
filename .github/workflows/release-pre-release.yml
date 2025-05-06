@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - bj-release-version
+      - 'beta-release-v*'
 jobs:
   test-pypi-publish:
     name: Upload release to Test PyPI
