@@ -11,8 +11,6 @@ from .exceptions import (
 from .record import QueriedRecord, Record, RecordQueryResult
 from .reference_id import ReferenceId
 
-"Context > Org > DataAPI"
-
 HttpMethod = Literal["GET", "POST", "PATCH", "DELETE"]
 Json = dict[str, Any] | list[Any]
 DownloadFileFunction = Callable[[str], Awaitable[bytes]]

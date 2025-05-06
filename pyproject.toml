@@ -11,6 +11,13 @@ dependencies = [
 
 [dependency-groups]
 docs = ["pdoc3"]
+test = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.10.0",
+    "ruff>=0.1.0"
+]
 
 [tool.setuptools]
 packages = ["heroku_applink", "heroku_applink.data_api"]
@@ -21,25 +28,6 @@ Documentation = "https://github.com/heroku/heroku-applink-python"
 Repository = "https://github.com/heroku/heroku-applink-python.git"
 "Bug Tracker" = "https://github.com/heroku/heroku-applink-python/issues"
 Changelog = "https://github.com/heroku/heroku-applink-python/CHANGELOG.md"
-
-[project.optional-dependencies]
-test = [
-    "pytest>=7.0.0",
-    "pytest-asyncio>=0.21.0",
-    "pytest-cov>=4.0.0",
-    "pytest-mock>=3.10.0",
-    "ruff>=0.1.0"
-]
-
-[project.urls]
-Homepage = "https://github.com/heroku/heroku-applink-python"
-Documentation = "https://github.com/heroku/heroku-applink-python"
-Repository = "https://github.com/heroku/heroku-applink-python"
-"Bug Tracker" = "https://github.com/heroku/heroku-applink-python/issues"
-Changelog = "https://github.com/heroku/heroku-applink-python/blob/main/CHANGELOG.md"
-
-[tool.setuptools]
-packages = ["heroku_applink", "heroku_applink.data_api"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -55,3 +43,22 @@ fix = true
 [tool.ruff.lint]
 select = ["E", "W", "F"]
 ignore = ["E501"]
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+envlist = py310, py311, py312, py313
+skip_missing_interpreters = true
+
+[testenv]
+extras = test
+setenv =
+    COVERAGE_FILE = .coverage.{envname}
+commands_pre =
+    coverage erase
+commands =
+    ruff check .
+    pytest
+    coverage report --fail-under=80 --show-missing
+    coverage erase
+"""
