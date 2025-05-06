@@ -11,13 +11,6 @@ dependencies = [
 
 [dependency-groups]
 docs = ["pdoc3"]
-test = [
-    "pytest>=7.0.0",
-    "pytest-asyncio>=0.21.0",
-    "pytest-cov>=4.0.0",
-    "pytest-mock>=3.10.0",
-    "ruff>=0.1.0"
-]
 
 [tool.setuptools]
 packages = ["heroku_applink", "heroku_applink.data_api"]
@@ -28,6 +21,16 @@ Documentation = "https://github.com/heroku/heroku-applink-python"
 Repository = "https://github.com/heroku/heroku-applink-python.git"
 "Bug Tracker" = "https://github.com/heroku/heroku-applink-python/issues"
 Changelog = "https://github.com/heroku/heroku-applink-python/CHANGELOG.md"
+
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.10.0",
+    "ruff>=0.1.0"
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
