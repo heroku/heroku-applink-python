@@ -23,5 +23,5 @@ $ uv sync --group docs
 Generate the documentation.
 
 ```shell
-$ pdoc3 --template-dir templates/python heroku_applink -o docs
+$ uv run pdoc3 --template-dir templates/python heroku_applink -o docs --force
 ```
