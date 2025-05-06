@@ -43,14 +43,14 @@ fi
 # git checkout "${MAIN_BRANCH}"
 # git pull origin "${MAIN_BRANCH}"
 
-# # 2. Compose branch name and version string
-# if [[ -n "$BETA" ]]; then
-#   BRANCH_NAME="${BETA}-release-v${VERSION}-${BUMP_TYPE}"
-#   VERSION_STRING="${VERSION}${BETA}"
-# else
-#   BRANCH_NAME="release-v${VERSION}-${BUMP_TYPE}"
-#   VERSION_STRING="${VERSION}"
-# fi
+# 2. Compose branch name and version string
+if [[ -n "$BETA" ]]; then
+  BRANCH_NAME="${BETA}-release-v${VERSION}-${BUMP_TYPE}"
+  VERSION_STRING="${VERSION}${BETA}"
+else
+  BRANCH_NAME="release-v${VERSION}-${BUMP_TYPE}"
+  VERSION_STRING="${VERSION}"
+fi
 
 # # 3. Create new branch
 # git checkout -b "$BRANCH_NAME"
