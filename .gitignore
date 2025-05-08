@@ -9,6 +9,10 @@ venv/
 dist/
 **.egg-info/
 _build/
+.tox
+.ruff_cache
+.pytest_cache
+.mypy_cache
 
 # Salesforce
 .codegenie/

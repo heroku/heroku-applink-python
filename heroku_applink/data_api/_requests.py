@@ -2,8 +2,6 @@ from base64 import standard_b64encode
 from typing import Any, Awaitable, Callable, Generic, Literal, TypeVar, cast
 from urllib.parse import urlencode
 
-"Context > Org > DataAPI"
-
 from .exceptions import (
     InnerSalesforceRestApiError,
     MissingFieldError,
