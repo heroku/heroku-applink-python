@@ -1,8 +1,6 @@
 import pytest
-import os
 from unittest.mock import AsyncMock, patch
 from heroku_applink.addons.heroku_applink import get_authorization
-from heroku_applink.context import Org, User
 
 
 @pytest.mark.asyncio
