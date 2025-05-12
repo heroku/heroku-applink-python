@@ -4,6 +4,8 @@ from .data_api.reference_id import ReferenceId
 from .data_api.unit_of_work import UnitOfWork
 from .middleware import IntegrationWsgiMiddleware, IntegrationAsgiMiddleware
 from .exceptions import ClientError, UnexpectedRestApiResponsePayload
+from .addons import get_authorization
+from .utils import HttpRequestUtil
 
 __all__ = [
     "client_context",
@@ -19,5 +21,7 @@ __all__ = [
     "IntegrationAsgiMiddleware",
     "ClientError",
     "UnexpectedRestApiResponsePayload",
+    "get_authorization",
+    "HttpRequestUtil",
 ]
 
