@@ -8,7 +8,6 @@ async def test_http_request_success():
     # Mock the response to return fake data
     mock_response = {"data": "fake_data"}
     mock_request = AsyncMock(return_value=mock_response)
-tox
     # Create an instance of HttpRequestUtil
     http_request_util = HttpRequestUtil()
 
