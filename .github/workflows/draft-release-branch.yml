@@ -1,0 +1,197 @@
+name: Draft Release Branch
+
+on:
+  workflow_dispatch:
+    inputs:
+      previous_version:
+        description: 'Previous version (e.g., 0.3.28)'
+        required: true
+      release_type:
+        description: 'Type of release'
+        required: true
+        type: choice
+        options:
+          - stable
+          - beta
+      bump_type:
+        description: 'Type of version bump (major, minor, patch)'
+        required: true
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+
+jobs:
+  draft-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Trigger build-and-test workflow
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          event-type: build-and-test
+          client-payload: '{"ref": "${{ github.ref }}"}'
+
+      - name: Wait for build-and-test workflow
+        uses: lewagon/wait-on-check-action@v1.3.1
+        with:
+          ref: ${{ github.ref }}
+          check-name: 'build-and-test'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 50
+
+      - name: Download build artifacts
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: build-and-test.yml
+          name: dist
+          path: dist
+
+      - name: Generate new version
+        id: version
+        run: |
+          # Get inputs
+          PREV_VERSION="${{ github.event.inputs.previous_version }}"
+          BUMP_TYPE="${{ github.event.inputs.bump_type }}"
+          RELEASE_TYPE="${{ github.event.inputs.release_type }}"
+          
+          echo "Previous version: $PREV_VERSION"
+          echo "Bump type: $BUMP_TYPE"
+          echo "Release type: $RELEASE_TYPE"
+          
+          # If no previous version provided, get it from pyproject.toml
+          if [ -z "$PREV_VERSION" ]; then
+            PREV_VERSION=$(grep '^version = ' pyproject.toml | sed 's/version = "\(.*\)"/\1/')
+            echo "Got version from pyproject.toml: $PREV_VERSION"
+          fi
+          
+          # Split version into components, handling beta/alpha versions
+          if [[ $PREV_VERSION =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)([a-z]+[0-9]*)?$ ]]; then
+            MAJOR="${BASH_REMATCH[1]}"
+            MINOR="${BASH_REMATCH[2]}"
+            PATCH="${BASH_REMATCH[3]}"
+            SUFFIX="${BASH_REMATCH[4]}"
+          else
+            echo "Invalid version format: $PREV_VERSION"
+            exit 1
+          fi
+          
+          echo "Version parts: MAJOR=$MAJOR MINOR=$MINOR PATCH=$PATCH SUFFIX=$SUFFIX"
+          
+          # Generate new version based on bump type
+          case "$BUMP_TYPE" in
+            major)
+              VERSION="$((MAJOR + 1)).0.0"
+              ;;
+            minor)
+              VERSION="$MAJOR.$((MINOR + 1)).0"
+              ;;
+            patch)
+              VERSION="$MAJOR.$MINOR.$((PATCH + 1))"
+              ;;
+          esac
+          
+          # Add release type suffix if needed
+          if [ "$RELEASE_TYPE" != "stable" ]; then
+            VERSION="${VERSION}-${RELEASE_TYPE}"
+          fi
+          
+          echo "Generated version: $VERSION"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "release_type=$RELEASE_TYPE" >> $GITHUB_OUTPUT
+
+      - name: Debug version output
+        run: |
+          echo "Version from previous step: ${{ steps.version.outputs.version }}"
+          echo "Release type from previous step: ${{ steps.version.outputs.release_type }}"
+
+      - name: Get last tag
+        id: last_tag
+        run: |
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          echo "LAST_TAG=$LAST_TAG" >> $GITHUB_OUTPUT
+
+      - name: Create release branch
+        run: |
+          BRANCH_NAME="release-v${{ steps.version.outputs.version }}"
+          echo "Creating branch: $BRANCH_NAME"
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git checkout -b "$BRANCH_NAME"
+
+      - name: Update version in pyproject.toml
+        if: steps.version.outputs.release_type == 'stable'
+        run: |
+          sed -i "s/^version = \".*\"/version = \"${{ steps.version.outputs.version }}\"/" pyproject.toml
+
+      - name: Generate changelog
+        if: steps.version.outputs.release_type == 'stable'
+        run: |
+          # Create new changelog entry
+          {
+            echo "## [${{ steps.version.outputs.version }}] - $(date +%Y-%m-%d)"
+            echo ""
+            if [ -n "${{ steps.last_tag.outputs.LAST_TAG }}" ]; then
+              git log --graph --format="%h %s" "${{ steps.last_tag.outputs.LAST_TAG }}..HEAD"
+            else
+              git log --graph --format="%h %s"
+            fi
+            echo ""
+          } > CHANGELOG.md.new
+
+          # If CHANGELOG.md exists, prepend new content
+          if [ -f CHANGELOG.md ]; then
+            # Get the header (everything before the first ##)
+            sed -n '1,/^##/p' CHANGELOG.md | sed '$d' > CHANGELOG.md.tmp
+            # Add the new version section
+            cat CHANGELOG.md.new >> CHANGELOG.md.tmp
+            # Add the rest of the existing content (everything after the first ##)
+            sed -n '/^##/,$p' CHANGELOG.md >> CHANGELOG.md.tmp
+            mv CHANGELOG.md.tmp CHANGELOG.md
+          else
+            # Create initial changelog if it doesn't exist
+            {
+              echo "# Changelog"
+              echo ""
+              echo "All notable changes to this project will be documented in this file."
+              echo ""
+              echo "The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),"
+              echo "and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)."
+              echo ""
+              cat CHANGELOG.md.new
+            } > CHANGELOG.md
+          fi
+          rm CHANGELOG.md.new
+
+      - name: Commit and push changes
+        id: commit
+        run: |
+          if [ "${{ steps.version.outputs.release_type }}" == "stable" ]; then
+            # For stable releases, commit changelog and version updates
+            git add CHANGELOG.md pyproject.toml
+            git commit -m "Release v${{ steps.version.outputs.version }}"
+          else
+            # For non-stable releases, create an empty commit
+            git commit --allow-empty -m "Release v${{ steps.version.outputs.version }}"
+          fi
+          
+          # Push to the branch
+          BRANCH_NAME="release-v${{ steps.version.outputs.version }}"
+          echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
+          git push -u origin "$BRANCH_NAME"
+
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Get the branch name from the previous step
+          BRANCH_NAME="${{ steps.commit.outputs.branch_name }}"
+          
+          # Create PR using GitHub CLI
+          gh pr create --title "Release v${{ steps.version.outputs.version }}" --body "${{ steps.version.outputs.release_type == 'stable' && 'Stable' || 'Pre-release' }} version bump and documentation updates." --base main --head "$BRANCH_NAME" --draft

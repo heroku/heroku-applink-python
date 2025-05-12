@@ -1,0 +1,80 @@
+name: Create Tag and Release
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+jobs:
+  create-tag-and-release:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'release-v')
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+          fetch-tags: true
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git config --global --add safe.directory /github/workspace
+
+      - name: Get version info
+        id: version_info
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          if [[ $PR_TITLE =~ v([0-9]+\.[0-9]+\.[0-9]+(-(beta|alpha))?[0-9]*) ]]; then
+            VERSION="${BASH_REMATCH[1]}"
+          else
+            echo "Could not extract version from PR title: $PR_TITLE"
+            exit 1
+          fi
+          if [[ $VERSION == *-beta* || $VERSION == *-alpha* ]]; then
+            echo "is_prerelease=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_prerelease=false" >> $GITHUB_OUTPUT
+          fi
+          CHANGELOG="${{ github.event.pull_request.body }}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "changelog=$CHANGELOG" >> $GITHUB_OUTPUT
+
+      - name: Download build artifacts
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: build-and-test.yml
+          name: dist
+          path: dist
+          branch: main
+
+      - name: Create and push tag
+        run: |
+          git checkout main
+          git pull origin main
+          
+          TAG_NAME="v${{ steps.version_info.outputs.version }}"
+          echo "Creating tag: $TAG_NAME"
+          git tag -a "$TAG_NAME" -m "${{ steps.version_info.outputs.changelog }}"
+          echo "Pushing tag to origin..."
+          git push origin "$TAG_NAME"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: "v${{ steps.version_info.outputs.version }}"
+          name: "Release v${{ steps.version_info.outputs.version }}"
+          body: ${{ steps.version_info.outputs.changelog }}
+          draft: false
+          prerelease: ${{ steps.version_info.outputs.is_prerelease == 'true' }}
+          files: |
+            dist/*.whl
+            dist/*.tar.gz 
+    

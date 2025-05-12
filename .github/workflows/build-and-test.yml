@@ -1,0 +1,116 @@
+name: Build and Test
+
+permissions:
+  contents: write
+  id-token: write
+
+on:
+  push:
+    branches: [ "main" ]
+    tags:
+      - "v*"  
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+      is_prerelease: ${{ steps.get_version.outputs.is_prerelease }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 
+
+      - name: Set up Python 
+        uses: actions/setup-python@v3
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install the project
+        run: uv sync --all-extras --dev
+
+      - name: Get version info
+        if: startsWith(github.ref, 'refs/tags/')
+        id: get_version
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            # Get version from tag
+            VERSION=${GITHUB_REF#refs/tags/v}
+            if [[ $VERSION == *-beta* || $VERSION == *-alpha* ]]; then
+              IS_PRERELEASE=true
+            else
+              IS_PRERELEASE=false
+            fi
+          else
+            # For branch pushes, get version from pyproject.toml
+            VERSION=$(python -c 'import tomli; print(tomli.load(open("pyproject.toml", "rb"))["project"]["version"])')
+            IS_PRERELEASE=false
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "is_prerelease=$IS_PRERELEASE" >> $GITHUB_OUTPUT
+
+      - name: Set version in package
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          sed -i "s/^version = \".*\"/version = \"${{ steps.get_version.outputs.version }}\"/" pyproject.toml
+
+      - name: Build the artifact in dist/
+        run: uv build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 5
+
+  test:
+    name: Test on Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install tox and tox-uv
+        run: pip install tox tox-uv
+
+      - name: Run tox
+        run: tox
+
+      - name: Clean up coverage files
+        run: |
+          rm -f .coverage*
+          rm -f coverage.xml
+          rm -rf htmlcov/
+
+  lint:
+    name: Lint with Ruff
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+          cache: pip
+
+      - name: Install ruff
+        run: pip install ruff
+
+      - name: Run Ruff
+        run: ruff check .
