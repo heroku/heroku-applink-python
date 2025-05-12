@@ -13,7 +13,12 @@ dependencies = [
 docs = ["pdoc3"]
 
 [tool.setuptools]
-packages = ["heroku_applink"]
+packages = [
+    "heroku_applink",
+    "heroku_applink.data_api",
+    "heroku_applink.addons",
+    "heroku_applink.utils"
+]
 
 [project.urls]
 Homepage = "https://github.com/heroku/heroku-applink-python"
