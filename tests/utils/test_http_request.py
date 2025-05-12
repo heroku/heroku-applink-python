@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import AsyncMock, patch
-from heroku_applink.utils.http_request import HttpRequestUtil
+from heroku_applink.utils import HttpRequestUtil
 
 @pytest.mark.asyncio
 async def test_http_request_success():
@@ -8,7 +8,7 @@ async def test_http_request_success():
     # Mock the response to return fake data
     mock_response = {"data": "fake_data"}
     mock_request = AsyncMock(return_value=mock_response)
-
+tox
     # Create an instance of HttpRequestUtil
     http_request_util = HttpRequestUtil()
 
