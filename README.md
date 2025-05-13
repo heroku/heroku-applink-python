@@ -114,3 +114,45 @@ $ uv run pdoc3 --template-dir templates/python heroku_applink -o docs --force
     # Format the codebase
     ruff format .
     ```
+
+## Usage Examples
+
+### Basic Setup
+
+1. Install the package:
+```bash
+pip install heroku_applink
+```
+
+2. Add the middleware to your web framework:
+
+```python
+# FastAPI example
+import asyncio
+import heroku_applink as sdk
+from fastapi import FastAPI
+
+app = FastAPI()
+app.add_middleware(sdk.IntegrationAsgiMiddleware)
+
+
+@app.get("/")
+def get_root():
+    return {"root": "page"}
+
+
+@app.get("/accounts")
+def get_accounts():
+    dataapi = sdk.context.get()
+    asyncio.run(query_accounts(dataapi))
+    return {"Some": "Accounts"}
+
+
+async def query_accounts(dataapi):
+    query = "SELECT Id, Name FROM Account"
+    result = await dataapi.query(query)
+    for record in result.records:
+        print("===== account record", record)
+```
+
+For more detailed information about the SDK's capabilities, please refer to the [full documentation](docs/).
