@@ -7,7 +7,7 @@ from .middleware import IntegrationWsgiMiddleware, IntegrationAsgiMiddleware
 from .exceptions import ClientError, UnexpectedRestApiResponsePayload
 from .connection import Connection
 from .middleware import client_context
-from .addons import get_authorization
+from .addons import get_authorization, resolve_addon_config_by_attachment, resolve_addon_config_by_url
 from .utils import HttpRequestUtil
 
 __all__ = [
@@ -27,6 +27,8 @@ __all__ = [
     "ClientError",
     "UnexpectedRestApiResponsePayload",
     "get_authorization",
+    "resolve_addon_config_by_attachment",
+    "resolve_addon_config_by_url",
     "HttpRequestUtil",
 ]
 

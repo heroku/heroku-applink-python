@@ -1,57 +1,80 @@
 import pytest
-from unittest.mock import AsyncMock, patch
-from heroku_applink.utils import HttpRequestUtil
+from unittest.mock import patch, AsyncMock
+from heroku_applink.utils.http_request import HttpRequestUtil
 
 @pytest.mark.asyncio
-async def test_http_request_success():
-    """Test successful HTTP request."""
-    # Mock the response to return fake data
-    mock_response = {"data": "fake_data"}
+async def test_http_request_success_json():
+    """Test successful HTTP request with a JSON response."""
+    mock_response = {"key": "value"}
     mock_request = AsyncMock(return_value=mock_response)
-    # Create an instance of HttpRequestUtil
+
     http_request_util = HttpRequestUtil()
 
-    # Patch the request method to mock it
     with patch.object(HttpRequestUtil, 'request', mock_request):
-        # Call the request method
         response = await http_request_util.request("https://fake-url.com", {"method": "GET"})
-
-        # Assert that the returned response matches the mock
         assert response == mock_response
         mock_request.assert_called_once_with("https://fake-url.com", {"method": "GET"})
 
 @pytest.mark.asyncio
-async def test_http_request_failure():
-    """Test failed HTTP request with exception handling."""
-    # Simulate an error by having the mock raise an exception
-    mock_request = AsyncMock(side_effect=Exception("Network error"))
-
-    # Create an instance of HttpRequestUtil
-    http_request_util = HttpRequestUtil()
-
-    # Patch the request method to mock it
-    with patch.object(HttpRequestUtil, 'request', mock_request):
-        # Assert that the error is raised when the request fails
-        with pytest.raises(Exception, match="Network error"):
-            await http_request_util.request("https://fake-url.com", {"method": "GET"})
-
-@pytest.mark.asyncio
-async def test_http_request_no_json():
-    """Test HTTP request when return_json is set to False."""
-    # Mock the response to return fake binary data
-    mock_response = b"binary_data"
+async def test_http_request_success_no_json():
+    """Test successful HTTP request with non-JSON response."""
+    mock_response = b"binary data"
     mock_request = AsyncMock(return_value=mock_response)
 
-    # Create an instance of HttpRequestUtil
     http_request_util = HttpRequestUtil()
 
-    # Patch the request method to mock it
     with patch.object(HttpRequestUtil, 'request', mock_request):
-        # Call the request method with return_json=False
         response = await http_request_util.request("https://fake-url.com", {"method": "GET"}, return_json=False)
-
-        # Assert that the returned response matches the mock binary data
         assert response == mock_response
-
-        # Update the mock call assertion to check for the correct arguments
         mock_request.assert_called_once_with("https://fake-url.com", {"method": "GET"}, return_json=False)
+
+@pytest.mark.asyncio
+async def test_http_request_network_error():
+    """Test network error when making the request."""
+    mock_request = AsyncMock(side_effect=Exception("Network Error"))
+
+    http_request_util = HttpRequestUtil()
+
+    with patch.object(HttpRequestUtil, 'request', mock_request):
+        with pytest.raises(Exception, match="Network Error"):
+            await http_request_util.request("https://fake-url.com", {"method": "GET"})
+        mock_request.assert_called_once_with("https://fake-url.com", {"method": "GET"})
+
+@pytest.mark.asyncio
+async def test_http_request_missing_method():
+    """Test missing method in options (defaults to GET)."""
+    mock_response = {"key": "value"}
+    mock_request = AsyncMock(return_value=mock_response)
+
+    http_request_util = HttpRequestUtil()
+
+    with patch.object(HttpRequestUtil, 'request', mock_request):
+        # No method provided, defaults to GET
+        response = await http_request_util.request("https://fake-url.com", {"headers": {}})
+        assert response == mock_response
+        mock_request.assert_called_once_with("https://fake-url.com", {"headers": {}})
+
+@pytest.mark.asyncio
+async def test_http_request_missing_headers():
+    """Test missing headers in options."""
+    mock_response = {"key": "value"}
+    mock_request = AsyncMock(return_value=mock_response)
+
+    http_request_util = HttpRequestUtil()
+
+    with patch.object(HttpRequestUtil, 'request', mock_request):
+        response = await http_request_util.request("https://fake-url.com", {"method": "GET"})
+        assert response == mock_response
+        mock_request.assert_called_once_with("https://fake-url.com", {"method": "GET"})
+
+@pytest.mark.asyncio
+async def test_http_request_invalid_url():
+    """Test invalid URL handling."""
+    mock_request = AsyncMock(side_effect=ValueError("Invalid URL"))
+
+    http_request_util = HttpRequestUtil()
+
+    with patch.object(HttpRequestUtil, 'request', mock_request):
+        with pytest.raises(ValueError, match="Invalid URL"):
+            await http_request_util.request("invalid-url", {"method": "GET"})
+        mock_request.assert_called_once_with("invalid-url", {"method": "GET"})
