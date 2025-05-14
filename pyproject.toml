@@ -41,7 +41,7 @@ test = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
-addopts = "--cov=heroku_applink.data_api --cov-report=term-missing -v"
+addopts = "--cov=heroku_applink --cov-report=term-missing -v"
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 
