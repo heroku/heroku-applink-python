@@ -2,6 +2,14 @@
 
 # update-documentation.sh
 # Script to update version in pyproject.toml and CHANGELOG.md with git log entries since last tag
+#
+# Usage:
+#   ./scripts/update-documentation.sh 0.1.1
+#
+# This will:
+#   1. Update the version in pyproject.toml
+#   2. Update CHANGELOG.md with all commits since the last tag
+#   3. Format the changelog with proper headers and commit references
 
 set -e
 
