@@ -1,0 +1,33 @@
+name: Draft Release Branch
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump_type:
+        description: 'Type of version bump (major, minor, patch)'
+        required: true
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+      previous_version:
+        description: 'Previous version (e.g., 0.3.28). If not provided, will use current version from pyproject.toml'
+        required: false
+        type: string
+
+jobs:
+  draft-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Make script executable
+        run: chmod +x scripts/draft-release.sh
+
+      - name: Run draft release script
+        run: |
+          ./scripts/draft-release.sh "${{ github.event.inputs.bump_type }}" "stable" "${{ github.event.inputs.previous_version }}"
