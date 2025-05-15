@@ -239,7 +239,7 @@ if [ -f "$OLD_CONTENT" ]; then
         HEADER_END_LINE=4 # fallback if no blank line found
     fi
     # Write the standardized header
-    echo "# ChangeLog" > "$CHANGELOG_FILE"
+    echo "# Changelog" > "$CHANGELOG_FILE"
     echo >> "$CHANGELOG_FILE"
     echo "All notable changes to this project will be documented in this file." >> "$CHANGELOG_FILE"
     echo "See [Conventional Commits](https://conventionalcommits.org) for commit guidelines." >> "$CHANGELOG_FILE"
