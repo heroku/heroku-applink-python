@@ -1,6 +1,6 @@
 [project]
 name = "heroku_applink"
-version = "0.1.0"
+version = "0.0.10"
 description = "Simple SDK for Heroku AppLink and Salesforce development"
 readme = "README.md"
 requires-python = ">=3.10"
