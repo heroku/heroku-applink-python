@@ -26,8 +26,8 @@ jobs:
           fetch-depth: 0
 
       - name: Make script executable
-        run: chmod +x scripts/draft-release.sh
+        run: chmod +x scripts/release/draft-release.sh
 
       - name: Run draft release script
         run: |
-          ./scripts/draft-release.sh "${{ github.event.inputs.bump_type }}" "stable" "${{ github.event.inputs.previous_version }}"
+          ./scripts/release/draft-release.sh "${{ github.event.inputs.bump_type }}" "stable" "${{ github.event.inputs.previous_version }}"

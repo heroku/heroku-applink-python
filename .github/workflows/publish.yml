@@ -6,8 +6,19 @@ on:
       - 'v*'
 
 jobs:
-  publish:
+  check_for_moratorium:
     runs-on: ubuntu-latest
+    environment: change_management
+    steps:
+      - uses: actions/checkout@v4
+      - env:
+          TPS_API_TOKEN: ${{ secrets.TPS_API_TOKEN_PARAM }}
+        run: ./scripts/release/tps_check_lock heroku-applink-python ${{ github.sha }}
+
+  publish:
+    needs: check_for_moratorium
+    runs-on: ubuntu-latest
+    environment: change_management
     steps:
       - uses: actions/checkout@v4
 
@@ -27,3 +38,9 @@ jobs:
 
       - name: Release to PyPI
         run: uv publish
+
+      - name: Publish To Change Management
+        env:
+          ACTOR_EMAIL: ${{ secrets.TPS_API_RELEASE_ACTOR_EMAIL }}
+          TPS_API_TOKEN: ${{ secrets.TPS_API_TOKEN_PARAM }}
+        run: ./scripts/release/tps_record_release heroku-applink-python ${{ github.sha }}
