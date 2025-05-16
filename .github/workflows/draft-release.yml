@@ -17,7 +17,7 @@ on:
         type: string
 
 jobs:
-  draft-release:
+  draft-release-branch:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

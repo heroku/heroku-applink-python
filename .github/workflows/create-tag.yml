@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  create-tag:
+  push-git-tag:
     if: ${{ github.event.workflow_run.conclusion == 'success' && contains(github.event.workflow_run.head_branch, 'release') }}
     runs-on: ubuntu-latest
     steps:

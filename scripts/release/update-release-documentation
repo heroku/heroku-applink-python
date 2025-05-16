@@ -2,7 +2,6 @@
 set -eu
 set -o pipefail
 
-# update-documentation.sh
 # Script to update version in pyproject.toml and CHANGELOG.md with git log entries since last tag
 #
 # Usage:

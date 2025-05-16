@@ -2,17 +2,17 @@
 set -eu
 set -o pipefail
 
-# draft-release.sh
+# draft-release
 # Script to create a release branch and PR for a new version
 #
 # Usage:
-#   ./release/draft-release.sh <bump_type> [previous_version]
+#   ./release/draft-release <bump_type> [previous_version]
 #   bump_type: major, minor, or patch
 #   previous_version: Optional previous version for changelog (e.g., 1.2.2)
 #
 # Example:
-#   ./scripts/release/draft-release.sh minor
-#   ./scripts/release/draft-release.sh patch 1.2.2
+#   ./scripts/release/draft-release minor
+#   ./scripts/release/draft-release patch 1.2.2
 
 
 # Function to display usage

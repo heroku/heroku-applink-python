@@ -1,4 +1,4 @@
-name: Package Library
+name: Test, Lint, and Build
 
 permissions:
   contents: write
