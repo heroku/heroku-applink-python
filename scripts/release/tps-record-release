@@ -39,7 +39,7 @@ if [ -z "$actor_email" ]; then
   exit 1
 fi
 
-# No app_id for cli releases
+# No app_id for releases
 # app_id="${4:-$APP_ID}"
 # if [ -z "$app_id" ]; then
 #   echo "Requires fourth argument: UUID of app being released" >&2

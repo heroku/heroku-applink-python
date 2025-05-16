@@ -11,9 +11,11 @@ jobs:
     environment: change_management
     steps:
       - uses: actions/checkout@v4
+      - name: Make scripts executable
+        run: chmod +x scripts/release/*
       - env:
           TPS_API_TOKEN: ${{ secrets.TPS_API_TOKEN_PARAM }}
-        run: ./scripts/release/tps_check_lock heroku-applink-python ${{ github.sha }}
+        run: ./scripts/release/tps-check-lock heroku-applink-python ${{ github.sha }}
 
   publish:
     needs: check_for_moratorium
@@ -21,6 +23,8 @@ jobs:
     environment: change_management
     steps:
       - uses: actions/checkout@v4
+      - name: Make scripts executable
+        run: chmod +x scripts/release/*
 
       - name: Download build artifacts
         uses: dawidd6/action-download-artifact@v2
@@ -43,4 +47,4 @@ jobs:
         env:
           ACTOR_EMAIL: ${{ secrets.TPS_API_RELEASE_ACTOR_EMAIL }}
           TPS_API_TOKEN: ${{ secrets.TPS_API_TOKEN_PARAM }}
-        run: ./scripts/release/tps_record_release heroku-applink-python ${{ github.sha }}
+        run: ./scripts/release/tps-record-release heroku-applink-python ${{ github.sha }}

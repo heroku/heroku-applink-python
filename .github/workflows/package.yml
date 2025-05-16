@@ -75,14 +75,10 @@ jobs:
       - name: Build the artifact in dist/
         run: uv build
 
-  upload_artifact_for_release:
-    needs: build
-    if: contains(github.head_ref, 'release/') || contains(github.head_ref, 'release-') || contains(github.head_ref, 'release-v')
-    runs-on: ubuntu-latest
-    steps:
       - name: Upload artifacts for release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, 'Merge pull request') && contains(github.event.head_commit.message, 'release')
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ github.head_ref }}
+          name: ${{ github.ref_name }}
           path: dist/
           retention-days: 90
