@@ -1,0 +1,26 @@
+name: TPS Lock Check
+
+on:
+  pull_request:
+    branches: [ "main" ]
+  push:
+    branches: 
+      - "main"
+      - "bj-tps-on-merge" #just for test
+    tags:
+      - 'v*'
+
+jobs:
+  check-lock:
+    runs-on: ubuntu-latest
+    environment: change_management
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Make script executable
+        run: chmod +x scripts/release/tps-check-lock
+
+      - name: Run TPS Lock Check
+        env:
+          TPS_API_TOKEN: ${{ secrets.TPS_API_TOKEN_PARAM }}
+        run: ./scripts/release/tps-check-lock heroku-applink-python ${{ github.sha }}
