@@ -1,0 +1,251 @@
+#!/bin/bash
+set -eu
+set -o pipefail
+
+# Script to update version in pyproject.toml and CHANGELOG.md with git log entries since last tag
+#
+# Usage:
+#   ./scripts/release/update-documentation.sh 0.1.1
+#
+# This will:
+#   1. Update the version in pyproject.toml
+#   2. Update CHANGELOG.md with all commits since the last tag
+#   3. Format the changelog with proper headers and commit references
+
+usage() {
+    echo "Usage: $0 <new_version> [previous_version]"
+    echo "  new_version: The new version to release (e.g., 1.2.3)"
+    echo "  previous_version: Optional previous version for changelog (e.g., 1.2.2)"
+    exit 1
+}
+
+# Check if required arguments are provided
+if [ "$#" -lt 1 ] || [ "$#" -gt 2 ]; then
+    usage
+fi
+
+NEW_VERSION=$1
+PREV_VERSION=$2
+
+# Function to update version in pyproject.toml
+update_pyproject_version() {
+    local version=$1
+    local pyproject_file="pyproject.toml"
+    
+    if [ ! -f "$pyproject_file" ]; then
+        echo "Error: $pyproject_file not found"
+        exit 1
+    fi
+    
+    # Update version in pyproject.toml
+    sed -i '' "s/^version = \".*\"/version = \"$version\"/" "$pyproject_file"
+    echo "Updated version to $version in $pyproject_file"
+}
+
+# Function to categorize commit message
+categorize_commit() {
+    local message=$1
+    local hash=$2
+    local body=$3
+
+    # First try conventional commit format
+    if [[ "$message" =~ ^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z-]+\))?: ]]; then
+        local type="${BASH_REMATCH[1]}"
+        case "$type" in
+            feat) echo "Features" ;;
+            fix) echo "Fixes" ;;
+            docs) echo "Docs" ;;
+            *) echo "Other" ;;
+        esac
+        return
+    fi
+
+    # If not conventional, analyze message content
+    message_lower=$(echo "$message" | tr '[:upper:]' '[:lower:]')
+    
+    # Features
+    if [[ "$message_lower" =~ ^(add|create|implement|new|update|upgrade|enhance|improve|support|adds|creates|implements|updates|upgrades|enhances|improves|supports) ]]; then
+        echo "Features"
+        return
+    fi
+
+    # Bug Fixes
+    if [[ "$message_lower" =~ ^(fix|fixes|fixed|resolve|resolves|resolved|correct|corrects|corrected|bug|issue|error|err|typo) ]]; then
+        echo "Fixes"
+        return
+    fi
+
+    # Documentation
+    if [[ "$message_lower" =~ ^(doc|docs|document|documentation|readme|comment|comments|note|notes|changelog) ]]; then
+        echo "Docs"
+        return
+    fi
+
+    # Default to other
+    echo "Other"
+}
+
+# Function to get commit messages for changelog
+get_changelog() {
+    local since_tag=$1
+    if [[ -z "$since_tag" ]]; then
+        git log --graph --format="%h %s" | while read -r line; do
+            echo "* $line"
+        done
+    else
+        git log --graph --format="%h %s" "${since_tag}..HEAD" | while read -r line; do
+            echo "* $line"
+        done
+    fi
+}
+
+# Update version in pyproject.toml
+update_pyproject_version "$NEW_VERSION"
+
+# Get the last tag (sorted by creation date)
+LAST_TAG=$(git tag --sort=creatordate | tail -n 1 2>/dev/null || echo "")
+
+echo "Last tag: $LAST_TAG"
+
+# Get the repository URL
+REPO_URL=$(git config --get remote.origin.url | sed 's/\.git$//' | sed 's/git@github.com:/https:\/\/github.com\//')
+
+echo "Repository URL: $REPO_URL"
+
+# Create temporary directory for our files
+TEMP_DIR=$(mktemp -d)
+trap 'rm -rf "$TEMP_DIR"' EXIT
+
+# Create temporary files in the temp directory
+NEW_CONTENT="$TEMP_DIR/new_content"
+FEATURES_TMP="$TEMP_DIR/features"
+FIXES_TMP="$TEMP_DIR/fixes"
+DOCS_TMP="$TEMP_DIR/docs"
+OTHER_TMP="$TEMP_DIR/other"
+OLD_CONTENT="$TEMP_DIR/old_content"
+
+# Save the old changelog if it exists
+if [ -f "CHANGELOG.md" ]; then
+    cp "CHANGELOG.md" "$OLD_CONTENT"
+fi
+
+# Create the new version content
+if [ -n "$LAST_TAG" ]; then
+    VERSION_HEADER="# [$NEW_VERSION]($REPO_URL/compare/$LAST_TAG...$NEW_VERSION) - $(date +%Y-%m-%d)"
+else
+    VERSION_HEADER="# [$NEW_VERSION]($REPO_URL/compare/HEAD...$NEW_VERSION) - $(date +%Y-%m-%d)"
+fi
+
+echo "Version header: $VERSION_HEADER"
+
+cat > "$NEW_CONTENT" << EOL
+$VERSION_HEADER
+
+
+### Changes
+
+EOL
+
+# Get all commits since last tag or previous version
+if [ -n "$LAST_TAG" ]; then
+    # Use the last tag as reference point
+    COMMITS=$(git log --pretty=format:"%s|%H" "${LAST_TAG}..HEAD")
+else
+    # If no tags, use all commits
+    COMMITS=$(git log --pretty=format:"%s|%H")
+fi
+
+echo "Found $(echo "$COMMITS" | wc -l) commits to process"
+
+# Initialize temporary files
+touch "$FEATURES_TMP" "$FIXES_TMP" "$DOCS_TMP" "$OTHER_TMP"
+
+echo "$COMMITS" | while IFS='|' read -r message hash; do
+    # Skip merge commits
+    if [[ ! $message =~ ^Merge ]]; then
+        # Format the commit message
+        if [[ "$message" =~ ^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z-]+\))?: ]]; then
+            # Remove the type prefix for conventional commits
+            formatted_message="${message#*:}"
+        else
+            formatted_message="$message"
+        fi
+
+        # Add breaking change notice if present
+        if [[ "$formatted_message" == *"BREAKING CHANGE"* ]]; then
+            formatted_message="$formatted_message (BREAKING CHANGE)"
+        fi
+
+        # Extract PR or issue number if present in the message
+        ref_number=""
+        ref_type=""
+        # Look for (#1234) or #1234 in the message
+        if [[ "$message" =~ \(#([0-9]+)\) ]]; then
+            ref_number="${BASH_REMATCH[1]}"
+            ref_type="pull"
+        elif [[ "$message" =~ \#([0-9]+) ]]; then
+            ref_number="${BASH_REMATCH[1]}"
+            ref_type="issues"
+        fi
+
+        # Get the category for this commit
+        category=$(categorize_commit "$message" "$hash" "")
+        case "$category" in
+            "Features") tmp_file="$FEATURES_TMP" ;;
+            "Fixes") tmp_file="$FIXES_TMP" ;;
+            "Docs") tmp_file="$DOCS_TMP" ;;
+            *) tmp_file="$OTHER_TMP" ;;
+        esac
+
+        # Add the commit to the appropriate category file
+        if [ -n "$ref_number" ]; then
+            echo "* $formatted_message ([#$ref_number]($REPO_URL/$ref_type/$ref_number))" >> "$tmp_file"
+        else
+            echo "* $formatted_message" >> "$tmp_file"
+        fi
+    fi
+done
+
+# Combine all categories into the new content
+for category in "Features" "Fixes" "Docs" "Other"; do
+    case "$category" in
+        "Features") tmp_file="$FEATURES_TMP" ;;
+        "Fixes") tmp_file="$FIXES_TMP" ;;
+        "Docs") tmp_file="$DOCS_TMP" ;;
+        *) tmp_file="$OTHER_TMP" ;;
+    esac
+    if [ -s "$tmp_file" ]; then
+        echo -e "\n### $category\n" >> "$NEW_CONTENT"
+        cat "$tmp_file" >> "$NEW_CONTENT"
+    fi
+done
+
+# Create the new changelog
+if [ -f "$OLD_CONTENT" ]; then
+    # Create a new changelog with the updated content
+    {
+        # Get the header (title and description)
+        awk '/^# \[/ {exit} {print}' "$OLD_CONTENT"
+        # Add the new version section
+        cat "$NEW_CONTENT"
+        # Add a blank line before the next version
+        echo
+        # Add all existing content after the header
+        awk '/^# \[/ {p=1} p {print}' "$OLD_CONTENT"
+    } > "CHANGELOG.md.new"
+    
+    # Move the new file to replace the old one
+    mv "CHANGELOG.md.new" "CHANGELOG.md"
+else
+    # Create a new changelog
+    {
+        echo "# Changelog"
+        echo
+        echo "All notable changes to this project will be documented in this file."
+        echo "See [Conventional Commits](https://conventionalcommits.org) for commit guidelines."
+        echo
+        cat "$NEW_CONTENT"
+    } > "CHANGELOG.md"
+fi
+
+echo "Updated CHANGELOG.md"
