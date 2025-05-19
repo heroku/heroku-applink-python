@@ -25,7 +25,7 @@ jobs:
       - uses: ./.github/actions/setup-uv
 
       - name: Install the project
-        run: uv sync --all-extras --group dev
+        run: uv sync --all-extras --extras dev
 
       - name: Build the artifact in dist/
         run: uv build
@@ -58,7 +58,7 @@ jobs:
       - uses: ./.github/actions/setup-uv
 
       - name: Install dependencies
-        run: uv sync --all-extras --group dev
+        run: uv sync --all-extras --extras dev
 
       - name: Run tox
         run: uv run tox
@@ -78,7 +78,7 @@ jobs:
       - uses: ./.github/actions/setup-uv
 
       - name: Install dependencies
-        run: uv sync --all-extras --group dev
+        run: uv sync --all-extras --extras dev
 
       - name: Run Ruff
         run: uv run ruff check .
