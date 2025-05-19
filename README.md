@@ -155,4 +155,4 @@ $ uv run pdoc3 --template-dir templates/python heroku_applink -o docs --force
             print("===== account record", record)
     ```
 
-For more detailed information about the SDK's capabilities, please refer to the [full documentation](docs/).
+For more detailed information about the SDK's capabilities, please refer to the [full documentation](docs/heroku_applink/index.md).
