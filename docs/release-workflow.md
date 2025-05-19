@@ -42,7 +42,7 @@ Both methods will:
 
 ### 2. Testing and Building
 
-When a pull request is created from a release branch:
+When a pull request is pushed into main from a branch named "release-*:
 
 1. The Package Library workflow runs automatically and:
    - Runs tests across Python 3.10, 3.11, 3.12, and 3.13
