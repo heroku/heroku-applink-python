@@ -1,5 +1,5 @@
 # Release Workflow
-updated: 05/16
+updated: 05/16/2025
 
 This document describes the process for releasing new versions of the heroku-applink-python library.
 
