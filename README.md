@@ -129,11 +129,11 @@ $ uv run pdoc3 --template-dir templates/python heroku_applink -o docs --force
     ```python
     # FastAPI example
     import asyncio
-    import heroku_applink as sdk
+    from heroku_applink import IntegrationAsgiMiddleware, client_context
     from fastapi import FastAPI
 
     app = FastAPI()
-    app.add_middleware(sdk.IntegrationAsgiMiddleware)
+    app.add_middleware(IntegrationAsgiMiddleware)
 
 
     @app.get("/")
@@ -143,7 +143,8 @@ $ uv run pdoc3 --template-dir templates/python heroku_applink -o docs --force
 
     @app.get("/accounts")
     def get_accounts():
-        dataapi = sdk.context.get()
+        context = client_context.get()
+        dataapi = context.data_api    
         asyncio.run(query_accounts(dataapi))
         return {"Some": "Accounts"}
 
