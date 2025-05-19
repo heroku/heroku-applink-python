@@ -32,6 +32,11 @@ test = [
     "ruff>=0.1.0",
     "coverage>=7.0.0"
 ]
+dev = [
+    "tox>=4.0.0",
+    "tox-uv>=0.1.0",
+    "ruff>=0.1.0"
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
