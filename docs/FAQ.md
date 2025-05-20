@@ -29,6 +29,18 @@ Optional environment variables:
   - `{ATTACHMENT_NAME}_API_URL`
   - `{ATTACHMENT_NAME}_TOKEN`
 
+For color/alias support (e.g., "PURPLE"):
+```bash
+export HEROKU_APPLINK_PURPLE_API_URL=https://api.heroku-applink.com
+export HEROKU_APPLINK_PURPLE_TOKEN=<your-addon-token>
+```
+
+**Best Practices for Environment Variables:**
+1. Never commit environment variables to version control
+2. Use different tokens for development and production
+3. Regularly rotate your authentication tokens
+4. For testing, create a `.env.test` file with test credentials
+
 ## Usage
 
 ### How do I get started with basic authorization?
@@ -36,6 +48,7 @@ Optional environment variables:
 from heroku_applink.addons.heroku_applink import get_authorization
 
 async def my_function():
+    # You must provide a valid developer name (org alias)
     client_context = await get_authorization("your_developer_name")
     # Use client_context to interact with Salesforce
 ```
@@ -49,23 +62,126 @@ client_context = await get_authorization(
 )
 ```
 
-### How do I handle errors?
+### How do I handle errors and timeouts?
 The package provides several exception types:
 - `ValueError`: For invalid input parameters
 - `EnvironmentError`: For missing environment variables
 - `RuntimeError`: For API request failures
+- `ClientError`: Network issues (timeouts, DNS, etc.)
+- `UnexpectedRestApiResponsePayload`: Non-JSON or malformed JSON from Salesforce
 
 Example error handling:
 ```python
+from heroku_applink.exceptions import ClientError, UnexpectedRestApiResponsePayload
+
 try:
     client_context = await get_authorization("developer_name")
 except ValueError as e:
     print(f"Invalid input: {e}")
 except EnvironmentError as e:
     print(f"Configuration error: {e}")
+except ClientError as e:
+    print(f"Network error: {e}")
+except UnexpectedRestApiResponsePayload as e:
+    print(f"Invalid response: {e}")
 except RuntimeError as e:
     print(f"API error: {e}")
 ```
+
+**Common Issues and Solutions:**
+
+1. **Authorization Failures**
+   - Problem: "Authorization request failed" error
+   - Solutions:
+     - Verify environment variables are set correctly
+     - Check if token is valid and not expired
+     - Ensure API URL is correct and accessible
+
+2. **Connection Timeouts**
+   - Problem: Connection timeout errors
+   - Solutions:
+     - Check network connection
+     - Verify API endpoint accessibility
+     - Check firewall settings
+   - Configuration:
+     - Default timeout is 5 seconds
+     - Can be adjusted in `addons/heroku_applink.py`:
+     ```python
+     HTTP_TIMEOUT_SECONDS = 10.0  # Increase for slow networks
+     ```
+
+### How do I integrate the SDK into my application?
+Use the provided middleware to populate a ContextVar with your ClientContext:
+
+#### WSGI (e.g. Django)
+```python
+# settings.py
+MIDDLEWARE = [
+    "heroku_applink.middleware.IntegrationWsgiMiddleware",
+    # ... your other middleware ...
+]
+```
+
+#### ASGI (e.g. FastAPI)
+```python
+# main.py
+from heroku_applink.middleware import IntegrationAsgiMiddleware
+
+app = IntegrationAsgiMiddleware(app)
+```
+
+Then in your handlers, retrieve context via:
+```python
+from heroku_applink.middleware import client_context
+ctx = client_context.get()
+```
+
+For custom frameworks, you can manually parse the header:
+```python
+from heroku_applink.context import ClientContext
+ctx = ClientContext.from_header(request.headers["x-client-context"])
+```
+
+### How can I perform CRUD operations against Salesforce?
+```python
+# Query
+result = await ctx.data_api.query("SELECT Id, Name FROM Account")
+for record in result.records:
+    print(record.fields["Id"], record.fields["Name"])
+
+# Create
+new_id = await ctx.data_api.create(
+    Record(type="Account", fields={"Name": "Acme Co"})
+)
+
+# Update
+await ctx.data_api.update(
+    Record(type="Account", fields={"Id": new_id, "Phone": "123-4567"})
+)
+
+# Delete
+await ctx.data_api.delete("Account", new_id)
+```
+
+### How do I run multiple operations atomically?
+Use the UnitOfWork composite API:
+```python
+from heroku_applink.data_api.unit_of_work import UnitOfWork
+from heroku_applink.data_api.record import Record
+
+uow = UnitOfWork()
+ref_acc = uow.register_create(Record(type="Account", fields={"Name":"X"}))
+uow.register_create(Record(type="Contact", fields={
+    "FirstName":"Joe", 
+    "LastName":"Smith", 
+    "AccountId": ref_acc
+}))
+results = await ctx.data_api.commit_unit_of_work(uow)
+# results[ref_acc] gives the new Account ID
+```
+
+### Why are my record fields case-sensitive?
+Unlike the Node.js SDK, the Python SDK stores `Record.fields` in a plain dict. Ensure you use the exact Salesforce field name casing (e.g. "Id", not "id"). To add case-insensitive lookup, wrap or subclass your dict to normalize keys to lower-case.
 
 ## Testing
 
@@ -81,44 +197,7 @@ pytest tests/addons/test_addons.py
 pytest -m functional
 ```
 
-### How do I set up test environment variables?
-Create a `.env.test` file:
-```env
-HEROKU_APPLINK_API_URL=https://your-test-endpoint.com
-HEROKU_APPLINK_TOKEN=your-test-token
-```
-
-## Troubleshooting
-
-### Common Issues and Solutions
-
-#### Authorization Failures
-**Problem**: Getting "Authorization request failed" error
-**Solutions**:
-1. Verify your environment variables are set correctly
-2. Check if your token is valid and not expired
-3. Ensure your API URL is correct and accessible
-
-#### Environment Variable Issues
-**Problem**: "Missing environment variables" error
-**Solutions**:
-1. Check if all required variables are set
-2. Verify variable names match exactly
-3. Ensure variables are in the correct environment
-
-#### Connection Timeouts
-**Problem**: Connection timeout errors
-**Solutions**:
-1. Check your network connection
-2. Verify the API endpoint is accessible
-3. Check if your firewall is blocking the connection
-
 ## Best Practices
-
-### Security
-1. Never commit environment variables to version control
-2. Use different tokens for development and production
-3. Regularly rotate your authentication tokens
 
 ### Performance
 1. Reuse ClientContext when possible
@@ -185,3 +264,11 @@ pip install --upgrade heroku-applink
 ### Related Projects
 - [Heroku Platform API](https://devcenter.heroku.com/articles/platform-api-reference)
 - [Salesforce REST API](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/)
+
+### How do I generate up-to-date docs?
+Install and run pdoc3:
+
+```bash
+pip install pdoc3
+pdoc --html --output-dir docs --force heroku_applink
+```
