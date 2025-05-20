@@ -15,6 +15,6 @@ _build/
 .pytest_cache
 .mypy_cache
 uv.lock
-
+.coverage
 # Salesforce
 .codegenie/
