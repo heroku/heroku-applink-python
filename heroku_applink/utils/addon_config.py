@@ -1,5 +1,7 @@
 import os
+from functools import lru_cache
 
+@lru_cache(maxsize=None)
 def resolve_addon_config_by_attachment_or_color(attachment_or_color: str) -> dict[str, str]:
     """
     First try:
@@ -28,6 +30,7 @@ def resolve_addon_config_by_attachment_or_color(attachment_or_color: str) -> dic
     return {"api_url": api_url, "token": token}
 
 
+@lru_cache(maxsize=None)
 def resolve_addon_config_by_url(url: str) -> dict[str, str]:
     """
     Match an env var ending in _API_URL to the given URL, then
