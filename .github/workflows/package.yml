@@ -22,7 +22,7 @@ jobs:
       - name: Set up Python 
         uses: actions/setup-python@v4
         with:
-          python-version: 3.11
+          python-version-file: pyproject.toml
 
       - uses: ./.github/actions/setup-uv
 
@@ -79,7 +79,7 @@ jobs:
       - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
-          python-version: 3.11
+          python-version-file: pyproject.toml
 
       - uses: ./.github/actions/setup-uv
 
