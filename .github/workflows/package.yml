@@ -24,7 +24,8 @@ jobs:
         with:
           python-version-file: pyproject.toml
 
-      - uses: ./.github/actions/setup-uv
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
 
       - name: Install the project
         run: uv sync --all-extras
@@ -61,7 +62,8 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - uses: ./.github/actions/setup-uv
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
 
       - name: Install dependencies
         run: uv sync --all-extras
@@ -81,7 +83,8 @@ jobs:
         with:
           python-version-file: pyproject.toml
 
-      - uses: ./.github/actions/setup-uv
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
 
       - name: Install dependencies
         run: uv sync --all-extras
