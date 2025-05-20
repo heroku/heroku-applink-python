@@ -1,99 +1,76 @@
-import os
-from typing import TypedDict, Optional, Any
 import urllib.parse
+from typing import TypedDict, Optional
 from heroku_applink.utils.http_request import HttpRequestUtil
 from heroku_applink.context import ClientContext, Org, User, DataAPI
+from heroku_applink.utils.addon_config import (
+    resolve_addon_config_by_attachment_or_color,
+    resolve_addon_config_by_url,
+)
 
 http_request_util = HttpRequestUtil()
 
 class RequestOptions(TypedDict):
     method: str
     headers: dict[str, str]
-    json: Optional[dict[str, Any]]  # `json` is optional
 
-def resolve_addon_config_by_attachment(attachment: str) -> dict:
-    """Resolve the addon configuration by attachment name."""
-    api_url = os.getenv(f"{attachment.upper()}_API_URL")
-    token = os.getenv(f"{attachment.upper()}_TOKEN")
-    if not api_url or not token:
-        raise EnvironmentError(f"Missing environment variables for attachment '{attachment}'. Required: API_URL and TOKEN.")
-    return {"api_url": api_url, "token": token}
-
-def resolve_addon_config_by_url(url: str) -> dict:
-    """Resolve the addon configuration based on the provided URL."""
-    for key, value in os.environ.items():
-        if key.endswith("_API_URL") and value.lower() == url.lower():
-            prefix = key.replace("_API_URL", "")
-            token = os.getenv(f"{prefix}_TOKEN")
-            if not token:
-                raise EnvironmentError(f"Missing token for API URL '{url}'.")
-            return {"api_url": value, "token": token}
-    raise EnvironmentError(f"Heroku Applink config not found for API URL: {url}")
-
-def validate_url(url: str) -> bool:
-    """Validate if a string is a valid URL."""
-    try:
-        result = urllib.parse.urlparse(url)
-        return all([result.scheme, result.netloc])
-    except ValueError:
-        return False
-
-async def get_authorization(developer_name: str, attachment_name_or_url: Optional[str] = "HEROKU_APPLINK") -> ClientContext:
+async def get_authorization(
+    developer_name: str,
+    attachment_or_url: Optional[str] = None,
+) -> ClientContext:
     """
-    Get authorization information for a Heroku Applink developer.
+    Parity with the Node.js getAuthorization, but using GET:
 
-    Args:
-        developer_name: The name of the developer to authorize.
-        attachment_name_or_url: Optional attachment name or URL.
-
-    Returns:
-        ClientContext: A context object containing the authorization information.
-
-    Raises:
-        ValueError: If developer_name is empty.
-        EnvironmentError: If required environment variables are missing.
-        RuntimeError: If the authorization request fails.
+      GET {apiUrl}/invocations/authorization?org_name=developer_name
     """
     if not developer_name:
         raise ValueError("Developer name must be provided")
 
-    if attachment_name_or_url:
-        if validate_url(attachment_name_or_url):
-            # If it's a valid URL, resolve config based on URL
-            config = resolve_addon_config_by_url(attachment_name_or_url)
-        else:
-            # Otherwise, resolve config based on attachment name
-            config = resolve_addon_config_by_attachment(attachment_name_or_url)
-    else:
-        # Default behavior if no attachment name or URL is provided
-        config = resolve_addon_config_by_attachment("HEROKU_APPLINK")
+    # determine config
+    if attachment_or_url:
+        is_url = False
+        try:
+            parts = urllib.parse.urlparse(attachment_or_url)
+            is_url = all([parts.scheme, parts.netloc])
+        except ValueError:
+            pass
 
-    auth_url = f"{config['api_url']}/invocations/authorization"
+        config = (
+            resolve_addon_config_by_url(attachment_or_url)
+            if is_url
+            else resolve_addon_config_by_attachment_or_color(attachment_or_url)
+        )
+    else:
+        config = resolve_addon_config_by_attachment_or_color("HEROKU_APPLINK")
+
+    # build GET URL with query param
+    base = config["api_url"].rstrip("/")
+    qs   = urllib.parse.urlencode({"org_name": developer_name})
+    full_url = f"{base}/invocations/authorization?{qs}"
+
     opts: RequestOptions = {
         "method": "GET",
         "headers": {
             "Authorization": f"Bearer {config['token']}",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         },
-        "json": {"developer_name": developer_name},
     }
 
     try:
-        response = await http_request_util.request(auth_url, opts)
+        response = await http_request_util.request(full_url, opts)
     except Exception as e:
-        raise RuntimeError(f"Failed to fetch authorization from {auth_url}: {str(e)}")
+        raise RuntimeError(f"Failed to fetch authorization from {full_url}: {e}")
 
-    if "message" in response:
+    if response.get("message"):
         raise RuntimeError(f"Authorization request failed: {response['message']}")
 
-    # Using ClientContext instead of OrgImpl
+    # hydrate ClientContext just like Node.js does
     org = Org(
         id=response["org_id"],
         domain_url=response["org_domain_url"],
-        user=User(id=response["user_id"], username=response["username"])
+        user=User(id=response["user_id"], username=response["username"]),
     )
 
-    client_context = ClientContext(
+    return ClientContext(
         org=org,
         request_id=response["request_id"],
         access_token=response["access_token"],
@@ -105,5 +82,3 @@ async def get_authorization(developer_name: str, attachment_name_or_url: Optiona
             access_token=response["access_token"],
         ),
     )
-
-    return client_context

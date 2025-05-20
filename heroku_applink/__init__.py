@@ -4,8 +4,8 @@ from .data_api.reference_id import ReferenceId
 from .data_api.unit_of_work import UnitOfWork
 from .middleware import IntegrationWsgiMiddleware, IntegrationAsgiMiddleware
 from .exceptions import ClientError, UnexpectedRestApiResponsePayload
-from .addons import get_authorization, resolve_addon_config_by_attachment, resolve_addon_config_by_url
-from .utils import HttpRequestUtil
+from .addons import get_authorization
+from .utils import HttpRequestUtil, resolve_addon_config_by_attachment_or_color, resolve_addon_config_by_url
 
 __all__ = [
     "client_context",
@@ -22,7 +22,7 @@ __all__ = [
     "ClientError",
     "UnexpectedRestApiResponsePayload",
     "get_authorization",
-    "resolve_addon_config_by_attachment",
+    "resolve_addon_config_by_attachment_or_color",
     "resolve_addon_config_by_url",
     "HttpRequestUtil",
 ]

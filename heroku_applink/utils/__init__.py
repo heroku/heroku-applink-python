@@ -6,5 +6,9 @@ For full license text, see the LICENSE file in the repo root or https://opensour
 """
 
 from .http_request import HttpRequestUtil
+from .addon_config import (
+    resolve_addon_config_by_attachment_or_color,
+    resolve_addon_config_by_url,
+)
 
-__all__ = ['HttpRequestUtil']
+__all__ = ['HttpRequestUtil', 'resolve_addon_config_by_attachment_or_color', 'resolve_addon_config_by_url']
