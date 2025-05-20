@@ -48,10 +48,10 @@ $ uv run pdoc3 --template-dir templates/python heroku_applink -o docs --force
     Sync all dependencies:
 
     ```bash
-    uv sync --all-extras --dev
+    uv sync --all-extras
     ```
 
-3. Install Development Dependencies:
+3. Sync Development Dependencies:
 
     ```bash
     uv sync --all-extras --dev
