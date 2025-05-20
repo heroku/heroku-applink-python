@@ -48,13 +48,13 @@ $ uv run pdoc3 --template-dir templates/python heroku_applink -o docs --force
     Sync all dependencies:
 
     ```bash
-    uv sync --all-extras --dev
+    uv sync --all-extras
     ```
 
-3. Install Development Dependencies:
+3. Sync Development Dependencies:
 
     ```bash
-    pip install -e ".[dev]"
+    uv sync --all-extras --dev
     ```
 
 ### Running Tests
@@ -63,20 +63,20 @@ $ uv run pdoc3 --template-dir templates/python heroku_applink -o docs --force
 
     ```bash
     # Run all tests
-    pytest
+    uv run pytest
 
     # Run all tests with coverage
-    pytest --cov=heroku_applink.data_api --cov-report=term-missing -v
+    uv run pytest --cov=heroku_applink.data_api --cov-report=term-missing -v
     ```
 
 2. Run a single test:
 
     ```bash
     # Run a specific test file
-    pytest <path_to_test_file>/test_specific_file.py
+    uv run pytest <path_to_test_file>/test_specific_file.py
 
     # Run a specific test file with coverage
-    pytest tests/data_api/test_data_api_record.py::test_some_specific_case \
+    uv run pytest tests/data_api/test_data_api_record.py::test_some_specific_case \
         --cov=heroku_applink.data_api
     ```
 
@@ -87,14 +87,14 @@ $ uv run pdoc3 --template-dir templates/python heroku_applink -o docs --force
     uv venv
     source .venv/bin/activate
     uv sync --all-extras --dev
-    pytest
+    uv run pytest
     ```
 
 4. Run tests across multiple Python versions with Tox:
 
     ```bash
-    pip install tox tox-uv
-    tox
+    uv sync --all-extras --dev
+    uv run tox
     ```
 
 ### Linting and Code Quality
@@ -103,16 +103,16 @@ $ uv run pdoc3 --template-dir templates/python heroku_applink -o docs --force
 
     ```bash
     # Check the code for issues
-    ruff check .
+    uv run ruff check .
 
     # Automatically fix issues
-    ruff check . --fix
+    uv run ruff check . --fix
 
     # Check a specific directory (e.g., heroku_applink)
-    ruff check heroku_applink/
+    uv run ruff check heroku_applink/
 
     # Format the codebase
-    ruff format .
+    uv run ruff format .
     ```
 
 ## Usage Examples
@@ -121,7 +121,7 @@ $ uv run pdoc3 --template-dir templates/python heroku_applink -o docs --force
 
 1. Install the package:
     ```bash
-    pip install heroku_applink
+    uv pip install heroku_applink
     ```
 
 2. Add the middleware to your web framework:
