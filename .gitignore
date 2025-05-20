@@ -17,3 +17,7 @@ uv.lock
 
 # Salesforce
 .codegenie/
+
+# Heroku TPS TEMP
+tpsGetLock_response.txt
+tpsRecordRelease_response.txt
