@@ -1,5 +1,6 @@
 import json
 import base64
+import aiohttp
 from dataclasses import dataclass
 
 from .config import Config
@@ -69,7 +70,7 @@ class ClientContext:
     """Namespace of the Salesforce component that made the request."""
 
     @classmethod
-    def from_header(cls, header: str, config: Config):
+    def from_header(cls, header: str, session: aiohttp.ClientSession):
         decoded = base64.b64decode(header)
         data = json.loads(decoded)
 
@@ -90,6 +91,6 @@ class ClientContext:
                 org_domain_url=data["orgDomainUrl"],
                 api_version=data["apiVersion"],
                 access_token=data["accessToken"],
-                session=config.session,
+                session=session,
             ),
         )

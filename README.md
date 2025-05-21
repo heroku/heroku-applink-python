@@ -132,12 +132,7 @@ $ uv run pdoc3 --template-dir templates/python heroku_applink -o docs --force
     import heroku_applink as sdk
     from fastapi import FastAPI
 
-    config = sdk.Config(
-        session=aiohttp.ClientSession(
-            cookie_jar=aiohttp.DummyCookieJar(),
-            timeout=aiohttp.ClientTimeout(total=5),
-        )
-    )
+    config = sdk.Config(request_timeout=5)
 
     app = FastAPI()
     app.add_middleware(sdk.IntegrationAsgiMiddleware, config=config)
