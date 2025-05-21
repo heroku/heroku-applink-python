@@ -2,7 +2,6 @@ import pytest
 from heroku_applink.middleware import (
     IntegrationWsgiMiddleware,
     IntegrationAsgiMiddleware,
-    from_request,
     client_context,
 )
 from heroku_applink.context import ClientContext, Org, User
