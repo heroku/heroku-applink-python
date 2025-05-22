@@ -8,7 +8,7 @@ from .session import Session
 client_context: contextvars.ContextVar = contextvars.ContextVar("client_context")
 
 class IntegrationWsgiMiddleware:
-    def __init__(self, get_response, config: Config) -> None:
+    def __init__(self, get_response, config=Config.default()) -> None:
         self.get_response = get_response
         self.config = config
         self.session = Session(self.config)
@@ -26,7 +26,7 @@ class IntegrationWsgiMiddleware:
         return response
 
 class IntegrationAsgiMiddleware:
-    def __init__(self, app, config: Config):
+    def __init__(self, app, config=Config.default()):
         self.app = app
         self.config = config
         self.session = Session(self.config)

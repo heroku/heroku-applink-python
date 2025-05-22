@@ -18,7 +18,3 @@ class Session:
 
     def client(self) -> aiohttp.ClientSession:
         return self.session
-
-    async def close(self):
-        await self.session.close()
-

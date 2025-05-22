@@ -1,9 +1,7 @@
 import json
 import base64
-import aiohttp
 from dataclasses import dataclass
 
-from .config import Config
 from .data_api import DataAPI
 from .session import Session
 
