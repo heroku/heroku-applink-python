@@ -90,6 +90,6 @@ class ClientContext:
                 org_domain_url=data["orgDomainUrl"],
                 api_version=data["apiVersion"],
                 access_token=data["accessToken"],
-                session=session.client(),
+                session=session,
             ),
         )

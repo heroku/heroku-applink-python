@@ -3,6 +3,8 @@ import pytest
 import orjson
 import aiohttp
 from unittest.mock import AsyncMock, patch, MagicMock
+from heroku_applink.config import Config
+from heroku_applink.session import Session
 from heroku_applink.data_api import DataAPI, Record, RecordQueryResult, UnitOfWork
 from heroku_applink.data_api.exceptions import ClientError, UnexpectedRestApiResponsePayload
 
@@ -11,7 +13,8 @@ def data_api():
     return DataAPI(
         org_domain_url="https://example.salesforce.com",
         api_version="v60.0",
-        access_token="token"
+        access_token="token",
+        session=Session(Config.default())
     )
 
 @pytest.mark.asyncio

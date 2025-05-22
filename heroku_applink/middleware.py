@@ -8,7 +8,7 @@ from .session import Session
 client_context: contextvars.ContextVar = contextvars.ContextVar("client_context")
 
 class IntegrationWsgiMiddleware:
-    def __init__(self, get_response, config=Config.default()) -> None:
+    def __init__(self, get_response, config=Config.default()):
         self.get_response = get_response
         self.config = config
         self.session = Session(self.config)

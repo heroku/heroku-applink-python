@@ -4,6 +4,8 @@ import aiohttp
 import orjson
 from aiohttp.payload import BytesPayload
 
+from heroku_applink.session import Session
+
 from ._requests import (
     CompositeGraphRestApiRequest,
     CreateRecordRestApiRequest,
@@ -37,11 +39,11 @@ class DataAPI:
         org_domain_url: str,
         api_version: str,
         access_token: str,
-        session: aiohttp.ClientSession,
+        session: Session,
     ) -> None:
         self._api_version = api_version
         self._org_domain_url = org_domain_url
-        self._shared_session = session
+        self._shared_session = session.client()
 
         self.access_token = access_token
 

@@ -1,14 +1,18 @@
 import base64
 import json
 import pytest
+
+from heroku_applink.config import Config
 from heroku_applink.context import User, Org, ClientContext
+from heroku_applink.session import Session
 
 class FakeDataAPI:
     """Fake DataAPI class for testing without real dependencies."""
-    def __init__(self, org_domain_url, api_version, access_token):
+    def __init__(self, org_domain_url, api_version, access_token, session):
         self.org_domain_url = org_domain_url
         self.api_version = api_version
         self.access_token = access_token
+        self.session = session
 
 @pytest.fixture(autouse=True)
 def patch_data_api(monkeypatch):
@@ -36,6 +40,7 @@ def test_client_context_creation():
             org_domain_url=org.domain_url,
             api_version="v57.0",
             access_token="fake_token",
+            session=Session(Config.default()),
         ),
         request_id="req-123",
         access_token="fake_token",
@@ -60,8 +65,9 @@ def test_client_context_from_header():
         "namespace": "ns",
     }
     encoded = base64.b64encode(json.dumps(payload).encode()).decode()
+    session = Session(Config.default())
 
-    ctx = ClientContext.from_header(encoded)
+    ctx = ClientContext.from_header(encoded, session)
 
     assert ctx.org.id == "00DJS0000000123ABC"
     assert ctx.org.user.username == "user@example.tld"
