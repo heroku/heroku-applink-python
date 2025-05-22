@@ -9,7 +9,7 @@ def test_config_default():
     assert config.socket_connect is None
     assert config.socket_read is None
 
-def test_config_client_session():
+def test_config_client_timeouts():
     config = Config(request_timeout=10)
 
     assert config.request_timeout == 10

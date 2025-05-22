@@ -4,7 +4,7 @@ import aiohttp
 import orjson
 from aiohttp.payload import BytesPayload
 
-from heroku_applink.session import Session
+from heroku_applink.connection import Connection
 
 from ._requests import (
     CompositeGraphRestApiRequest,
@@ -39,12 +39,12 @@ class DataAPI:
         org_domain_url: str,
         api_version: str,
         access_token: str,
-        session: Session,
+        connection: Connection,
     ) -> None:
         self._api_version = api_version
         self._org_domain_url = org_domain_url
         self.access_token = access_token
-        self._session = session
+        self._connection = connection
 
     async def query(self, soql: str, timeout: float|None=None) -> RecordQueryResult:
         """
@@ -208,7 +208,7 @@ class DataAPI:
         body = rest_api_request.request_body()
 
         try:
-            response = await self._session.request(
+            response = await self._connection.request(
                 method,
                 url,
                 headers=self._default_headers(),
@@ -237,7 +237,7 @@ class DataAPI:
         return await rest_api_request.process_response(response.status, json_body)
 
     async def _download_file(self, url: str) -> bytes:
-        response = await self._session.request(
+        response = await self._connection.request(
             "GET", f"{self._org_domain_url}{url}", headers=self._default_headers()
         )
 

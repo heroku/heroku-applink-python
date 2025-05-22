@@ -5,11 +5,11 @@ from .data_api.reference_id import ReferenceId
 from .data_api.unit_of_work import UnitOfWork
 from .middleware import IntegrationWsgiMiddleware, IntegrationAsgiMiddleware
 from .exceptions import ClientError, UnexpectedRestApiResponsePayload
-from .session import Session
+from .connection import Connection
 
 __all__ = [
     "Config",
-    "Session",
+    "Connection",
     "client_context",
     "ClientContext",
     "Org",

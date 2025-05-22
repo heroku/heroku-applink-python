@@ -3,7 +3,7 @@ import pytest
 from aioresponses import aioresponses
 
 from heroku_applink.config import Config
-from heroku_applink.session import Session
+from heroku_applink.connection import Connection
 
 @pytest.fixture
 def config():
@@ -15,17 +15,16 @@ def config():
     )
 
 @pytest.fixture
-def session(config):
-    return Session(config)
+def connection(config):
+    return Connection(config)
 
-def test_session_init(config):
-    session = Session(config)
-    assert isinstance(session, Session)
-    assert session._config == config
-    assert session._session is None
+def test_connection_init(config):
+    connection = Connection(config)
+    assert isinstance(connection, Connection)
+    assert connection._config == config
 
 @pytest.mark.asyncio
-async def test_session_request_get(session):
+async def test_connection_request_get(connection):
     with aioresponses() as m:
         m.get(
             'https://example.com',
@@ -33,13 +32,14 @@ async def test_session_request_get(session):
             payload={'key': 'value'}
         )
 
-        response = await session.request("GET", "https://example.com")
+        response = await connection.request("GET", "https://example.com")
+
         assert response.status == 200
         data = await response.json()
         assert data == {'key': 'value'}
 
 @pytest.mark.asyncio
-async def test_session_request_post(session):
+async def test_connection_request_post(connection):
     with aioresponses() as m:
         m.post(
             'https://example.com',
@@ -47,7 +47,7 @@ async def test_session_request_post(session):
             payload={'id': '123'}
         )
 
-        response = await session.request(
+        response = await connection.request(
             "POST",
             "https://example.com",
             data={'name': 'test'}
@@ -57,7 +57,7 @@ async def test_session_request_post(session):
         assert data == {'id': '123'}
 
 @pytest.mark.asyncio
-async def test_session_request_with_headers(session):
+async def test_connection_request_with_headers(connection):
     with aioresponses() as m:
         m.get(
             'https://example.com',
@@ -66,7 +66,7 @@ async def test_session_request_with_headers(session):
         )
 
         headers = {'Authorization': 'Bearer token'}
-        response = await session.request(
+        response = await connection.request(
             "GET",
             "https://example.com",
             headers=headers
@@ -74,7 +74,7 @@ async def test_session_request_with_headers(session):
         assert response.status == 200
 
 @pytest.mark.asyncio
-async def test_session_request_error(session):
+async def test_connection_request_error(connection):
     with aioresponses() as m:
         m.get(
             'https://example.com',
@@ -82,40 +82,40 @@ async def test_session_request_error(session):
             payload={'error': 'Internal Server Error'}
         )
 
-        response = await session.request("GET", "https://example.com")
+        response = await connection.request("GET", "https://example.com")
         assert response.status == 500
         data = await response.json()
         assert data == {'error': 'Internal Server Error'}
 
 @pytest.mark.asyncio
-async def test_session_close(session):
-    # First request creates the session
+async def test_connection_close(connection):
+    # First request creates the connection
     with aioresponses() as m:
         m.get('https://example.com', status=200)
-        await session.request("GET", "https://example.com")
-        assert session._session is not None
+        await connection.request("GET", "https://example.com")
+        assert connection._session is not None
 
     # Close the session
-    await session.close()
-    assert session._session is None
+    await connection.close()
+    assert connection._session is None
 
 @pytest.mark.asyncio
-async def test_session_reuse(session):
+async def test_connection_reuse(connection):
     with aioresponses() as m:
         m.get('https://example.com', status=200, repeat=True)
 
         # First request
-        response1 = await session.request("GET", "https://example.com")
+        response1 = await connection.request("GET", "https://example.com")
         assert response1.status == 200
-        session1 = session._session
+        session1 = connection._session
 
         # Second request should reuse the same session
-        response2 = await session.request("GET", "https://example.com")
+        response2 = await connection.request("GET", "https://example.com")
         assert response2.status == 200
-        assert session._session is session1
+        assert connection._session is session1
 
 @pytest.mark.asyncio
-async def test_session_custom_timeout(session):
+async def test_connection_custom_timeout(connection):
     with aioresponses() as m:
         m.get(
             'https://example.com',
@@ -123,7 +123,7 @@ async def test_session_custom_timeout(session):
             payload={'key': 'value'}
         )
 
-        response = await session.request(
+        response = await connection.request(
             "GET",
             "https://example.com",
             timeout=10.0
@@ -133,7 +133,7 @@ async def test_session_custom_timeout(session):
         assert data == {'key': 'value'}
 
 @pytest.mark.asyncio
-async def test_session_multiple_requests(session):
+async def test_connection_multiple_requests(connection):
     with aioresponses() as m:
         m.get('https://example.com/1', status=200, payload={'id': '1'})
         m.get('https://example.com/2', status=200, payload={'id': '2'})
@@ -142,7 +142,7 @@ async def test_session_multiple_requests(session):
         # Make multiple requests
         responses = []
         for i in range(1, 4):
-            response = await session.request("GET", f"https://example.com/{i}")
+            response = await connection.request("GET", f"https://example.com/{i}")
             data = await response.json()
             responses.append(data)
 

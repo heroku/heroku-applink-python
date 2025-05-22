@@ -5,11 +5,11 @@ Sub-modules
 -----------
 
 * heroku_applink.config
+* heroku_applink.connection
 * heroku_applink.context
 * heroku_applink.data_api
 * heroku_applink.exceptions
 * heroku_applink.middleware
-* heroku_applink.session
 
 Classes
 -------
@@ -25,7 +25,7 @@ Information about the Salesforce org that made the request.
 ## Static methods
 
 ```python
-def from_header(header: str, session: heroku_applink.session.Session)
+def from_header(header: str, connection: heroku_applink.connection.Connection)
 ```
 
 ## Instance variables
@@ -85,6 +85,32 @@ def default() ‑> heroku_applink.config.Config
 
 * `socket_read: float | None`
     Timeout for reading from the Salesforce Data API.
+
+<!-- python-connection.md -->
+# `Connection`
+
+```python
+class Connection(config: heroku_applink.config.Config)
+```
+A connection for making asynchronous HTTP requests.
+
+## Methods
+
+### `close`
+
+```python
+def close(self)
+```
+Close the connection.
+
+### `request`
+
+```python
+def request(self, method, url, headers=None, data=None, timeout: float | None = None) ‑> aiohttp.client_reqrep.ClientResponse
+```
+Make an HTTP request to the given URL.
+
+If a timeout is provided, it will be used to set the timeout for the request.
 
 <!-- python-integrationasgimiddleware.md -->
 # `IntegrationAsgiMiddleware`
@@ -207,32 +233,6 @@ Used to reference results of other operations inside the same unit of work.
 
 * `id: str`
     The internal identifier of this `ReferenceId`.
-
-<!-- python-session.md -->
-# `Session`
-
-```python
-class Session(config: heroku_applink.config.Config)
-```
-A session for making asynchronous HTTP requests.
-
-## Methods
-
-### `close`
-
-```python
-def close(self)
-```
-Close the session.
-
-### `request`
-
-```python
-def request(self, method, url, headers=None, data=None, timeout: float | None = None) ‑> aiohttp.client_reqrep.ClientResponse
-```
-Make an HTTP request to the given URL.
-
-If a timeout is provided, it will be used to set the timeout for the request.
 
 <!-- python-unexpectedrestapiresponsepayload.md -->
 # `UnexpectedRestApiResponsePayload`

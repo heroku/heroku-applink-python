@@ -3,9 +3,9 @@ import asyncio
 
 from .config import Config
 
-class Session:
+class Connection:
     """
-    A session for making asynchronous HTTP requests.
+    A connection for making asynchronous HTTP requests.
     """
 
     def __init__(self, config: Config):
@@ -40,7 +40,7 @@ class Session:
 
     async def close(self):
         """
-        Close the session.
+        Close the connection.
         """
         if self._session:
             await self._session.close()
@@ -48,7 +48,7 @@ class Session:
 
     def __del__(self):
         """
-        Close the session when the object is deleted.
+        Close the connection when the object is deleted.
         """
         try:
             loop = asyncio.get_running_loop()
