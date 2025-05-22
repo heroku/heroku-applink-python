@@ -42,7 +42,8 @@ class Session:
         Close the session.
         """
         if self._session:
-            self._session.close()
+            await self._session.close()
+            self._session = None
 
     def _client(self) -> aiohttp.ClientSession:
         """
