@@ -25,6 +25,10 @@ class Session:
             self._session.close()
 
     def _client(self) -> aiohttp.ClientSession:
+        """
+        Lazily get the underlying `aiohttp.ClientSession`. This session is
+        persisted so we can take advantage of connection pooling.
+        """
         if self._session is None:
             self._session = aiohttp.ClientSession(
                 # Disable cookie storage using `DummyCookieJar`, given that we
