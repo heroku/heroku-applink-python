@@ -1,5 +1,5 @@
 import pytest
-from aiohttp import ClientTimeout
+
 from aioresponses import aioresponses
 
 from heroku_applink.config import Config
