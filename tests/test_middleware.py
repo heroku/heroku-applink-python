@@ -36,7 +36,7 @@ def test_wsgi_middleware_call(mock_client_context):
     mock_request = Mock()
     mock_request.headers = {"x-client-context": "dummy-header"}
 
-    with patch("heroku_applink.middleware.from_request", return_value=mock_client_context):
+    with patch("heroku_applink.middleware.ClientContext.from_header", return_value=mock_client_context):
         response = middleware(mock_request)
         assert response == "response"
         assert client_context.get() == mock_client_context
