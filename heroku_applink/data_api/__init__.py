@@ -43,9 +43,8 @@ class DataAPI:
     ) -> None:
         self._api_version = api_version
         self._org_domain_url = org_domain_url
-        self._session = session.client()
-
         self.access_token = access_token
+        self._session = session
 
     async def query(self, soql: str) -> RecordQueryResult:
         """

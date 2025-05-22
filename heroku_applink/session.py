@@ -21,3 +21,10 @@ class Session:
                 ),
             )
         return self._session
+
+    def request(self, method, url, headers=None, data=None):
+        return self.client().request(method, url, headers=headers, data=data)
+
+    async def close(self):
+        if self._session:
+            self._session.close()
