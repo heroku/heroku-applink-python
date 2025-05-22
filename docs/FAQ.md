@@ -6,7 +6,7 @@
 Heroku Applink is a Python package that provides integration between Heroku applications and Salesforce. It enables secure communication and data exchange between Heroku apps and Salesforce orgs.
 
 ### What are the system requirements?
-- Python 3.8 or higher
+- Python 3.10 or higher
 - A Heroku account
 - A Salesforce org
 - Required environment variables for authentication
@@ -14,8 +14,39 @@ Heroku Applink is a Python package that provides integration between Heroku appl
 ## Installation and Setup
 
 ### How do I install the package?
+
+Using pip:
 ```bash
 pip install heroku-applink
+```
+
+Using uv:
+```bash
+uv pip install heroku-applink
+```
+
+To add it to your project's dependencies in pyproject.toml:
+```toml
+[project]
+name = "your-project-name"
+version = "0.1.0"
+description = "Your project description"
+requires-python = ">=3.10"
+dependencies = [
+    "heroku-applink>=0.1.0",
+    "aiohttp>=3.11.12",
+    "orjson>=3.10.15"
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.10.0",
+    "ruff>=0.1.0",
+    "coverage>=7.0.0"
+]
 ```
 
 ### What environment variables do I need to set up?
@@ -244,6 +275,18 @@ pytest -m functional
 ## Version History
 
 ### How do I check the current version?
+
+Using pip:
+```bash
+pip show heroku-applink
+```
+
+Using uv:
+```bash
+uv pip show heroku-applink
+```
+
+You can also check the version programmatically:
 ```python
 import heroku_applink
 print(heroku_applink.__version__)
@@ -272,3 +315,5 @@ Install and run pdoc3:
 pip install pdoc3
 pdoc --html --output-dir docs --force heroku_applink
 ```
+
+
