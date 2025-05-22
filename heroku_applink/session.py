@@ -1,4 +1,5 @@
 import aiohttp
+import asyncio
 
 from .config import Config
 
@@ -44,6 +45,12 @@ class Session:
         if self._session:
             await self._session.close()
             self._session = None
+
+    def __del__(self):
+        """
+        Close the session when the object is deleted.
+        """
+        asyncio.run(self.close())
 
     def _client(self) -> aiohttp.ClientSession:
         """
