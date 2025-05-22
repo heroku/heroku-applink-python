@@ -7,6 +7,7 @@ from heroku_applink.utils.addon_config import (
     resolve_addon_config_by_attachment_or_color,
     resolve_addon_config_by_url,
 )
+import os
 
 http_request_util = HttpRequestUtil()
 
@@ -15,7 +16,10 @@ class RequestOptions(TypedDict):
     headers: dict[str, str]
 
 # How long to wait for the add-on call before giving up (in seconds)
-HTTP_TIMEOUT_SECONDS = 5.0
+try:
+    HTTP_TIMEOUT_SECONDS = float(os.getenv("HEROKU_APPLINK_TIMEOUT", "5.0"))
+except ValueError:
+    HTTP_TIMEOUT_SECONDS = 5.0
 
 # Fields we expect in a successful authorization payload
 _REQUIRED_FIELDS = {

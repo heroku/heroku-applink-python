@@ -124,7 +124,35 @@ $ uv run pdoc3 --template-dir templates/python heroku_applink -o docs --force
     uv pip install heroku_applink
     ```
 
-2. Add the middleware to your web framework:
+2. Using the get_authorization function:
+    ```python
+    import asyncio
+    from heroku_applink.addons.heroku_applink import get_authorization
+
+    async def main():
+        # Get authorization for a developer
+        # You can provide either a developer name or an attachment/URL
+        context = await get_authorization(
+            developer_name="your_developer_name",
+            attachment_or_url="HEROKU_APPLINK"  # Optional: defaults to HEROKU_APPLINK if not provided
+        )
+        
+        # Access the context properties
+        print(f"Organization ID: {context.org.id}")
+        print(f"User ID: {context.org.user.id}")
+        print(f"Username: {context.org.user.username}")
+        
+        # Use the DataAPI to make queries
+        query = "SELECT Id, Name FROM Account"
+        result = await context.data_api.query(query)
+        for record in result.records:
+            print(f"Account: {record}")
+
+    # Run the async function
+    asyncio.run(main())
+    ```
+
+3. Add the middleware to your web framework:
 
     ```python
     # FastAPI example
