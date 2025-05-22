@@ -50,7 +50,11 @@ class Session:
         """
         Close the session when the object is deleted.
         """
-        asyncio.run(self.close())
+        try:
+            loop = asyncio.get_running_loop()
+            loop.create_task(self.close())
+        except RuntimeError:
+            asyncio.run(self.close())
 
     def _client(self) -> aiohttp.ClientSession:
         """
