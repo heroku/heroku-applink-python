@@ -43,7 +43,7 @@ class DataAPI:
     ) -> None:
         self._api_version = api_version
         self._org_domain_url = org_domain_url
-        self._shared_session = session.client()
+        self._session = session.client()
 
         self.access_token = access_token
 
@@ -197,7 +197,7 @@ class DataAPI:
         body = rest_api_request.request_body()
 
         try:
-            response = await self._shared_session.request(
+            response = await self._session.request(
                 method,
                 url,
                 headers=self._default_headers(),
@@ -225,7 +225,7 @@ class DataAPI:
         return await rest_api_request.process_response(response.status, json_body)
 
     async def _download_file(self, url: str) -> bytes:
-        response = await self._shared_session.request(
+        response = await self._session.request(
             "GET", f"{self._org_domain_url}{url}", headers=self._default_headers()
         )
 
