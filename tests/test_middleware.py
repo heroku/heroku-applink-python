@@ -1,4 +1,5 @@
 import pytest
+
 from heroku_applink.middleware import (
     IntegrationWsgiMiddleware,
     IntegrationAsgiMiddleware,
