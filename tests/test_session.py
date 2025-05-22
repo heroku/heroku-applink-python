@@ -142,7 +142,7 @@ async def test_session_multiple_requests(session):
         # Make multiple requests
         responses = []
         for i in range(1, 4):
-            response = await session.request(f"GET", f"https://example.com/{i}")
+            response = await session.request("GET", f"https://example.com/{i}")
             data = await response.json()
             responses.append(data)
 

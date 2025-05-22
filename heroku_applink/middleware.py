@@ -1,4 +1,3 @@
-import aiohttp
 import contextvars
 
 from .config import Config
