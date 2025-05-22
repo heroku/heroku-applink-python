@@ -6,6 +6,7 @@ from .data_api.unit_of_work import UnitOfWork
 from .middleware import IntegrationWsgiMiddleware, IntegrationAsgiMiddleware
 from .exceptions import ClientError, UnexpectedRestApiResponsePayload
 from .connection import Connection
+from .middleware import client_context
 
 __all__ = [
     "Config",
