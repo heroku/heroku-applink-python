@@ -3,11 +3,28 @@ import aiohttp
 from .config import Config
 
 class Session:
+    """
+    A session for making asynchronous HTTP requests.
+    """
+
     def __init__(self, config: Config):
         self._config = config
         self._session = None
 
-    def client(self) -> aiohttp.ClientSession:
+    def request(self, method, url, headers=None, data=None):
+        """
+        Make an HTTP request to the given URL.
+        """
+        return self._client().request(method, url, headers=headers, data=data)
+
+    async def close(self):
+        """
+        Close the session.
+        """
+        if self._session:
+            self._session.close()
+
+    def _client(self) -> aiohttp.ClientSession:
         if self._session is None:
             self._session = aiohttp.ClientSession(
                 # Disable cookie storage using `DummyCookieJar`, given that we
@@ -21,10 +38,3 @@ class Session:
                 ),
             )
         return self._session
-
-    def request(self, method, url, headers=None, data=None):
-        return self.client().request(method, url, headers=headers, data=data)
-
-    async def close(self):
-        if self._session:
-            self._session.close()
