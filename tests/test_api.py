@@ -20,8 +20,8 @@ async def root():
 @app.get("/client-context")
 async def client_context(request: Request):
     data_api = request.scope["client-context"].data_api
-    result = await data_api.query("SELECT Id, Name FROM Account")
-    return {"message": "Hello, World!", "result": result}
+
+    return {"message": "Hello, World!", "data_api_populated": data_api is not None}
 
 
 
@@ -55,7 +55,7 @@ def test_scoped_client_context(client):
     )
 
     assert response.status_code == 200
-    assert response.json() == {"message": "Hello, World!"}
+    assert response.json() == {"message": "Hello, World!", "data_api_populated": True}
 
 
 
