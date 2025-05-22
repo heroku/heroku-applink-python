@@ -37,7 +37,7 @@ class DataAPI:
         org_domain_url: str,
         api_version: str,
         access_token: str,
-        session: aiohttp.ClientSession | None = None,
+        session: aiohttp.ClientSession,
     ) -> None:
         self._api_version = api_version
         self._org_domain_url = org_domain_url
@@ -194,10 +194,8 @@ class DataAPI:
         method: str = rest_api_request.http_method()
         body = rest_api_request.request_body()
 
-        session = self._shared_session or _create_session()
-
         try:
-            response = await session.request(
+            response = await self._shared_session.request(
                 method,
                 url,
                 headers=self._default_headers(),
@@ -221,34 +219,20 @@ class DataAPI:
             raise UnexpectedRestApiResponsePayload(
                 f"The server didn't respond with valid JSON: {e.__class__.__name__}: {e}"
             ) from e
-        finally:
-            if session != self._shared_session:
-                await session.close()
 
         return await rest_api_request.process_response(response.status, json_body)
 
     async def _download_file(self, url: str) -> bytes:
-        session = self._shared_session or _create_session()
+        response = await self._shared_session.request(
+            "GET", f"{self._org_domain_url}{url}", headers=self._default_headers()
+        )
 
-        try:
-            response = await session.request(
-                "GET", f"{self._org_domain_url}{url}", headers=self._default_headers()
-            )
-
-            return await response.read()
-        finally:
-            if session != self._shared_session:
-                await session.close()
+        return await response.read()
 
     def _default_headers(self) -> dict[str, str]:
         return {
             "Authorization": f"Bearer {self.access_token}",
         }
-
-
-def _create_session() -> aiohttp.ClientSession:
-    # Disable cookie storage using `DummyCookieJar`, given that we don't need cookie support.
-    return aiohttp.ClientSession(cookie_jar=aiohttp.DummyCookieJar())
 
 
 def _json_serialize(data: Any) -> BytesPayload:

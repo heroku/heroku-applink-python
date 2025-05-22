@@ -85,13 +85,6 @@ async def test_default_headers(data_api):
     assert headers["Authorization"] == "Bearer token"
 
 @pytest.mark.asyncio
-async def test_create_session():
-    from heroku_applink.data_api import _create_session
-    session = _create_session()
-    assert isinstance(session, aiohttp.ClientSession)
-    await session.close()
-
-@pytest.mark.asyncio
 async def test_json_serialize():
     from heroku_applink.data_api import _json_serialize
     payload = _json_serialize({"key": "value"})
@@ -137,12 +130,3 @@ async def test_commit_unit_of_work_with_update_and_delete(data_api):
     result = await data_api.commit_unit_of_work(uow)
     assert result[update_ref] == "001X"
     assert result[delete_ref] == "003Y"
-
-
-@pytest.mark.asyncio
-async def test_create_session_cleanup():
-    from heroku_applink.data_api import _create_session
-    session = _create_session()
-    assert isinstance(session, aiohttp.ClientSession)
-    await session.close()
-    assert session.closed
