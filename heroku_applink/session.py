@@ -11,9 +11,18 @@ class Session:
         self._config = config
         self._session = None
 
-    def request(self, method, url, headers=None, data=None, timeout: float|None=None):
+    def request(
+        self,
+        method,
+        url,
+        headers=None,
+        data=None,
+        timeout: float|None=None
+    ) -> aiohttp.ClientResponse:
         """
         Make an HTTP request to the given URL.
+
+        If a timeout is provided, it will be used to set the timeout for the request.
         """
         if timeout is not None:
             timeout = aiohttp.ClientTimeout(total=timeout)
@@ -27,6 +36,7 @@ class Session:
         )
 
         return response
+
     async def close(self):
         """
         Close the session.
