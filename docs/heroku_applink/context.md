@@ -15,7 +15,7 @@ Information about the Salesforce org that made the request.
 ## Static methods
 
 ```python
-def from_header(header: str)
+def from_header(header: str, session: heroku_applink.session.Session)
 ```
 
 ## Instance variables

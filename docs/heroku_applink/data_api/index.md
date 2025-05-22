@@ -16,7 +16,7 @@ Classes
 # `DataAPI`
 
 ```python
-class DataAPI(*, org_domain_url: str, api_version: str, access_token: str, session: aiohttp.client.ClientSession | None = None)
+class DataAPI(*, org_domain_url: str, api_version: str, access_token: str, session: heroku_applink.session.Session)
 ```
 Data API client to interact with data in a Salesforce org.
 
