@@ -11,12 +11,22 @@ class Session:
         self._config = config
         self._session = None
 
-    def request(self, method, url, headers=None, data=None):
+    def request(self, method, url, headers=None, data=None, timeout: float|None=None):
         """
         Make an HTTP request to the given URL.
         """
-        return self._client().request(method, url, headers=headers, data=data)
+        if timeout is not None:
+            timeout = aiohttp.ClientTimeout(total=timeout)
 
+        response = self._client().request(
+            method,
+            url,
+            headers=headers,
+            data=data,
+            timeout=timeout
+        )
+
+        return response
     async def close(self):
         """
         Close the session.

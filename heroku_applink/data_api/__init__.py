@@ -190,7 +190,7 @@ class DataAPI:
             )
         )
 
-    async def _execute(self, rest_api_request: RestApiRequest[T]) -> T:
+    async def _execute(self, rest_api_request: RestApiRequest[T], timeout: float|None=None) -> T:
         url: str = rest_api_request.url(self._org_domain_url, self._api_version)
         method: str = rest_api_request.http_method()
         body = rest_api_request.request_body()
@@ -201,6 +201,7 @@ class DataAPI:
                 url,
                 headers=self._default_headers(),
                 data=None if body is None else _json_serialize(body),
+                timeout=timeout,
             )
 
             # Using orjson for faster JSON deserialization over the stdlib.
