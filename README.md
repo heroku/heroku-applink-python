@@ -152,7 +152,7 @@ def get_root():
 
 @app.get("/accounts")
 def get_accounts():
-    data_api = request.scope["client-context"].data_api
+    data_api = sdk.client_context.get().data_api
     asyncio.run(query_accounts(data_api))
     return {"Some": "Accounts"}
 
@@ -185,7 +185,7 @@ def index():
 
 @app.route("/accounts")
 def get_accounts():
-    data_api = request.environ['client-context'].data_api
+    data_api = sdk.client_context.get().data_api
     query = "SELECT Id, Name FROM Account"
     result = data_api.query(query)
 
