@@ -13,16 +13,19 @@ def from_request(request) -> ClientContext:
 
 
 class IntegrationWsgiMiddleware:
+    def __init__(self, app):
+        self.app = app
 
-    def __init__(self, get_response) -> None:
-        self.get_response = get_response
+    def __call__(self, environ, start_response):
+        header = environ.get("HTTP_X_CLIENT_CONTEXT")
 
-    def __call__(self, request):
-        ctx = from_request(request)
+        if not header:
+            raise ValueError("x-client-context not set")
+
+        ctx = ClientContext.from_header(header)
         client_context.set(ctx)
 
-        response = self.get_response(request)
-        return response
+        return self.app(environ, start_response)
 
 class IntegrationAsgiMiddleware:
     def __init__(self, app):
