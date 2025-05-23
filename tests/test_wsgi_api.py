@@ -16,7 +16,7 @@ def index():
 
 @app.route("/client-context")
 def client_context():
-    data_api = request.scope["client-context"].data_api
+    data_api = request.environ['client-context'].data_api
 
     return jsonify({"data_api_populated": data_api is not None})
 
@@ -54,4 +54,4 @@ def test_scoped_client_context(client, client_context):
     )
 
     assert response.status_code == 200
-    assert response.json() == {"data_api_populated": True}
+    assert response.json == {"data_api_populated": True}

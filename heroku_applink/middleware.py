@@ -22,8 +22,7 @@ class IntegrationWsgiMiddleware:
         if not header:
             raise ValueError("x-client-context not set")
 
-        ctx = ClientContext.from_header(header)
-        client_context.set(ctx)
+        environ["client-context"] = ClientContext.from_header(header)
 
         return self.app(environ, start_response)
 
