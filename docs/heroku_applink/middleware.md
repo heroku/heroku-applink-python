@@ -25,5 +25,5 @@ class IntegrationAsgiMiddleware(app)
 # `IntegrationWsgiMiddleware`
 
 ```python
-class IntegrationWsgiMiddleware(get_response)
+class IntegrationWsgiMiddleware(app)
 ```

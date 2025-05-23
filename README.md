@@ -117,42 +117,74 @@ $ uv run pdoc3 --template-dir templates/python heroku_applink -o docs --force
 
 ## Usage Examples
 
+For more detailed information about the SDK's capabilities, please refer to the [full documentation](docs/heroku_applink/index.md).
+
 ### Basic Setup
 
-1. Install the package:
-    ```bash
-    uv pip install heroku_applink
-    ```
+Install the package.
 
-2. Add the middleware to your web framework:
+```shell
+$ uv pip install heroku_applink
+```
 
-    ```python
-    # FastAPI example
-    import asyncio
-    import heroku_applink as sdk
-    from fastapi import FastAPI
+Add the middleware to your web framework.
 
-    app = FastAPI()
-    app.add_middleware(sdk.IntegrationAsgiMiddleware)
+#### ASGI
 
+If you are using an ASGI framework (like FastAPI), you can use the `IntegrationAsgiMiddleware` to automatically populate the `client-context` in the request scope.
 
-    @app.get("/")
-    def get_root():
-        return {"root": "page"}
+```python
+# FastAPI example
+import asyncio
+import heroku_applink as sdk
+from fastapi import FastAPI
 
-
-    @app.get("/accounts")
-    def get_accounts():
-        dataapi = sdk.context.get()
-        asyncio.run(query_accounts(dataapi))
-        return {"Some": "Accounts"}
+app = FastAPI()
+app.add_middleware(sdk.IntegrationAsgiMiddleware)
 
 
-    async def query_accounts(dataapi):
-        query = "SELECT Id, Name FROM Account"
-        result = await dataapi.query(query)
-        for record in result.records:
-            print("===== account record", record)
-    ```
+@app.get("/")
+def get_root():
+    return {"root": "page"}
 
-For more detailed information about the SDK's capabilities, please refer to the [full documentation](docs/heroku_applink/index.md).
+
+@app.get("/accounts")
+def get_accounts():
+    dataapi = sdk.context.get()
+    asyncio.run(query_accounts(dataapi))
+    return {"Some": "Accounts"}
+
+
+async def query_accounts(dataapi):
+    query = "SELECT Id, Name FROM Account"
+    result = await dataapi.query(query)
+    for record in result.records:
+        print("===== account record", record)
+```
+
+#### WSGI
+
+If you are using a WSGI framework (like Flask), you can use the `IntegrationWsgiMiddleware` to automatically populate the `client-context` in the request environment.
+
+```python
+from flask import Flask, jsonify, request
+
+import heroku_applink as sdk
+
+app = Flask(__name__)
+app.wsgi_app = sdk.IntegrationWsgiMiddleware(app.wsgi_app)
+
+
+@app.route("/")
+def index():
+    return jsonify({"message": "Hello, World!"})
+
+
+@app.route("/accounts")
+def get_accounts():
+    data_api = request.environ['client-context'].data_api
+    query = "SELECT Id, Name FROM Account"
+    result = await data_api.query(query)
+
+    return jsonify({"accounts": [record.get("Name") for record in result.records]})
+```

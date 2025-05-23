@@ -6,6 +6,7 @@ Sub-modules
 
 * heroku_applink.context
 * heroku_applink.data_api
+* heroku_applink.exceptions
 * heroku_applink.middleware
 
 Classes
@@ -45,6 +46,14 @@ def from_header(header: str)
 * `request_id: str`
     Request ID from the Salesforce org.
 
+<!-- python-clienterror.md -->
+# `ClientError`
+
+```python
+class ClientError(*args, **kwargs)
+```
+Raised when there is an error with the HTTP client.
+
 <!-- python-integrationasgimiddleware.md -->
 # `IntegrationAsgiMiddleware`
 
@@ -56,7 +65,7 @@ class IntegrationAsgiMiddleware(app)
 # `IntegrationWsgiMiddleware`
 
 ```python
-class IntegrationWsgiMiddleware(get_response)
+class IntegrationWsgiMiddleware(app)
 ```
 
 <!-- python-org.md -->
@@ -166,6 +175,14 @@ Used to reference results of other operations inside the same unit of work.
 
 * `id: str`
     The internal identifier of this `ReferenceId`.
+
+<!-- python-unexpectedrestapiresponsepayload.md -->
+# `UnexpectedRestApiResponsePayload`
+
+```python
+class UnexpectedRestApiResponsePayload(*args, **kwargs)
+```
+Raised when the API response is not in the expected format.
 
 <!-- python-unitofwork.md -->
 # `UnitOfWork`
