@@ -1,8 +1,8 @@
 import pytest
+
 from heroku_applink.middleware import (
     IntegrationWsgiMiddleware,
     IntegrationAsgiMiddleware,
-    from_request,
     client_context,
 )
 from heroku_applink.context import ClientContext, Org, User
@@ -37,12 +37,13 @@ def test_wsgi_middleware_call(mock_client_context):
     mock_request = Mock()
     mock_request.headers = {"x-client-context": "dummy-header"}
 
-    with patch("heroku_applink.middleware.from_request", return_value=mock_client_context):
+    with patch("heroku_applink.middleware.ClientContext.from_header", return_value=mock_client_context):
         response = middleware(mock_request)
         assert response == "response"
         assert client_context.get() == mock_client_context
 
-def test_asgi_middleware_initialization():
+@pytest.mark.asyncio
+async def test_asgi_middleware_initialization():
     """Test that the ASGI middleware can be initialized."""
     mock_app = AsyncMock()
     middleware = IntegrationAsgiMiddleware(mock_app)
@@ -66,11 +67,3 @@ async def test_asgi_middleware_call(mock_client_context):
         assert client_context.get() == mock_client_context
         assert scope["client-context"] == mock_client_context
         mock_app.assert_called_once_with(scope, receive, send)
-
-def test_from_request_missing_header():
-    """Test that from_request raises ValueError when header is missing."""
-    mock_request = Mock()
-    mock_request.headers = {}
-
-    with pytest.raises(ValueError, match="x-client-context not set"):
-        from_request(mock_request)

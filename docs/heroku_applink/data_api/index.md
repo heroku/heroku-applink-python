@@ -16,7 +16,7 @@ Classes
 # `DataAPI`
 
 ```python
-class DataAPI(*, org_domain_url: str, api_version: str, access_token: str, session: aiohttp.client.ClientSession | None = None)
+class DataAPI(*, org_domain_url: str, api_version: str, access_token: str, connection: heroku_applink.connection.Connection)
 ```
 Data API client to interact with data in a Salesforce org.
 
@@ -28,7 +28,7 @@ to make it easier for you to query, insert, and update records.
 ### `commit_unit_of_work`
 
 ```python
-def commit_unit_of_work(self, unit_of_work: heroku_applink.data_api.unit_of_work.UnitOfWork) ‑> dict[heroku_applink.data_api.reference_id.ReferenceId, str]
+def commit_unit_of_work(self, unit_of_work: heroku_applink.data_api.unit_of_work.UnitOfWork, timeout: float | None = None) ‑> dict[heroku_applink.data_api.reference_id.ReferenceId, str]
 ```
 Commit a `UnitOfWork`, which executes all operations registered with it.
 
@@ -60,7 +60,7 @@ second_record_id = result[second_create_reference_id]
 ### `create`
 
 ```python
-def create(self, record: heroku_applink.data_api.record.Record) ‑> str
+def create(self, record: heroku_applink.data_api.record.Record, timeout: float | None = None) ‑> str
 ```
 Create a new record based on the given `Record` object.
 
@@ -82,7 +82,7 @@ record_id = await context.org.data_api.create(
 ### `delete`
 
 ```python
-def delete(self, object_type: str, record_id: str) ‑> str
+def delete(self, object_type: str, record_id: str, timeout: float | None = None) ‑> str
 ```
 Delete an existing record of the given Salesforce object type and ID.
 
@@ -97,7 +97,7 @@ await data_api.delete("Account", "001B000001Lp1FxIAJ")
 ### `query`
 
 ```python
-def query(self, soql: str) ‑> heroku_applink.data_api.record.RecordQueryResult
+def query(self, soql: str, timeout: float | None = None) ‑> heroku_applink.data_api.record.RecordQueryResult
 ```
 Query for records using the given SOQL string.
 
@@ -118,7 +118,7 @@ For more information, see the [Query REST API documentation](https://developer.s
 ### `query_more`
 
 ```python
-def query_more(self, result: heroku_applink.data_api.record.RecordQueryResult) ‑> heroku_applink.data_api.record.RecordQueryResult
+def query_more(self, result: heroku_applink.data_api.record.RecordQueryResult, timeout: float | None = None) ‑> heroku_applink.data_api.record.RecordQueryResult
 ```
 Query for more records, based on the given `RecordQueryResult`.
 
@@ -136,7 +136,7 @@ For more information, see the [Query More Results REST API documentation](https:
 ### `update`
 
 ```python
-def update(self, record: heroku_applink.data_api.record.Record) ‑> str
+def update(self, record: heroku_applink.data_api.record.Record, timeout: float | None = None) ‑> str
 ```
 Update an existing record based on the given `Record` object.
 

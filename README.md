@@ -139,8 +139,10 @@ import asyncio
 import heroku_applink as sdk
 from fastapi import FastAPI
 
+config = sdk.Config(request_timeout=5)
+
 app = FastAPI()
-app.add_middleware(sdk.IntegrationAsgiMiddleware)
+app.add_middleware(sdk.IntegrationAsgiMiddleware, config=config)
 
 
 @app.get("/")
@@ -150,14 +152,14 @@ def get_root():
 
 @app.get("/accounts")
 def get_accounts():
-    dataapi = sdk.context.get()
-    asyncio.run(query_accounts(dataapi))
+    data_api = request.scope["client-context"].data_api
+    asyncio.run(query_accounts(data_api))
     return {"Some": "Accounts"}
 
 
-async def query_accounts(dataapi):
+async def query_accounts(data_api):
     query = "SELECT Id, Name FROM Account"
-    result = await dataapi.query(query)
+    result = await data_api.query(query)
     for record in result.records:
         print("===== account record", record)
 ```
@@ -171,8 +173,9 @@ from flask import Flask, jsonify, request
 
 import heroku_applink as sdk
 
+config = sdk.Config(request_timeout=5)
 app = Flask(__name__)
-app.wsgi_app = sdk.IntegrationWsgiMiddleware(app.wsgi_app)
+app.wsgi_app = sdk.IntegrationWsgiMiddleware(app.wsgi_app, config=config)
 
 
 @app.route("/")
