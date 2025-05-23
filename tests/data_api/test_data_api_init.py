@@ -6,13 +6,23 @@ from unittest.mock import AsyncMock, patch, MagicMock
 from heroku_applink.data_api import DataAPI, Record, RecordQueryResult, UnitOfWork
 from heroku_applink.data_api.exceptions import ClientError, UnexpectedRestApiResponsePayload
 
+@pytest.fixture(autouse=True)
+async def clear_cache():
+    """Clear any cached responses between tests."""
+    yield
+    # No need to explicitly clear cache as each test creates its own session
+    # and the data_api fixture handles cleanup
+
 @pytest.fixture
-def data_api():
-    return DataAPI(
+async def data_api():
+    api = DataAPI(
         org_domain_url="https://example.salesforce.com",
         api_version="v60.0",
         access_token="token"
     )
+    yield api
+    if api._shared_session:
+        await api._shared_session.close()
 
 @pytest.mark.asyncio
 async def test_query(data_api):

@@ -1,8 +1,9 @@
 import asyncio
 import urllib.parse
-from typing import TypedDict, Optional
+from typing import TypedDict, Optional, TYPE_CHECKING
 from heroku_applink.utils.http_request import HttpRequestUtil
-from heroku_applink.context import ClientContext, Org, User, DataAPI
+from heroku_applink.models import Org, User
+from heroku_applink.context import DataAPI
 from heroku_applink.utils.addon_config import (
     resolve_addon_config_by_attachment_or_color,
     resolve_addon_config_by_url,
@@ -33,14 +34,17 @@ _REQUIRED_FIELDS = {
     "namespace",
 }
 
+if TYPE_CHECKING:
+    from heroku_applink.context import ClientContext
 
 async def get_authorization(
     developer_name: str,
     attachment_or_url: Optional[str] = None,
-) -> ClientContext:
+) -> 'ClientContext':
+    from heroku_applink.context import ClientContext
     """
     Fetch authorization for a given Heroku AppLink developer.
-    Uses GET {apiUrl}/invocations/authorization?org_name=developer_name
+    Uses GET {apiUrl}/authorizations/{developer_name}
     with a Bearer token from the add-on config.
     """
 
@@ -63,8 +67,7 @@ async def get_authorization(
 
     # 2) Build the full request URL (strip any trailing slash)
     base = config["api_url"].rstrip("/")
-    qs   = urllib.parse.urlencode({"org_name": developer_name})
-    full_url = f"{base}/invocations/authorization?{qs}"
+    full_url = f"{base}/authorizations/{developer_name}"
 
     opts: RequestOptions = {
         "method": "GET",
@@ -105,6 +108,7 @@ async def get_authorization(
             id=response["user_id"],
             username=response["username"],
         ),
+        type=response["org_type"],
     )
 
     return ClientContext(

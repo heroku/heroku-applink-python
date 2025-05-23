@@ -5,7 +5,8 @@ from heroku_applink.middleware import (
     from_request,
     client_context,
 )
-from heroku_applink.context import ClientContext, Org, User
+from heroku_applink.models import Org, User
+from heroku_applink.context import ClientContext, OrgType
 from unittest.mock import Mock, patch, AsyncMock
 
 @pytest.fixture
@@ -15,6 +16,7 @@ def mock_client_context():
             id="00DJS0000000123ABC",
             domain_url="https://example-domain-url.my.salesforce.com",
             user=User(id="005JS000000H123", username="user@example.tld"),
+            type=OrgType.SALESFORCE,
         ),
         request_id="test-request-id",
         access_token="test-access-token",

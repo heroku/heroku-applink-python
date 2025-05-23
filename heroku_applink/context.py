@@ -1,76 +1,35 @@
 import json
 import base64
-from dataclasses import dataclass
-
+from dataclasses import dataclass, field
 from .data_api import DataAPI
+from .addons import heroku_applink
+from .models import Org, User, OrgType
 
-__all__ = ["User", "Org", "ClientContext"]
-
-
-@dataclass(frozen=True, kw_only=True, slots=True)
-class User:
-    """
-    Information about the Salesforce user that made the request.
-    """
-
-    id: str
-    """
-    The user's ID.
-
-    For example: `005JS000000H123`
-    """
-    username: str
-    """
-    The username of the user.
-
-    For example: `user@example.tld`
-    """
-
-
-@dataclass(frozen=True, kw_only=True, slots=True)
-class Org:
-    """Information about the Salesforce org and the user that made the request."""
-
-    id: str
-    """
-    The Salesforce org ID.
-
-    For example: `00DJS0000000123ABC`
-    """
-
-    domain_url: str
-    """
-    The canonical URL of the Salesforce org.
-
-    This URL never changes. Use this URL when making API calls to your org.
-
-    For example: `https://example-domain-url.my.salesforce.com`
-    """
-    user: User
-    """The currently logged in user."""
-
+__all__ = ["User", "Org", "ClientContext", "OrgType"]
 
 @dataclass(frozen=True, kw_only=True, slots=True)
 class ClientContext:
     """Information about the Salesforce org that made the request."""
-
     org: Org
-    """Information about the Salesforce org and the user that made the request."""
     data_api: DataAPI
-    """An initialized data API client instance for interacting with data in the org."""
     request_id: str
-    """Request ID from the Salesforce org."""
     access_token: str
-    """Valid access token for the current context org/user."""
     api_version: str
-    """API version of the Salesforce component that made the request."""
     namespace: str
-    """Namespace of the Salesforce component that made the request."""
+    addons: object = field(default_factory=lambda: type('Addons', (), {
+        'heroku_integration': heroku_applink
+    }))
 
     @classmethod
     def from_header(cls, header: str):
         decoded = base64.b64decode(header)
         data = json.loads(decoded)
+
+        org_type = data.get("orgType", "SalesforceOrg")
+        try:
+            org_type = OrgType(org_type)
+        except ValueError:
+            org_type = OrgType.SALESFORCE
 
         return cls(
             org=Org(
@@ -80,6 +39,7 @@ class ClientContext:
                     id=data["userContext"]["userId"],
                     username=data["userContext"]["username"],
                 ),
+                type=OrgType.SALESFORCE,
             ),
             request_id=data["requestId"],
             access_token=data["accessToken"],

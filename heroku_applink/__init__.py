@@ -1,4 +1,5 @@
-from .context import ClientContext, Org, User
+from .context import ClientContext
+from .models import Org, User
 from .data_api.record import QueriedRecord, Record, RecordQueryResult
 from .data_api.reference_id import ReferenceId
 from .data_api.unit_of_work import UnitOfWork

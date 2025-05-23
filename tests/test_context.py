@@ -1,7 +1,8 @@
 import base64
 import json
 import pytest
-from heroku_applink.context import User, Org, ClientContext
+from heroku_applink.models import User, Org, OrgType
+from heroku_applink.context import ClientContext
 
 class FakeDataAPI:
     """Fake DataAPI class for testing without real dependencies."""
@@ -22,14 +23,14 @@ def test_user_creation():
 
 def test_org_creation():
     user = User(id="005JS000000H123", username="user@example.tld")
-    org = Org(id="00DJS0000000123ABC", domain_url="https://example-domain.my.salesforce.com", user=user)
+    org = Org(id="00DJS0000000123ABC", domain_url="https://example-domain.my.salesforce.com", user=user, type=OrgType.SALESFORCE)
     assert org.id == "00DJS0000000123ABC"
     assert org.domain_url.startswith("https://")
     assert isinstance(org.user, User)
 
 def test_client_context_creation():
     user = User(id="005JS000000H123", username="user@example.tld")
-    org = Org(id="00DJS0000000123ABC", domain_url="https://example-domain.my.salesforce.com", user=user)
+    org = Org(id="00DJS0000000123ABC", domain_url="https://example-domain.my.salesforce.com", user=user, type=OrgType.SALESFORCE)
     ctx = ClientContext(
         org=org,
         data_api=FakeDataAPI(

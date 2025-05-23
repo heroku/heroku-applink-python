@@ -1,10 +1,10 @@
 import pytest
-import urllib.parse
 from typing import Dict, Any
 
 import heroku_applink.addons.heroku_applink as module
 
-from heroku_applink.context import ClientContext, Org, User, DataAPI
+from heroku_applink.models import Org, User, OrgType
+from heroku_applink.context import ClientContext, DataAPI
 
 # Use pytest-asyncio for testing async functions
 pytest_plugins = ("pytest_asyncio",)
@@ -19,6 +19,7 @@ VALID_RESPONSE: Dict[str, Any] = {
     "access_token": "TOKEN_ABC",
     "api_version": "v52.0",
     "namespace": "testns",
+    "org_type": OrgType.SALESFORCE,
 }
 
 
@@ -110,8 +111,7 @@ async def test_http_error_wrapping(monkeypatch):
         module.http_request_util, "request", raising_request
     )
 
-    encoded = urllib.parse.urlencode({"org_name": "bob"})
-    full_url = f"https://api.test/invocations/authorization?{encoded}"
+    full_url = "https://api.test/authorizations/bob"
 
     with pytest.raises(RuntimeError) as exc:
         await module.get_authorization("bob", None)
