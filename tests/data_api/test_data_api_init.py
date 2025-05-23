@@ -3,6 +3,8 @@ import pytest
 import orjson
 import aiohttp
 from unittest.mock import AsyncMock, patch, MagicMock
+from heroku_applink.config import Config
+from heroku_applink.connection import Connection
 from heroku_applink.data_api import DataAPI, Record, RecordQueryResult, UnitOfWork
 from heroku_applink.data_api.exceptions import ClientError, UnexpectedRestApiResponsePayload
 
@@ -11,7 +13,8 @@ def data_api():
     return DataAPI(
         org_domain_url="https://example.salesforce.com",
         api_version="v60.0",
-        access_token="token"
+        access_token="token",
+        connection=Connection(Config.default())
     )
 
 @pytest.mark.asyncio
@@ -85,13 +88,6 @@ async def test_default_headers(data_api):
     assert headers["Authorization"] == "Bearer token"
 
 @pytest.mark.asyncio
-async def test_create_session():
-    from heroku_applink.data_api import _create_session
-    session = _create_session()
-    assert isinstance(session, aiohttp.ClientSession)
-    await session.close()
-
-@pytest.mark.asyncio
 async def test_json_serialize():
     from heroku_applink.data_api import _json_serialize
     payload = _json_serialize({"key": "value"})
@@ -137,12 +133,3 @@ async def test_commit_unit_of_work_with_update_and_delete(data_api):
     result = await data_api.commit_unit_of_work(uow)
     assert result[update_ref] == "001X"
     assert result[delete_ref] == "003Y"
-
-
-@pytest.mark.asyncio
-async def test_create_session_cleanup():
-    from heroku_applink.data_api import _create_session
-    session = _create_session()
-    assert isinstance(session, aiohttp.ClientSession)
-    await session.close()
-    assert session.closed

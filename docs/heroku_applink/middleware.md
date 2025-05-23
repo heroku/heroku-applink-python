@@ -1,16 +1,6 @@
 Module heroku_applink.middleware
 ================================
 
-Functions
----------
-
-<!-- python-from_request.md -->
-# `from_request`
-
-```python
-def from_request(request) ‑> heroku_applink.context.ClientContext
-```
-
 Classes
 -------
 
@@ -18,12 +8,12 @@ Classes
 # `IntegrationAsgiMiddleware`
 
 ```python
-class IntegrationAsgiMiddleware(app)
+class IntegrationAsgiMiddleware(app, config=Config(request_timeout=5, connect_timeout=None, socket_connect=None, socket_read=None))
 ```
 
 <!-- python-integrationwsgimiddleware.md -->
 # `IntegrationWsgiMiddleware`
 
 ```python
-class IntegrationWsgiMiddleware(get_response)
+class IntegrationWsgiMiddleware(get_response, config=Config(request_timeout=5, connect_timeout=None, socket_connect=None, socket_read=None))
 ```

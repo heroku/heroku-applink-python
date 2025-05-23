@@ -132,8 +132,10 @@ $ uv run pdoc3 --template-dir templates/python heroku_applink -o docs --force
     import heroku_applink as sdk
     from fastapi import FastAPI
 
+    config = sdk.Config(request_timeout=5)
+
     app = FastAPI()
-    app.add_middleware(sdk.IntegrationAsgiMiddleware)
+    app.add_middleware(sdk.IntegrationAsgiMiddleware, config=config)
 
 
     @app.get("/")
@@ -142,15 +144,15 @@ $ uv run pdoc3 --template-dir templates/python heroku_applink -o docs --force
 
 
     @app.get("/accounts")
-    def get_accounts():
-        dataapi = sdk.context.get()
-        asyncio.run(query_accounts(dataapi))
+    def get_accounts(request: Request):
+        data_api = request.scope["client-context"].data_api
+        asyncio.run(query_accounts(data_api))
         return {"Some": "Accounts"}
 
 
-    async def query_accounts(dataapi):
+    async def query_accounts(data_api):
         query = "SELECT Id, Name FROM Account"
-        result = await dataapi.query(query)
+        result = await data_api.query(query)
         for record in result.records:
             print("===== account record", record)
     ```

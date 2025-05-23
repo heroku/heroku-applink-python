@@ -4,8 +4,11 @@ Module heroku_applink
 Sub-modules
 -----------
 
+* heroku_applink.config
+* heroku_applink.connection
 * heroku_applink.context
 * heroku_applink.data_api
+* heroku_applink.exceptions
 * heroku_applink.middleware
 
 Classes
@@ -22,7 +25,7 @@ Information about the Salesforce org that made the request.
 ## Static methods
 
 ```python
-def from_header(header: str)
+def from_header(header: str, connection: heroku_applink.connection.Connection)
 ```
 
 ## Instance variables
@@ -45,18 +48,82 @@ def from_header(header: str)
 * `request_id: str`
     Request ID from the Salesforce org.
 
+<!-- python-clienterror.md -->
+# `ClientError`
+
+```python
+class ClientError(*args, **kwargs)
+```
+Raised when there is an error with the HTTP client.
+
+<!-- python-config.md -->
+# `Config`
+
+```python
+class Config(request_timeout: float = 5, connect_timeout: float | None = None, socket_connect: float | None = None, socket_read: float | None = None)
+```
+Configuration for the Salesforce Data API client.
+
+## Static methods
+
+```python
+def default() ‑> heroku_applink.config.Config
+```
+
+## Instance variables
+
+* `connect_timeout: float | None`
+    Timeout for connecting to the Salesforce Data API.
+
+* `request_timeout: float`
+    Timeout for requests to the Salesforce Data API. In most cases, you'll only
+    need to set this value. Connection Timeout, Socket Connect, and Socket Read
+    are optional and only used in special cases.
+
+* `socket_connect: float | None`
+    Timeout for connecting to the Salesforce Data API.
+
+* `socket_read: float | None`
+    Timeout for reading from the Salesforce Data API.
+
+<!-- python-connection.md -->
+# `Connection`
+
+```python
+class Connection(config: heroku_applink.config.Config)
+```
+A connection for making asynchronous HTTP requests.
+
+## Methods
+
+### `close`
+
+```python
+def close(self)
+```
+Close the connection.
+
+### `request`
+
+```python
+def request(self, method, url, headers=None, data=None, timeout: float | None = None) ‑> aiohttp.client_reqrep.ClientResponse
+```
+Make an HTTP request to the given URL.
+
+If a timeout is provided, it will be used to set the timeout for the request.
+
 <!-- python-integrationasgimiddleware.md -->
 # `IntegrationAsgiMiddleware`
 
 ```python
-class IntegrationAsgiMiddleware(app)
+class IntegrationAsgiMiddleware(app, config=Config(request_timeout=5, connect_timeout=None, socket_connect=None, socket_read=None))
 ```
 
 <!-- python-integrationwsgimiddleware.md -->
 # `IntegrationWsgiMiddleware`
 
 ```python
-class IntegrationWsgiMiddleware(get_response)
+class IntegrationWsgiMiddleware(get_response, config=Config(request_timeout=5, connect_timeout=None, socket_connect=None, socket_read=None))
 ```
 
 <!-- python-org.md -->
@@ -166,6 +233,14 @@ Used to reference results of other operations inside the same unit of work.
 
 * `id: str`
     The internal identifier of this `ReferenceId`.
+
+<!-- python-unexpectedrestapiresponsepayload.md -->
+# `UnexpectedRestApiResponsePayload`
+
+```python
+class UnexpectedRestApiResponsePayload(*args, **kwargs)
+```
+Raised when the API response is not in the expected format.
 
 <!-- python-unitofwork.md -->
 # `UnitOfWork`
