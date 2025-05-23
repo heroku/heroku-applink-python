@@ -184,7 +184,7 @@ def index():
 def get_accounts():
     data_api = request.environ['client-context'].data_api
     query = "SELECT Id, Name FROM Account"
-    result = await data_api.query(query)
+    result = data_api.query(query)
 
     return jsonify({"accounts": [record.get("Name") for record in result.records]})
 ```
