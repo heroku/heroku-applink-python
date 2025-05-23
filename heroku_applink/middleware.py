@@ -1,28 +1,26 @@
-import contextvars
+from contextvars import ContextVar
 
 from .config import Config
 from .context import ClientContext
 from .connection import Connection
 
-client_context: contextvars.ContextVar = contextvars.ContextVar("client_context")
+client_context: ContextVar[ClientContext] = ContextVar("client_context")
 
 class IntegrationWsgiMiddleware:
-    def __init__(self, get_response, config=Config.default()):
-        self.get_response = get_response
+    def __init__(self, app, config=Config.default()):
+        self.app = app
         self.config = config
         self.connection = Connection(self.config)
 
-    def __call__(self, request):
-        header = request.headers.get("x-client-context")
+    def __call__(self, environ, start_response):
+        header = environ.get("HTTP_X_CLIENT_CONTEXT")
 
         if not header:
             raise ValueError("x-client-context not set")
 
-        ctx = ClientContext.from_header(header, self.connection)
-        client_context.set(ctx)
+        client_context.set(ClientContext.from_header(header, self.connection))
 
-        response = self.get_response(request)
-        return response
+        return self.app(environ, start_response)
 
 class IntegrationAsgiMiddleware:
     def __init__(self, app, config=Config.default()):
@@ -40,8 +38,6 @@ class IntegrationAsgiMiddleware:
         if not header:
             raise ValueError("x-client-context not set")
 
-        ctx = ClientContext.from_header(header, self.connection)
-        client_context.set(ctx)
-        scope["client-context"] = ctx
+        client_context.set(ClientContext.from_header(header, self.connection))
 
         await self.app(scope, receive, send)

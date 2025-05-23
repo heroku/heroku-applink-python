@@ -117,44 +117,98 @@ $ uv run pdoc3 --template-dir templates/python heroku_applink -o docs --force
 
 ## Usage Examples
 
+For more detailed information about the SDK's capabilities, please refer to the [full documentation](docs/heroku_applink/index.md).
+
 ### Basic Setup
 
-1. Install the package:
-    ```bash
-    uv pip install heroku_applink
-    ```
+Install the package.
 
-2. Add the middleware to your web framework:
+```shell
+$ uv pip install heroku_applink
+```
 
-    ```python
-    # FastAPI example
-    import asyncio
-    import heroku_applink as sdk
-    from fastapi import FastAPI
+Add the middleware to your web framework.
 
-    config = sdk.Config(request_timeout=5)
+#### ASGI
 
-    app = FastAPI()
-    app.add_middleware(sdk.IntegrationAsgiMiddleware, config=config)
+If you are using an ASGI framework (like FastAPI), you can use the `IntegrationAsgiMiddleware` to automatically populate the `client-context` in the request scope.
 
+```python
+# FastAPI example
+import asyncio
+import heroku_applink as sdk
+from fastapi import FastAPI
 
-    @app.get("/")
-    def get_root():
-        return {"root": "page"}
+config = sdk.Config(request_timeout=5)
 
-
-    @app.get("/accounts")
-    def get_accounts(request: Request):
-        data_api = request.scope["client-context"].data_api
-        asyncio.run(query_accounts(data_api))
-        return {"Some": "Accounts"}
+app = FastAPI()
+app.add_middleware(sdk.IntegrationAsgiMiddleware, config=config)
 
 
-    async def query_accounts(data_api):
-        query = "SELECT Id, Name FROM Account"
-        result = await data_api.query(query)
-        for record in result.records:
-            print("===== account record", record)
-    ```
+@app.get("/")
+def get_root():
+    return {"root": "page"}
 
-For more detailed information about the SDK's capabilities, please refer to the [full documentation](docs/heroku_applink/index.md).
+
+@app.get("/accounts")
+def get_accounts():
+    data_api = sdk.client_context.get().data_api
+    asyncio.run(query_accounts(data_api))
+    return {"Some": "Accounts"}
+
+
+async def query_accounts(data_api):
+    query = "SELECT Id, Name FROM Account"
+    result = await data_api.query(query)
+    for record in result.records:
+        print("===== account record", record)
+```
+
+#### WSGI
+
+If you are using a WSGI framework (like Flask), you can use the `IntegrationWsgiMiddleware` to automatically populate the `client-context` in the request environment.
+
+```python
+from flask import Flask, jsonify, request
+
+import heroku_applink as sdk
+
+config = sdk.Config(request_timeout=5)
+app = Flask(__name__)
+app.wsgi_app = sdk.IntegrationWsgiMiddleware(app.wsgi_app, config=config)
+
+
+@app.route("/")
+def index():
+    return jsonify({"message": "Hello, World!"})
+
+
+@app.route("/accounts")
+def get_accounts():
+    data_api = sdk.client_context.get().data_api
+    query = "SELECT Id, Name FROM Account"
+    result = data_api.query(query)
+
+    return jsonify({"accounts": [record.get("Name") for record in result.records]})
+```
+
+#### Directly from the x-client-context header
+
+If you are not using a framework, you can manually extract the `x-client-context`
+header and use the `DataAPI` class to query the Salesforce org.
+
+```python
+from heroku_applink.data_api import DataAPI
+
+header = request.headers.get("x-client-context")
+decoded = base64.b64decode(header)
+data = json.loads(decoded)
+
+data_api = DataAPI(
+    org_domain_url=data["orgDomainUrl"],
+    api_version=data["apiVersion"],
+    access_token=data["accessToken"],
+)
+
+result = data_api.query("SELECT Id, Name FROM Account")
+```

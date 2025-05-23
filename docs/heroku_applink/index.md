@@ -123,7 +123,7 @@ class IntegrationAsgiMiddleware(app, config=Config(request_timeout=5, connect_ti
 # `IntegrationWsgiMiddleware`
 
 ```python
-class IntegrationWsgiMiddleware(get_response, config=Config(request_timeout=5, connect_timeout=None, socket_connect=None, socket_read=None))
+class IntegrationWsgiMiddleware(app, config=Config(request_timeout=5, connect_timeout=None, socket_connect=None, socket_read=None))
 ```
 
 <!-- python-org.md -->
