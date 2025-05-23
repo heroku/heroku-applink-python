@@ -3,7 +3,6 @@ import json
 import base64
 
 from flask import Flask, jsonify, request
-from flask.testing import FlaskClient
 
 from heroku_applink.middleware import IntegrationWsgiMiddleware
 
@@ -26,9 +25,12 @@ def client():
     with app.test_client() as client:
         yield client
 
-@pytest.fixture
-def client_context():
-    return {
+def test_endpoint_raises_client_context_error(client):
+    with pytest.raises(ValueError, match="x-client-context not set"):
+        client.get("/")
+
+def test_scoped_client_context(client):
+    client_context = {
         "orgId": "00DJS0000000123ABC",
         "orgDomainUrl": "https://example-domain-url.my.salesforce.com",
         "userContext": {
@@ -41,11 +43,6 @@ def client_context():
         "namespace": "heroku_applink",
     }
 
-def test_endpoint_raises_client_context_error(client):
-    with pytest.raises(ValueError, match="x-client-context not set"):
-        client.get("/")
-
-def test_scoped_client_context(client, client_context):
     response = client.get(
         "/client-context",
         headers={

@@ -26,9 +26,12 @@ async def client_context(request: Request):
 def client():
     return TestClient(app)
 
-@pytest.fixture
-def client_context():
-    return {
+def test_endpoint_raises_client_context_error(client):
+    with pytest.raises(ValueError, match="x-client-context not set"):
+        client.get("/")
+
+def test_scoped_client_context(client):
+    client_context = {
         "orgId": "00DJS0000000123ABC",
         "orgDomainUrl": "https://example-domain-url.my.salesforce.com",
         "userContext": {
@@ -41,11 +44,6 @@ def client_context():
         "namespace": "heroku_applink",
     }
 
-def test_endpoint_raises_client_context_error(client):
-    with pytest.raises(ValueError, match="x-client-context not set"):
-        client.get("/")
-
-def test_scoped_client_context(client, client_context):
     response = client.get(
         "/client-context",
         headers={
