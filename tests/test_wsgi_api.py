@@ -4,10 +4,10 @@ import base64
 
 from flask import Flask, jsonify, request
 
-from heroku_applink.middleware import IntegrationWsgiMiddleware
+import heroku_applink as sdk
 
 app = Flask(__name__)
-app.wsgi_app = IntegrationWsgiMiddleware(app.wsgi_app)
+app.wsgi_app = sdk.IntegrationWsgiMiddleware(app.wsgi_app)
 
 @app.route("/")
 def index():
@@ -15,7 +15,7 @@ def index():
 
 @app.route("/client-context")
 def client_context():
-    data_api = request.environ['client-context'].data_api
+    data_api = sdk.client_context.get().data_api
 
     return jsonify({"data_api_populated": data_api is not None})
 

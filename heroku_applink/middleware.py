@@ -1,10 +1,10 @@
-import contextvars
+from contextvars import ContextVar
 
 from .config import Config
 from .context import ClientContext
 from .connection import Connection
 
-client_context: contextvars.ContextVar = contextvars.ContextVar("client_context")
+client_context: ContextVar[ClientContext] = ContextVar("client_context")
 
 class IntegrationWsgiMiddleware:
     def __init__(self, app, config=Config.default()):
@@ -18,7 +18,7 @@ class IntegrationWsgiMiddleware:
         if not header:
             raise ValueError("x-client-context not set")
 
-        environ["client-context"] = ClientContext.from_header(header, self.connection)
+        client_context.set(ClientContext.from_header(header, self.connection))
 
         return self.app(environ, start_response)
 
@@ -38,8 +38,6 @@ class IntegrationAsgiMiddleware:
         if not header:
             raise ValueError("x-client-context not set")
 
-        ctx = ClientContext.from_header(header, self.connection)
-        client_context.set(ctx)
-        scope["client-context"] = ctx
+        client_context.set(ClientContext.from_header(header, self.connection))
 
         await self.app(scope, receive, send)

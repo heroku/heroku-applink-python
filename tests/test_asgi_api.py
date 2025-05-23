@@ -5,18 +5,18 @@ import base64
 from fastapi import FastAPI, Request
 from fastapi.testclient import TestClient
 
-from heroku_applink.middleware import IntegrationAsgiMiddleware
+import heroku_applink as sdk
 
 app = FastAPI()
-app.add_middleware(IntegrationAsgiMiddleware)
+app.add_middleware(sdk.IntegrationAsgiMiddleware)
 
 @app.get("/")
 async def root():
     return {"message": "Hello, World!"}
 
 @app.get("/client-context")
-async def client_context(request: Request):
-    data_api = request.scope["client-context"].data_api
+async def client_context():
+    data_api = sdk.client_context.get().data_api
 
     return {"data_api_populated": data_api is not None}
 
