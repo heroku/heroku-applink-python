@@ -188,3 +188,24 @@ def get_accounts():
 
     return jsonify({"accounts": [record.get("Name") for record in result.records]})
 ```
+
+#### Directly from the x-client-context header
+
+If you are not using a framework, you can manually extract the `x-client-context`
+header and use the `DataAPI` class to query the Salesforce org.
+
+```python
+from heroku_applink.data_api import DataAPI
+
+header = request.headers.get("x-client-context")
+decoded = base64.b64decode(header)
+data = json.loads(decoded)
+
+data_api = DataAPI(
+    org_domain_url=data["orgDomainUrl"],
+    api_version=data["apiVersion"],
+    access_token=data["accessToken"],
+)
+
+result = data_api.query("SELECT Id, Name FROM Account")
+```
