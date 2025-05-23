@@ -2,7 +2,7 @@ import pytest
 import json
 import base64
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 import heroku_applink as sdk
