@@ -7,8 +7,10 @@ from .connection import Connection
 client_context: contextvars.ContextVar = contextvars.ContextVar("client_context")
 
 class IntegrationWsgiMiddleware:
-    def __init__(self, app):
+    def __init__(self, app, config=Config.default()):
         self.app = app
+        self.config = config
+        self.connection = Connection(self.config)
 
     def __call__(self, environ, start_response):
         header = environ.get("HTTP_X_CLIENT_CONTEXT")
@@ -16,7 +18,7 @@ class IntegrationWsgiMiddleware:
         if not header:
             raise ValueError("x-client-context not set")
 
-        environ["client-context"] = ClientContext.from_header(header)
+        environ["client-context"] = ClientContext.from_header(header, self.connection)
 
         return self.app(environ, start_response)
 
