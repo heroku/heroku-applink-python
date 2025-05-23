@@ -3,7 +3,10 @@ import pytest
 from flask import Flask, jsonify, request
 from flask.testing import FlaskClient
 
+from heroku_applink.middleware import IntegrationWsgiMiddleware
+
 app = Flask(__name__)
+app.wsgi_app = IntegrationWsgiMiddleware(app.wsgi_app)
 
 @app.route("/")
 def index():
