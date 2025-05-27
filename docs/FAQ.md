@@ -2,8 +2,8 @@
 
 ## General Questions
 
-### What is Heroku Applink?
-Heroku Applink is a Python package that provides integration between Heroku applications and Salesforce. It enables secure communication and data exchange between Heroku apps and Salesforce orgs.
+### What is Heroku Applink Python SDK?
+Heroku Applink Python SDK is a Python package that provides integration between Heroku applications and Salesforce. It enables secure communication and data exchange between Heroku apps and Salesforce orgs.
 
 ### What are the system requirements?
 - Python 3.10 or higher
@@ -23,6 +23,13 @@ pip install heroku-applink
 Using uv:
 ```bash
 uv pip install heroku-applink
+```
+
+Using requirements.txt:
+```txt
+heroku-applink>=0.1.0
+aiohttp>=3.11.12
+orjson>=3.10.15
 ```
 
 To add it to your project's dependencies in pyproject.toml:
@@ -315,5 +322,3 @@ Install and run pdoc3:
 pip install pdoc3
 pdoc --html --output-dir docs --force heroku_applink
 ```
-
-
