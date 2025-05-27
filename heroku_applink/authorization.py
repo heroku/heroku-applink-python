@@ -1,5 +1,4 @@
 import os
-import aiohttp
 
 from dataclasses import dataclass
 from functools import lru_cache
@@ -86,7 +85,7 @@ def _is_valid_url(url: str) -> bool:
     try:
         result = urlparse(url)
         return all([result.scheme, result.netloc])
-    except:
+    except Exception:
         return False
 
 @lru_cache(maxsize=None)
