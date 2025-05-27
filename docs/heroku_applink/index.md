@@ -1,9 +1,14 @@
 Module heroku_applink
 =====================
+Copyright (c) 2025, salesforce.com, inc.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
+For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
 
 Sub-modules
 -----------
 
+* heroku_applink.authorization
 * heroku_applink.config
 * heroku_applink.connection
 * heroku_applink.context
@@ -11,8 +16,43 @@ Sub-modules
 * heroku_applink.exceptions
 * heroku_applink.middleware
 
+Functions
+---------
+
+<!-- python-get_authorization.md -->
+# `get_authorization`
+
+```python
+def get_authorization(config: heroku_applink.config.Config) ‑> heroku_applink.context.ClientContext
+```
+
+<!-- python-get_client_context.md -->
+# `get_client_context`
+
+```python
+def get_client_context() ‑> heroku_applink.context.ClientContext
+```
+
 Classes
 -------
+
+<!-- python-authorization.md -->
+# `Authorization`
+
+```python
+class Authorization(config: heroku_applink.config.Config)
+```
+
+## Methods
+
+### `get_client_context`
+
+```python
+def get_client_context(self) ‑> heroku_applink.context.ClientContext
+```
+Fetch authorization for a given Heroku AppLink developer.
+Uses GET {apiUrl}/authorizations/{developer_name}
+with a Bearer token from the add-on config.
 
 <!-- python-clientcontext.md -->
 # `ClientContext`
@@ -60,7 +100,7 @@ Raised when there is an error with the HTTP client.
 # `Config`
 
 ```python
-class Config(request_timeout: float = 5, connect_timeout: float | None = None, socket_connect: float | None = None, socket_read: float | None = None)
+class Config(developer_name: str | None = None, attachment_or_url: str | None = None, request_timeout: float = 5, connect_timeout: float | None = None, socket_connect: float | None = None, socket_read: float | None = None)
 ```
 Configuration for the Salesforce Data API client.
 
@@ -72,8 +112,14 @@ def default() ‑> heroku_applink.config.Config
 
 ## Instance variables
 
+* `attachment_or_url: str | None`
+    The type of the None singleton.
+
 * `connect_timeout: float | None`
     Timeout for connecting to the Salesforce Data API.
+
+* `developer_name: str | None`
+    The type of the None singleton.
 
 * `request_timeout: float`
     Timeout for requests to the Salesforce Data API. In most cases, you'll only
@@ -106,7 +152,7 @@ Close the connection.
 ### `request`
 
 ```python
-def request(self, method, url, headers=None, data=None, timeout: float | None = None) ‑> aiohttp.client_reqrep.ClientResponse
+def request(self, method, url, params=None, headers=None, data=None, timeout: float | None = None) ‑> aiohttp.client_reqrep.ClientResponse
 ```
 Make an HTTP request to the given URL.
 
@@ -116,14 +162,14 @@ If a timeout is provided, it will be used to set the timeout for the request.
 # `IntegrationAsgiMiddleware`
 
 ```python
-class IntegrationAsgiMiddleware(app, config=Config(request_timeout=5, connect_timeout=None, socket_connect=None, socket_read=None))
+class IntegrationAsgiMiddleware(app, config=Config(developer_name=None, attachment_or_url='HEROKU_APPLINK', request_timeout=5, connect_timeout=None, socket_connect=None, socket_read=None))
 ```
 
 <!-- python-integrationwsgimiddleware.md -->
 # `IntegrationWsgiMiddleware`
 
 ```python
-class IntegrationWsgiMiddleware(app, config=Config(request_timeout=5, connect_timeout=None, socket_connect=None, socket_read=None))
+class IntegrationWsgiMiddleware(app, config=Config(developer_name=None, attachment_or_url='HEROKU_APPLINK', request_timeout=5, connect_timeout=None, socket_connect=None, socket_read=None))
 ```
 
 <!-- python-org.md -->

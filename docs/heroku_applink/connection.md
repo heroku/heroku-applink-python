@@ -24,7 +24,7 @@ Close the connection.
 ### `request`
 
 ```python
-def request(self, method, url, headers=None, data=None, timeout: float | None = None) ‑> aiohttp.client_reqrep.ClientResponse
+def request(self, method, url, params=None, headers=None, data=None, timeout: float | None = None) ‑> aiohttp.client_reqrep.ClientResponse
 ```
 Make an HTTP request to the given URL.
 
