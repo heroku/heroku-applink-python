@@ -1,3 +1,6 @@
+from typing import Optional
+
+from .authorization import Authorization
 from .config import Config
 from .context import ClientContext, Org, User
 from .data_api.record import QueriedRecord, Record, RecordQueryResult
@@ -7,16 +10,18 @@ from .middleware import IntegrationWsgiMiddleware, IntegrationAsgiMiddleware
 from .exceptions import ClientError, UnexpectedRestApiResponsePayload
 from .connection import Connection
 from .middleware import client_context
-from .addons import get_authorization
-from .utils import HttpRequestUtil, resolve_addon_config_by_attachment_or_color, resolve_addon_config_by_url
 
 def get_client_context() -> ClientContext:
-  # TODO: Error handling if no client context is set.
-  return client_context.get()
+    # TODO: Error handling if no client context is set.
+    return client_context.get()
 
+def get_authorization(config: Config) -> ClientContext:
+    return Authorization(config).get_client_context()
 
 __all__ = [
     "get_client_context",
+    "get_authorization",
+    "Authorization",
     "Config",
     "Connection",
     "client_context",
@@ -32,9 +37,5 @@ __all__ = [
     "IntegrationAsgiMiddleware",
     "ClientError",
     "UnexpectedRestApiResponsePayload",
-    "get_authorization",
-    "resolve_addon_config_by_attachment_or_color",
-    "resolve_addon_config_by_url",
-    "HttpRequestUtil",
 ]
 

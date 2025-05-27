@@ -7,6 +7,10 @@ class Config:
     Configuration for the Salesforce Data API client.
     """
 
+    developer_name: str|None = None
+
+    attachment_or_url: str|None = None
+
     request_timeout: float = 5
     """
     Timeout for requests to the Salesforce Data API. In most cases, you'll only
@@ -32,6 +36,8 @@ class Config:
     @classmethod
     def default(cls) -> "Config":
         return cls(
+            developer_name=None,
+            attachment_or_url="HEROKU_APPLINK",
             request_timeout=5,
             connect_timeout=None,
             socket_connect=None,

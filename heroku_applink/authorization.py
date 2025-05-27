@@ -19,31 +19,28 @@ class AuthBundle:
     api_url: str
     token: str
 
+
 class Authorization:
   def __init__(self, config: Config):
     self.config = config
     self.connection = Connection(self.config)
 
-  def get_client_context(
-      self,
-      developer_name: str,
-      attachment_or_url: Optional[str] = None,
-    ) -> ClientContext:
+  def get_client_context(self) -> ClientContext:
     """
     Fetch authorization for a given Heroku AppLink developer.
     Uses GET {apiUrl}/authorizations/{developer_name}
     with a Bearer token from the add-on config.
     """
 
-    if not developer_name:
+    if not self.config.developer_name:
         raise ValueError("Developer name must be provided")
 
-    auth_bundle = _resolve_attachment_or_url(attachment_or_url)
+    auth_bundle = _resolve_attachment_or_url(self.config.attachment_or_url)
 
     try:
         response = self.connection.request(
             "GET",
-            f"{auth_bundle.api_url}/authorizations/{developer_name}",
+            f"{auth_bundle.api_url}/authorizations/{self.config.developer_name}",
             headers={
                 "Authorization": f"Bearer {auth_bundle.token}",
                 "Content-Type": "application/json",
