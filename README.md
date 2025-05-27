@@ -150,7 +150,7 @@ def get_root():
 
 @app.get("/accounts")
 def get_accounts():
-    data_api = sdk.client_context.get().data_api
+    data_api = sdk.get_client_context().data_api
     asyncio.run(query_accounts(data_api))
     return {"Some": "Accounts"}
 
@@ -183,7 +183,7 @@ def index():
 
 @app.route("/accounts")
 def get_accounts():
-    data_api = sdk.client_context.get().data_api
+    data_api = sdk.get_client_context().data_api
     query = "SELECT Id, Name FROM Account"
     result = data_api.query(query)
 
@@ -215,15 +215,19 @@ result = data_api.query("SELECT Id, Name FROM Account")
 
 ```python
 import asyncio
-from heroku_applink.addons.heroku_applink import get_authorization
+import heroku_applink as sdk
+
 
 async def main():
-    # Get authorization for a developer
-    # You can provide either a developer name or an attachment/URL
-    context = await get_authorization(
+    config = sdk.Config(
         developer_name="your_developer_name",
-        attachment_or_url="HEROKU_APPLINK"  # Optional: defaults to HEROKU_APPLINK if not provided
+        # You can provide either a developer name or an attachment/URL.
+        # Optional: defaults to HEROKU_APPLINK if not provided
+        attachment_or_url="HEROKU_APPLINK"
     )
+
+    # Get authorization for a developer
+    context = await sdk.get_authorization(config=config)
 
     # Access the context properties
     print(f"Organization ID: {context.org.id}")

@@ -10,7 +10,13 @@ from .middleware import client_context
 from .addons import get_authorization
 from .utils import HttpRequestUtil, resolve_addon_config_by_attachment_or_color, resolve_addon_config_by_url
 
+def get_client_context() -> ClientContext:
+  # TODO: Error handling if no client context is set.
+  return client_context.get()
+
+
 __all__ = [
+    "get_client_context",
     "Config",
     "Connection",
     "client_context",

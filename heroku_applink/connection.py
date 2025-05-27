@@ -16,6 +16,7 @@ class Connection:
         self,
         method,
         url,
+        params=None,
         headers=None,
         data=None,
         timeout: float|None=None
@@ -31,6 +32,7 @@ class Connection:
         response = self._client().request(
             method,
             url,
+            params=params,
             headers=headers,
             data=data,
             timeout=timeout
