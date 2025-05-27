@@ -7,6 +7,31 @@ from heroku_applink.authorization import (
     _resolve_addon_config_by_url,
     _is_valid_url,
 )
+from heroku_applink.context import ClientContext
+
+@pytest.mark.asyncio
+async def test_attachment_based_success(monkeypatch):
+    # Call without trailing slash base, ensure rstrip
+    monkeypatch.setenv("HEROKU_APPLINK_API_URL", "https://api.test/")
+    monkeypatch.setenv("HEROKU_APPLINK_TOKEN", "TOKEN")
+
+    authorization = Authorization(Config(
+        developer_name="devName",
+        attachment_or_url=None
+    ))
+
+    context = await authorization.get_client_context()
+
+    assert isinstance(context, ClientContext)
+    assert context is not None
+
+    assert context.org is not None
+    assert context.org.id is not None
+    assert context.org.domain_url is not None
+    assert context.org.user is not None
+    assert context.org.user.id is not None
+    assert context.request_id is not None
+
 
 def test_resolve_addon_config_by_url(monkeypatch):
     # Set URL env var and corresponding token

@@ -25,7 +25,7 @@ class Authorization:
     self.config = config
     self.connection = Connection(self.config)
 
-  def get_client_context(self) -> ClientContext:
+  async def get_client_context(self) -> ClientContext:
     """
     Fetch authorization for a given Heroku AppLink developer.
     Uses GET {apiUrl}/authorizations/{developer_name}
@@ -36,7 +36,7 @@ class Authorization:
         raise ValueError("Developer name must be provided")
 
     auth_bundle = _resolve_attachment_or_url(self.config.attachment_or_url)
-    response = self.connection.request(
+    response = await self.connection.request(
         "GET",
         f"{auth_bundle.api_url}/authorizations/{self.config.developer_name}",
         headers={
