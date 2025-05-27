@@ -54,6 +54,9 @@ Fetch authorization for a given Heroku AppLink developer.
 Uses GET {apiUrl}/authorizations/{developer_name}
 with a Bearer token from the add-on config.
 
+For a list of exceptions, see:
+  * https://docs.aiohttp.org/en/stable/client_reference.html
+
 <!-- python-clientcontext.md -->
 # `ClientContext`
 
