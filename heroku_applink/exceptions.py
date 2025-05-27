@@ -1,5 +1,7 @@
 # heroku_applink/exceptions.py
 
+import aiohttp
+
 class ClientError(Exception):
     """Raised when there is an error with the HTTP client."""
     pass

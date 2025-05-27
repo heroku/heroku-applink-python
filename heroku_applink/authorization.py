@@ -1,4 +1,6 @@
 import os
+import aiohttp
+
 from dataclasses import dataclass
 from functools import lru_cache
 from typing import Optional
@@ -8,7 +10,6 @@ from .config import Config
 from .connection import Connection
 from .context import ClientContext, Org, User
 from .data_api import DataAPI
-
 
 @dataclass
 class AuthBundle:
@@ -30,6 +31,9 @@ class Authorization:
     Fetch authorization for a given Heroku AppLink developer.
     Uses GET {apiUrl}/authorizations/{developer_name}
     with a Bearer token from the add-on config.
+
+    For a list of exceptions, see:
+      * https://docs.aiohttp.org/en/stable/client_reference.html
     """
 
     if not self.config.developer_name:
@@ -44,12 +48,8 @@ class Authorization:
        "Authorization": f"Bearer {auth_bundle.token}",
        "Content-Type": "application/json",
     }
+
     response = await self.connection.request("GET", request_url, headers=headers)
-
-    # TODO: Handle 401, 403, 404, 500, etc.
-    if response.status != 200:
-        raise RuntimeError(f"Failed to fetch authorization: {response.status}")
-
     payload = await response.json()
 
     return self._build_client_context(payload)

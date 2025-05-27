@@ -1,5 +1,6 @@
 import pytest
 
+import aiohttp
 from aioresponses import aioresponses
 from typing import Dict, Any
 
@@ -56,7 +57,76 @@ async def test_attachment_based_success(monkeypatch):
         assert context.org.user.id is not None
         assert context.request_id is not None
 
+@pytest.mark.asyncio
+async def test_attachment_with_server_side_error(monkeypatch):
+    developer_name = "devName"
 
+    monkeypatch.setenv("HEROKU_APPLINK_API_URL", "https://api.test/")
+    monkeypatch.setenv("HEROKU_APPLINK_TOKEN", "TOKEN")
+
+    authorization = Authorization(Config(
+        developer_name=developer_name,
+        attachment_or_url=None
+    ))
+
+    with aioresponses() as m:
+        m.get(
+            f"https://api.test/authorizations/{developer_name}",
+            status=500,
+            payload={"error": "Internal Server Error"}
+        )
+
+        with pytest.raises(aiohttp.client_exceptions.ClientResponseError) as exc_info:
+            await authorization.get_client_context()
+
+        assert exc_info.value.status, 500
+
+@pytest.mark.asyncio
+async def test_attachment_with_client_side_error(monkeypatch):
+    developer_name = "devName"
+
+    monkeypatch.setenv("HEROKU_APPLINK_API_URL", "https://api.test/")
+    monkeypatch.setenv("HEROKU_APPLINK_TOKEN", "TOKEN")
+
+    authorization = Authorization(Config(
+        developer_name=developer_name,
+        attachment_or_url=None
+    ))
+
+    with aioresponses() as m:
+        m.get(
+            f"https://api.test/authorizations/{developer_name}",
+            status=400,
+            payload={"error": "Bad Request"}
+        )
+
+        with pytest.raises(aiohttp.client_exceptions.ClientResponseError) as exc_info:
+            await authorization.get_client_context()
+
+        assert exc_info.value.status, 400
+
+@pytest.mark.asyncio
+async def test_attachment_with_timeout_error(monkeypatch):
+    developer_name = "devName"
+
+    monkeypatch.setenv("HEROKU_APPLINK_API_URL", "https://api.test/")
+    monkeypatch.setenv("HEROKU_APPLINK_TOKEN", "TOKEN")
+
+    authorization = Authorization(Config(
+        developer_name=developer_name,
+        attachment_or_url=None
+    ))
+
+    with aioresponses() as m:
+        m.get(
+            f"https://api.test/authorizations/{developer_name}",
+            exception=aiohttp.ServerTimeoutError
+        )
+
+        with pytest.raises(aiohttp.ServerTimeoutError) as exc_info:
+            await authorization.get_client_context()
+
+        assert isinstance(exc_info.value, aiohttp.ServerTimeoutError)
 
 def test_resolve_addon_config_by_url(monkeypatch):
     # Set URL env var and corresponding token
