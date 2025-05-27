@@ -17,8 +17,11 @@ from .connection import Connection
 from .middleware import client_context
 
 def get_client_context() -> ClientContext:
-    # TODO: Error handling if no client context is set.
-    return client_context.get()
+    try:
+      return client_context.get()
+    except LookupError:
+        # TODO: Add a more specific error message.
+        raise ValueError("No client context found")
 
 def get_authorization(config: Config) -> ClientContext:
     return Authorization(config).get_client_context()
