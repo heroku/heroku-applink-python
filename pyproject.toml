@@ -16,8 +16,6 @@ docs = ["pdoc3"]
 packages = [
     "heroku_applink",
     "heroku_applink.data_api",
-    "heroku_applink.addons",
-    "heroku_applink.utils"
 ]
 
 [project.urls]

@@ -2,7 +2,7 @@ import pytest
 import urllib.parse
 from typing import Dict, Any
 
-import heroku_applink.addons.heroku_applink as module
+# import heroku_applink.addons.heroku_applink as module
 
 from heroku_applink.context import ClientContext, Org, User, DataAPI
 

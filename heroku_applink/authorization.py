@@ -36,25 +36,20 @@ class Authorization:
         raise ValueError("Developer name must be provided")
 
     auth_bundle = _resolve_attachment_or_url(self.config.attachment_or_url)
+    response = self.connection.request(
+        "GET",
+        f"{auth_bundle.api_url}/authorizations/{self.config.developer_name}",
+        headers={
+            "Authorization": f"Bearer {auth_bundle.token}",
+            "Content-Type": "application/json",
+        },
+    )
 
-    try:
-        response = self.connection.request(
-            "GET",
-            f"{auth_bundle.api_url}/authorizations/{self.config.developer_name}",
-            headers={
-                "Authorization": f"Bearer {auth_bundle.token}",
-                "Content-Type": "application/json",
-            },
-        )
+    # TODO: Handle 401, 403, 404, 500, etc.
+    if response.status != 200:
+        raise RuntimeError(f"Failed to fetch authorization: {response.status}")
 
-        # TODO: Handle 401, 403, 404, 500, etc.
-        if response.status != 200:
-            raise RuntimeError(f"Failed to fetch authorization: {response.status}")
-
-        payload = response.json()
-    except Exception as e:
-        # Be careful not to include opts (credentials) in the message
-        raise RuntimeError(f"Failed to fetch authorization: {e}")
+    payload = response.json()
 
     return self._build_client_context(payload)
 
