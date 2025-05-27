@@ -1,5 +1,8 @@
 import pytest
 
+from aioresponses import aioresponses
+from typing import Dict, Any
+
 from heroku_applink.config import Config
 from heroku_applink.authorization import (
     Authorization,
@@ -9,28 +12,50 @@ from heroku_applink.authorization import (
 )
 from heroku_applink.context import ClientContext
 
+# A sample valid response payload from the add-on
+VALID_RESPONSE: Dict[str, Any] = {
+    "org_id": "00DTEST123",
+    "org_domain_url": "https://example.my.salesforce.com/",
+    "user_id": "005TEST456",
+    "username": "user@example.com",
+    "request_id": "REQ-789",
+    "access_token": "TOKEN_ABC",
+    "api_version": "v52.0",
+    "namespace": "testns",
+}
+
 @pytest.mark.asyncio
 async def test_attachment_based_success(monkeypatch):
+    developer_name = "devName"
+
     # Call without trailing slash base, ensure rstrip
     monkeypatch.setenv("HEROKU_APPLINK_API_URL", "https://api.test/")
     monkeypatch.setenv("HEROKU_APPLINK_TOKEN", "TOKEN")
 
     authorization = Authorization(Config(
-        developer_name="devName",
+        developer_name=developer_name,
         attachment_or_url=None
     ))
 
-    context = await authorization.get_client_context()
+    with aioresponses() as m:
+        m.get(
+            f"https://api.test/authorizations/{developer_name}",
+            status=200,
+            payload=VALID_RESPONSE
+        )
 
-    assert isinstance(context, ClientContext)
-    assert context is not None
+        context = await authorization.get_client_context()
 
-    assert context.org is not None
-    assert context.org.id is not None
-    assert context.org.domain_url is not None
-    assert context.org.user is not None
-    assert context.org.user.id is not None
-    assert context.request_id is not None
+        assert isinstance(context, ClientContext)
+        assert context is not None
+
+        assert context.org is not None
+        assert context.org.id is not None
+        assert context.org.domain_url is not None
+        assert context.org.user is not None
+        assert context.org.user.id is not None
+        assert context.request_id is not None
+
 
 
 def test_resolve_addon_config_by_url(monkeypatch):

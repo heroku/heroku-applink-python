@@ -2,7 +2,7 @@ import os
 from dataclasses import dataclass
 from functools import lru_cache
 from typing import Optional
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urljoin
 
 from .config import Config
 from .connection import Connection
@@ -36,20 +36,21 @@ class Authorization:
         raise ValueError("Developer name must be provided")
 
     auth_bundle = _resolve_attachment_or_url(self.config.attachment_or_url)
-    response = await self.connection.request(
-        "GET",
-        f"{auth_bundle.api_url}/authorizations/{self.config.developer_name}",
-        headers={
-            "Authorization": f"Bearer {auth_bundle.token}",
-            "Content-Type": "application/json",
-        },
+    request_url = urljoin(
+       auth_bundle.api_url,
+       f"authorizations/{self.config.developer_name}"
     )
+    headers = {
+       "Authorization": f"Bearer {auth_bundle.token}",
+       "Content-Type": "application/json",
+    }
+    response = await self.connection.request("GET", request_url, headers=headers)
 
     # TODO: Handle 401, 403, 404, 500, etc.
     if response.status != 200:
         raise RuntimeError(f"Failed to fetch authorization: {response.status}")
 
-    payload = response.json()
+    payload = await response.json()
 
     return self._build_client_context(payload)
 
@@ -68,6 +69,7 @@ class Authorization:
             org_domain_url=response["org_domain_url"],
             api_version=response["api_version"],
             access_token=response["access_token"],
+            connection=self.connection,
         ),
     )
 
