@@ -25,12 +25,48 @@ Functions
 ```python
 def get_authorization(config: heroku_applink.config.Config) ‑> heroku_applink.context.ClientContext
 ```
+Call `get_authorization` to get the client context for a given Heroku AppLink
+addon. This is useful when you want to query Salesforce data through a specific
+Heroku AppLink addon as opposed to getting information from the `x-client-context`
+header in a request from Salesforce.
+
+```python
+import heroku_applink as sdk
+
+config = sdk.Config(
+    developer_name="my-developer-name",
+    attachment_or_url="HEROKU_APPLINK_BLUE",
+)
+context = await sdk.get_authorization(config)
+
+query = "SELECT Id, Name FROM Account"
+result = await context.data_api.query(query)
+for record in result.records:
+    print(f"Account: {record.get('Name')}")
+```
 
 <!-- python-get_client_context.md -->
 # `get_client_context`
 
 ```python
 def get_client_context() ‑> heroku_applink.context.ClientContext
+```
+Call `get_client_context` to get the client context for the current incoming
+request from Salesforce. This will be set by the `IntegrationWsgiMiddleware` or
+`IntegrationAsgiMiddleware` in your application and can only be used in requests
+that are routed through one of these middlewares.
+
+```python
+import heroku_applink as sdk
+
+@app.get("/accounts")
+def get_accounts():
+  context = sdk.get_client_context()
+
+  query = "SELECT Id, Name FROM Account"
+  result = await context.data_api.query(query)
+
+  return jsonify({"accounts": [record.get("Name") for record in result.records]})
 ```
 
 Classes
