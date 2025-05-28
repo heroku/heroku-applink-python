@@ -23,13 +23,25 @@ usage() {
     exit 1
 }
 
+# Function to handle errors
+handle_error() {
+    local line_no=$1
+    local error_code=$2
+    local error_command=$3
+    echo "Error occurred in line $line_no (exit code $error_code): $error_command"
+    exit 1
+}
+
+# Set up error handling
+trap 'handle_error ${LINENO} $? "$BASH_COMMAND"' ERR
+
 # Check if required arguments are provided
 if [ "$#" -lt 1 ] || [ "$#" -gt 2 ]; then
     usage
 fi
 
 BUMP_TYPE=$1
-PREV_VERSION=$2
+PREV_VERSION=${2:-}  # Make second argument optional
 
 # Validate bump type
 if [[ ! "$BUMP_TYPE" =~ ^(major|minor|patch)$ ]]; then
@@ -38,6 +50,11 @@ if [[ ! "$BUMP_TYPE" =~ ^(major|minor|patch)$ ]]; then
 fi
 
 # Get current version from pyproject.toml
+if [ ! -f "pyproject.toml" ]; then
+    echo "Error: pyproject.toml not found"
+    exit 1
+fi
+
 CURRENT_VERSION=$(grep '^version = ' pyproject.toml | sed 's/version = "\(.*\)"/\1/')
 if [ -z "$CURRENT_VERSION" ]; then
     echo "Error: Could not find version in pyproject.toml"
@@ -47,7 +64,27 @@ fi
 # If no previous version provided, use the one in pyproject.toml
 if [ -z "$PREV_VERSION" ]; then
     PREV_VERSION=$CURRENT_VERSION
-    echo "Using current version ($CURRENT_VERSION) as previous version"
+    echo "Using version currently defined in pyproject.toml ($CURRENT_VERSION) as previous version"
+fi
+
+# Validate version format
+if ! [[ "$CURRENT_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    echo "Error: Invalid version format in pyproject.toml: $CURRENT_VERSION"
+    exit 1
+fi
+
+# If no previous version provided, use the one from pyproject.toml for changelog
+if [ -z "$PREV_VERSION" ]; then
+    if [ ! -f "pyproject.toml" ]; then
+        echo "Error: pyproject.toml not found"
+        exit 1
+    fi
+    PREV_VERSION=$(grep '^version = ' pyproject.toml | sed 's/version = "\(.*\)"/\1/')
+    if [ -z "$PREV_VERSION" ]; then
+        echo "Error: Could not find version in pyproject.toml"
+        exit 1
+    fi
+    echo "Using version currently defined in pyproject.toml ($PREV_VERSION) as previous version for changelog"
 fi
 
 # Split version into components
@@ -62,7 +99,7 @@ case "$BUMP_TYPE" in
         NEW_VERSION="$((MAJOR + 1)).0.0"
         ;;
     minor)
-        NEW_VERSION="$MAJOR.$((MINOR + 1)).0"
+        NEW_VERSION="$MAJOR.$((MINOR + 1)).$PATCH"
         ;;
     patch)
         NEW_VERSION="$MAJOR.$MINOR.$((PATCH + 1))"
@@ -77,6 +114,12 @@ echo "Previous version from changelog: $PREV_VERSION"
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 if [ "$CURRENT_BRANCH" != "main" ]; then
     echo "Error: Must be on main branch"
+    exit 1
+fi
+
+# Check if working directory is clean
+if ! git diff-index --quiet HEAD --; then
+    echo "Error: Working directory is not clean. Please commit or stash your changes."
     exit 1
 fi
 
@@ -103,21 +146,40 @@ fi
 
 git checkout -b "$BRANCH_NAME"
 
-# Make the update-release-documentation.sh script executable
-chmod +x scripts/release/update-release-documentation.sh
-
 # Get the absolute path of the script's directory
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
-# Call the update-release-documentation.sh script with the new version
-"$SCRIPT_DIR/update-release-documentation.sh" "$NEW_VERSION" "$PREV_VERSION"
+# Call the update-release-documentation script with the new version
+if ! "$SCRIPT_DIR/update-release-documentation" "$NEW_VERSION" "$PREV_VERSION"; then
+    echo "Error: Failed to update release documentation"
+    git checkout main
+    git branch -D "$BRANCH_NAME"
+    exit 1
+fi
 
 # Commit changes
-git add pyproject.toml CHANGELOG.md
-git commit -m "Bump version to $NEW_VERSION"
+if ! git add pyproject.toml CHANGELOG.md; then
+    echo "Error: Failed to stage changes"
+    git checkout main
+    git branch -D "$BRANCH_NAME"
+    exit 1
+fi
+
+if ! git commit -m "release-v$NEW_VERSION bump-$BUMP_TYPE"; then
+    echo "Error: Failed to commit changes"
+    git checkout main
+    git branch -D "$BRANCH_NAME"
+    exit 1
+fi
 
 # Push branch
-git push -u origin "$BRANCH_NAME"
+if ! git push -f -u origin "$BRANCH_NAME"; then
+    echo "Error: Failed to push branch $BRANCH_NAME"
+    git checkout main
+    git branch -D "$BRANCH_NAME"
+    exit 1
+fi
+echo "Successfully pushed branch $BRANCH_NAME"
 
 # Create the pull request
 echo "Creating pull request..."
@@ -162,11 +224,48 @@ if [ -f "$PR_TEMPLATE" ]; then
     PR_BODY=$(cat "$TEMP_PR_BODY")
 fi
 
-gh pr create \
-    --title "Release v$NEW_VERSION" \
-    --body "$PR_BODY" \
-    --base main \
-    --head "release-v$NEW_VERSION" \
-    --draft
+# Try using gh CLI if available and authenticated
+if command -v gh &> /dev/null && gh auth status &> /dev/null; then
+    if ! gh pr create \
+        --title "Release v$NEW_VERSION" \
+        --body "$PR_BODY" \
+        --base main \
+        --head "release-v$NEW_VERSION" \
+        --draft; then
+        echo "Error: Failed to create pull request with gh CLI"
+        exit 1
+    fi
+    echo "Successfully created pull request with gh CLI"
+else
+    # Fallback to curl with GH_TOKEN
+    if [ -z "${GH_TOKEN:-}" ]; then
+        echo "Error: GH_TOKEN environment variable is not set and gh CLI is not available/authenticated."
+        exit 1
+    fi
+
+    # Get the repository name from git config
+    REPO_URL=$(git config --get remote.origin.url)
+    REPO_OWNER=$(echo "$REPO_URL" | sed -E 's/.*github.com[:/]([^/]+)\/([^/]+).*/\1/')
+    REPO_NAME=$(echo "$REPO_URL" | sed -E 's/.*github.com[:/]([^/]+)\/([^/]+).*/\2/' | sed 's/\\.git$//')
+
+    PR_RESPONSE=$(curl -s -X POST \
+      -H "Authorization: token $GH_TOKEN" \
+      -H "Accept: application/vnd.github.v3+json" \
+      "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/pulls" \
+      -d "{
+        \"title\": \"Release v$NEW_VERSION\",
+        \"body\": \"$PR_BODY\",
+        \"head\": \"release-v$NEW_VERSION\",
+        \"base\": \"main\",
+        \"draft\": true
+      }")
+
+    if echo "$PR_RESPONSE" | grep -q "message.*Not Found"; then
+        echo "Error: Failed to create pull request with curl"
+        echo "API Response: $PR_RESPONSE"
+        exit 1
+    fi
+    echo "Successfully created pull request with curl"
+fi
 
 echo "Done! Review the changes and merge the pull request when ready."
