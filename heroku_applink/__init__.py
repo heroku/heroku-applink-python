@@ -25,10 +25,10 @@ def get_client_context() -> ClientContext:
 
     ```python
     import heroku_applink as sdk
+    from fastapi import FastAPI
 
-    config = sdk.Config(request_timeout=5)
     app = FastAPI()
-    app.add_middleware(sdk.IntegrationAsgiMiddleware, config=config)
+    app.add_middleware(sdk.IntegrationAsgiMiddleware, config=sdk.Config(request_timeout=5))
 
     @app.get("/accounts")
     async def get_accounts():
