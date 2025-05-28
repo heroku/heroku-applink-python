@@ -89,11 +89,8 @@ def _resolve_attachment_or_url(attachment_or_url: Optional[str] = None) -> AuthB
       return _resolve_addon_config_by_attachment_or_color("HEROKU_APPLINK")
 
 def _is_valid_url(url: str) -> bool:
-    try:
-        result = urlparse(url)
-        return all([result.scheme, result.netloc])
-    except Exception:
-        return False
+    result = urlparse(url)
+    return all([result.scheme, result.netloc])
 
 @lru_cache(maxsize=None)
 def _resolve_addon_config_by_attachment_or_color(attachment_or_color: str) -> AuthBundle:
@@ -133,8 +130,10 @@ def _resolve_addon_config_by_url(url: str) -> AuthBundle:
         if var.endswith("_API_URL") and val.lower() == url.lower():
             prefix = var[: -len("_API_URL")]
             token = os.getenv(f"{prefix}_TOKEN")
+
             if not token:
                 raise EnvironmentError(f"Missing token for API URL: {url}")
+
             return AuthBundle(api_url=val, token=token)
 
     raise EnvironmentError(f"Heroku Applink config not found for API URL: {url}")

@@ -9,6 +9,7 @@ from heroku_applink.authorization import (
     Authorization,
     _resolve_addon_config_by_attachment_or_color,
     _resolve_addon_config_by_url,
+    _resolve_attachment_or_url,
     _is_valid_url,
 )
 from heroku_applink.context import ClientContext
@@ -128,6 +129,23 @@ async def test_attachment_with_timeout_error(monkeypatch):
 
         assert isinstance(exc_info.value, aiohttp.ServerTimeoutError)
 
+def test_resolve_attachment_or_url(monkeypatch):
+    # Set URL env var and corresponding token
+    monkeypatch.setenv('EXAMPLE_API_URL', 'https://api.test.com')
+    monkeypatch.setenv('EXAMPLE_TOKEN', 'url-token')
+
+    auth = _resolve_attachment_or_url("EXAMPLE")
+
+    assert auth is not None
+    assert auth.api_url == "https://api.test.com"
+    assert auth.token == "url-token"
+
+    auth = _resolve_attachment_or_url("https://api.test.com")
+
+    assert auth is not None
+    assert auth.api_url == "https://api.test.com"
+    assert auth.token == "url-token"
+
 def test_resolve_addon_config_by_url(monkeypatch):
     # Set URL env var and corresponding token
     monkeypatch.setenv('EXAMPLE_API_URL', 'https://api.test.com')
@@ -155,6 +173,7 @@ def test_resolve_by_url_missing(monkeypatch):
 
     with pytest.raises(EnvironmentError) as exc_info:
         _resolve_addon_config_by_url('https://doesnotexist')
+
     assert 'Heroku Applink config not found for API URL' in str(exc_info.value)
 
 def test_resolve_addon_config_by_attachment_or_color_direct(monkeypatch):
@@ -167,6 +186,15 @@ def test_resolve_addon_config_by_attachment_or_color_direct(monkeypatch):
     assert auth is not None
     assert auth.api_url == "https://api.example.com"
     assert auth.token == "secret-token"
+
+def test_resolve_by_attachment_or_color_missing(monkeypatch):
+    monkeypatch.delenv('HEROKU_APPLINK_BLUE_API_URL', raising=False)
+    monkeypatch.delenv('HEROKU_APPLINK_BLUE_TOKEN', raising=False)
+
+    with pytest.raises(EnvironmentError) as exc_info:
+        _resolve_addon_config_by_attachment_or_color('HEROKU_APPLINK_BLUE')
+
+    assert 'Heroku Applink config not found for \'HEROKU_APPLINK_BLUE\'' in str(exc_info.value)
 
 def test_resolve_by_color_fallback(monkeypatch):
     # Remove direct and set fallback under HEROKU_APPLINK
