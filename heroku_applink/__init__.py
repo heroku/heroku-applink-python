@@ -26,14 +26,18 @@ def get_client_context() -> ClientContext:
     ```python
     import heroku_applink as sdk
 
+    config = sdk.Config(request_timeout=5)
+    app = FastAPI()
+    app.add_middleware(sdk.IntegrationAsgiMiddleware, config=config)
+
     @app.get("/accounts")
-    def get_accounts():
+    async def get_accounts():
       context = sdk.get_client_context()
 
       query = "SELECT Id, Name FROM Account"
       result = await context.data_api.query(query)
 
-      return jsonify({"accounts": [record.get("Name") for record in result.records]})
+      return {"accounts": [record.get("Name") for record in result.records]}
     ```
     """
     try:
