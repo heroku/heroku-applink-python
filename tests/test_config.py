@@ -1,3 +1,4 @@
+import pytest
 
 from heroku_applink.config import Config
 
