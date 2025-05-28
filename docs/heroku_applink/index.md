@@ -58,15 +58,19 @@ that are routed through one of these middlewares.
 
 ```python
 import heroku_applink as sdk
+from fastapi import FastAPI
+
+app = FastAPI()
+app.add_middleware(sdk.IntegrationAsgiMiddleware, config=sdk.Config(request_timeout=5))
 
 @app.get("/accounts")
-def get_accounts():
+async def get_accounts():
   context = sdk.get_client_context()
 
   query = "SELECT Id, Name FROM Account"
   result = await context.data_api.query(query)
 
-  return jsonify({"accounts": [record.get("Name") for record in result.records]})
+  return {"accounts": [record.get("Name") for record in result.records]}
 ```
 
 Classes
