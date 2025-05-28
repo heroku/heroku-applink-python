@@ -32,12 +32,12 @@ def get_client_context() -> ClientContext:
 
     @app.get("/accounts")
     async def get_accounts():
-      context = sdk.get_client_context()
+        context = sdk.get_client_context()
 
-      query = "SELECT Id, Name FROM Account"
-      result = await context.data_api.query(query)
+        query = "SELECT Id, Name FROM Account"
+        result = await context.data_api.query(query)
 
-      return {"accounts": [record.get("Name") for record in result.records]}
+        return {"accounts": [record.get("Name") for record in result.records]}
     ```
     """
     try:
