@@ -11,7 +11,6 @@ import aiohttp
 import orjson
 from aiohttp.payload import BytesPayload
 
-from heroku_applink.config import Config
 from heroku_applink.connection import Connection
 
 from ._requests import (
