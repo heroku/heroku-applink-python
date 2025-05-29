@@ -205,21 +205,15 @@ if [ -f "$PR_TEMPLATE" ]; then
     cp "$PR_TEMPLATE" "$TEMP_PR_BODY"
 
     # Add our changes to the Summary section
-    sed -i '' '/^## Summary$/a\
-- Updated version to '"$NEW_VERSION"'\
-- Updated CHANGELOG.md with all changes since the previous release.' "$TEMP_PR_BODY"
+    sed -i "/^## Summary$/a - Updated version to $NEW_VERSION\n - Updated CHANGELOG.md with all changes since the previous release." "$TEMP_PR_BODY"
 
     # Add git log to What Changed section
     echo "$GIT_LOG" > "$TEMP_PR_BODY.tmp"
-    sed -i '' '/^## What Changed$/r '"$TEMP_PR_BODY.tmp" "$TEMP_PR_BODY"
+    sed -i "/^## What Changed$/r $TEMP_PR_BODY.tmp" "$TEMP_PR_BODY"
     rm "$TEMP_PR_BODY.tmp"
 
     # Add our checklist items
-    sed -i '' '/^## Checklist$/a\
-- [ ] Review changelog entries\
-- [ ] Verify version bump\
-- [ ] Test the changes\
-- [ ] Approve the release' "$TEMP_PR_BODY"
+    sed -i "/^## Checklist$/a - [ ] Review changelog entries\n - [ ] Verify version bump\n - [ ] Test the changes\n - [ ] Approve the release" "$TEMP_PR_BODY"
 
     PR_BODY=$(cat "$TEMP_PR_BODY")
 fi
@@ -235,7 +229,7 @@ if command -v gh &> /dev/null && gh auth status &> /dev/null; then
         echo "Error: Failed to create pull request with gh CLI"
         exit 1
     fi
-    echo "Successfully created pull request with gh CLI"
+    echo "Successfully created draft pull request with gh CLI"
 else
     # Fallback to curl with GH_TOKEN
     if [ -z "${GH_TOKEN:-}" ]; then
@@ -265,7 +259,7 @@ else
         echo "API Response: $PR_RESPONSE"
         exit 1
     fi
-    echo "Successfully created pull request with curl"
+    echo "Successfully created draft pull request with curl"
 fi
 
 echo "Done! Review the changes and merge the pull request when ready."
