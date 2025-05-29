@@ -46,21 +46,17 @@ def get_client_context() -> ClientContext:
         # TODO: Add a more specific error message.
         raise ValueError("No client context found")
 
-def get_authorization(config: Config) -> ClientContext:
+def get_authorization(developer_name: str, attachment_or_url: str|None=None) -> Authorization:
     """
-    Call `get_authorization` to get the client context for a given Heroku AppLink
-    addon. This is useful when you want to query Salesforce data through a specific
-    Heroku AppLink addon as opposed to getting information from the `x-client-context`
-    header in a request from Salesforce.
+    TODO: Add documentation.
 
     ```python
     import heroku_applink as sdk
 
-    config = sdk.Config(
+    authorization = await sdk.get_authorization(
         developer_name="my-developer-name",
         attachment_or_url="HEROKU_APPLINK_BLUE",
     )
-    context = await sdk.get_authorization(config)
 
     query = "SELECT Id, Name FROM Account"
     result = await context.data_api.query(query)
@@ -68,7 +64,7 @@ def get_authorization(config: Config) -> ClientContext:
         print(f"Account: {record.get('Name')}")
     ```
     """
-    return Authorization(config).get_client_context()
+    return Authorization.find(developer_name, attachment_or_url)
 
 __all__ = [
     "get_client_context",

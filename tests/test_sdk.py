@@ -5,10 +5,7 @@ import heroku_applink as sdk
 @pytest.mark.asyncio
 async def test_get_authorization_missing_developer_name():
     with pytest.raises(ValueError) as exc:
-      await sdk.get_authorization(sdk.Config(
-          developer_name="",
-          attachment_or_url=None
-      ))
+      await sdk.get_authorization(developer_name="", attachment_or_url=None)
 
     assert "Developer name must be provided" in str(exc.value)
 

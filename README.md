@@ -219,24 +219,20 @@ import heroku_applink as sdk
 
 
 async def main():
-    config = sdk.Config(
+    # Get authorization for a developer
+    authorization = await sdk.get_authorization(
         developer_name="your_developer_name",
-        # You can provide either a developer name or an attachment/URL.
-        # Optional: defaults to HEROKU_APPLINK if not provided
         attachment_or_url="HEROKU_APPLINK"
     )
 
-    # Get authorization for a developer
-    context = await sdk.get_authorization(config=config)
-
     # Access the context properties
-    print(f"Organization ID: {context.org.id}")
-    print(f"User ID: {context.org.user.id}")
-    print(f"Username: {context.org.user.username}")
+    print(f"Organization ID: {authorization.org.id}")
+    print(f"User ID: {authorization.org.user.id}")
+    print(f"Username: {authorization.org.user.username}")
 
     # Use the DataAPI to make queries
     query = "SELECT Id, Name FROM Account"
-    result = await context.data_api.query(query)
+    result = await authorization.data_api.query(query)
     for record in result.records:
         print(f"Account: {record}")
 

@@ -12,18 +12,27 @@ from heroku_applink.authorization import (
     _resolve_attachment_or_url,
     _is_valid_url,
 )
-from heroku_applink.context import ClientContext
 
 # A sample valid response payload from the add-on
 VALID_RESPONSE: Dict[str, Any] = {
-    "org_id": "00DTEST123",
-    "org_domain_url": "https://example.my.salesforce.com/",
-    "user_id": "005TEST456",
-    "username": "user@example.com",
-    "request_id": "REQ-789",
-    "access_token": "TOKEN_ABC",
-    "api_version": "v52.0",
-    "namespace": "testns",
+    "id": "b8bc7bcb-89c3-45c0-b7b7-4fb4427e598a",
+    "status": "authorized",
+    "org": {
+        "id": "00DSG00000DGEIr2AP",
+        "developer_name": "productionOrg2",
+        "instance_url": "https://dmomain.my.salesforce.com",
+        "type": "SalesforceOrg",
+        "api_version": "57.0",
+        "user_auth": {
+            "username": "admin@whatever.org",
+            "user_id": "005...",
+            "access_token": "00DSG00000DGEIr2AP!<token>"
+        }
+    },
+    "created_at": "2025-03-06T18:20:42.226577Z",
+    "last_modified_at": "2025-03-09T18:20:42.226577Z",
+    "created_by": "foo@heroku.com",
+    "last_modified_by": "foo@heroku.com"
 }
 
 @pytest.mark.asyncio
@@ -34,11 +43,6 @@ async def test_attachment_based_success(monkeypatch):
     monkeypatch.setenv("HEROKU_APPLINK_API_URL", "https://api.test/")
     monkeypatch.setenv("HEROKU_APPLINK_TOKEN", "TOKEN")
 
-    authorization = Authorization(Config(
-        developer_name=developer_name,
-        attachment_or_url=None
-    ))
-
     with aioresponses() as m:
         m.get(
             f"https://api.test/authorizations/{developer_name}",
@@ -46,17 +50,25 @@ async def test_attachment_based_success(monkeypatch):
             payload=VALID_RESPONSE
         )
 
-        context = await authorization.get_client_context()
+        authorization = await Authorization.find(developer_name)
 
-        assert isinstance(context, ClientContext)
-        assert context is not None
+        assert isinstance(authorization, Authorization)
+        assert authorization is not None
 
-        assert context.org is not None
-        assert context.org.id is not None
-        assert context.org.domain_url is not None
-        assert context.org.user is not None
-        assert context.org.user.id is not None
-        assert context.request_id is not None
+        assert authorization.id is not None
+        assert authorization.status is not None
+        assert authorization.org is not None
+
+        assert authorization.org.id is not None
+        assert authorization.org.developer_name is not None
+        assert authorization.org.instance_url is not None
+        assert authorization.org.type is not None
+        assert authorization.org.api_version is not None
+        assert authorization.org.user_auth is not None
+
+        assert authorization.org.user_auth.username is not None
+        assert authorization.org.user_auth.user_id is not None
+        assert authorization.org.user_auth.access_token is not None
 
 @pytest.mark.asyncio
 async def test_attachment_with_server_side_error(monkeypatch):

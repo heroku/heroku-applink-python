@@ -14,10 +14,10 @@ from urllib.parse import urlparse, urljoin
 
 from .config import Config
 from .connection import Connection
-from .context import ClientContext, Org, User
 from .data_api import DataAPI
 
-@dataclass
+
+@dataclass(frozen=True, kw_only=True, slots=True)
 class AuthBundle:
     """
     A bundle of authentication information for the Salesforce Data API. This
@@ -26,58 +26,96 @@ class AuthBundle:
     api_url: str
     token: str
 
+@dataclass(frozen=True, kw_only=True, slots=True)
+class UserAuth:
+    username: str
+    user_id: str
+    access_token: str
 
+@dataclass(frozen=True, kw_only=True, slots=True)
+class Org:
+    id: str
+    developer_name: str
+    instance_url: str
+    type: str
+    api_version: str
+    user_auth: UserAuth
+
+@dataclass
 class Authorization:
-  def __init__(self, config: Config):
-    self.config = config
-    self.connection = Connection(self.config)
+    id: str
+    status: str
+    org: Org
+    created_at: str
+    last_modified_at: str
+    created_by: str
+    last_modified_by: str
 
-  async def get_client_context(self) -> ClientContext:
-    """
-    Fetch authorization for a given Heroku AppLink developer.
-    Uses GET {apiUrl}/authorizations/{developer_name}
-    with a Bearer token from the add-on config.
+    def data_api(self, config: Config=Config.default()) -> DataAPI:
+        if self.data_api is None:
+            self.data_api = DataAPI(
+                org_domain_url=self.org.instance_url,
+                api_version=self.org.api_version,
+                access_token=self.org.user_auth.access_token,
+                connection=Connection(config),
+            )
 
-    For a list of exceptions, see:
-      * https://docs.aiohttp.org/en/stable/client_reference.html
-    """
+        return self.data_api
 
-    if not self.config.developer_name:
-        raise ValueError("Developer name must be provided")
+    @staticmethod
+    async def find(
+        developer_name: str,
+        attachment_or_url: str|None=None,
+        config: Config=Config.default()
+    ) -> "Authorization":
+        """
+        Fetch authorization for a given Heroku AppLink developer.
+        Uses GET {apiUrl}/authorizations/{developer_name}
+        with a Bearer token from the add-on config.
 
-    auth_bundle = _resolve_attachment_or_url(self.config.attachment_or_url)
-    request_url = urljoin(
-       auth_bundle.api_url,
-       f"authorizations/{self.config.developer_name}"
-    )
-    headers = {
-       "Authorization": f"Bearer {auth_bundle.token}",
-       "Content-Type": "application/json",
-    }
+        For a list of exceptions, see:
+        * https://docs.aiohttp.org/en/stable/client_reference.html
+        """
 
-    response = await self.connection.request("GET", request_url, headers=headers)
-    payload = await response.json()
+        if not developer_name:
+            raise ValueError("Developer name must be provided")
 
-    return self._build_client_context(payload)
+        connection = Connection(config)
+        auth_bundle = _resolve_attachment_or_url(attachment_or_url)
+        request_url = urljoin(auth_bundle.api_url, f"authorizations/{developer_name}")
+        headers = {
+            "Authorization": f"Bearer {auth_bundle.token}",
+            "Content-Type": "application/json",
+        }
 
-  def _build_client_context(self, response: dict) -> ClientContext:
-    return ClientContext(
-        org=Org(
-            id=response["org_id"],
-            domain_url=response["org_domain_url"],
-            user=User(id=response["user_id"], username=response["username"]),
-        ),
-        request_id=response["request_id"],
-        access_token=response["access_token"],
-        api_version=response["api_version"],
-        namespace=response["namespace"],
-        data_api=DataAPI(
-            org_domain_url=response["org_domain_url"],
-            api_version=response["api_version"],
-            access_token=response["access_token"],
-            connection=self.connection,
-        ),
-    )
+        response = await connection.request("GET", request_url, headers=headers)
+        payload = await response.json()
+
+        return Authorization._build_authorization(payload)
+
+    @staticmethod
+    def _build_authorization(payload: dict) -> "Authorization":
+        return Authorization(
+            id=payload["id"],
+            status=payload["status"],
+            org=Org(
+                id=payload["org"]["id"],
+                developer_name=payload["org"]["developer_name"],
+                instance_url=payload["org"]["instance_url"],
+                type=payload["org"]["type"],
+                api_version=payload["org"]["api_version"],
+                user_auth=UserAuth(
+                    username=payload["org"]["user_auth"]["username"],
+                    user_id=payload["org"]["user_auth"]["user_id"],
+                    access_token=payload["org"]["user_auth"]["access_token"],
+                ),
+            ),
+            created_at=payload["created_at"],
+            last_modified_at=payload["last_modified_at"],
+            created_by=payload["created_by"],
+            last_modified_by=payload["last_modified_by"],
+        )
+
 
 def _resolve_attachment_or_url(attachment_or_url: Optional[str] = None) -> AuthBundle:
    if attachment_or_url:

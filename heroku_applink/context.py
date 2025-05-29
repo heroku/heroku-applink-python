@@ -14,7 +14,6 @@ from .connection import Connection
 
 __all__ = ["User", "Org", "ClientContext"]
 
-
 @dataclass(frozen=True, kw_only=True, slots=True)
 class User:
     """
