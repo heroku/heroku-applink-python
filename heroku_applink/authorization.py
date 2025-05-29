@@ -28,12 +28,18 @@ class AuthBundle:
 
 @dataclass(frozen=True, kw_only=True, slots=True)
 class UserAuth:
+    """
+    User authentication information for the Salesforce org.
+    """
     username: str
     user_id: str
     access_token: str
 
 @dataclass(frozen=True, kw_only=True, slots=True)
 class Org:
+    """
+    Salesforce org information.
+    """
     id: str
     developer_name: str
     instance_url: str
@@ -43,6 +49,12 @@ class Org:
 
 @dataclass
 class Authorization:
+    """
+    Authorization information for a Salesforce org with access to a Data API for
+    making SOQL queries.
+    """
+    connection: Connection
+
     id: str
     status: str
     org: Org
@@ -51,16 +63,22 @@ class Authorization:
     created_by: str
     last_modified_by: str
 
-    def data_api(self, config: Config=Config.default()) -> DataAPI:
-        if self.data_api is None:
-            self.data_api = DataAPI(
-                org_domain_url=self.org.instance_url,
-                api_version=self.org.api_version,
-                access_token=self.org.user_auth.access_token,
-                connection=Connection(config),
-            )
+    """
+    Example usage:
 
-        return self.data_api
+    ```python
+    authorization = await Authorization.find(developer_name)
+    data_api = authorization.data_api()
+    result = await data_api.query("SELECT Id, Name FROM Account")
+    ```
+    """
+    def data_api(self) -> DataAPI:
+        return DataAPI(
+            org_domain_url=self.org.instance_url,
+            api_version=self.org.api_version,
+            access_token=self.org.user_auth.access_token,
+            connection=self.connection,
+        )
 
     @staticmethod
     async def find(
@@ -72,6 +90,9 @@ class Authorization:
         Fetch authorization for a given Heroku AppLink developer.
         Uses GET {apiUrl}/authorizations/{developer_name}
         with a Bearer token from the add-on config.
+
+        This function will raise aiohttp-specific exceptions for HTTP errors and
+        any HTTP response other than 200 OK.
 
         For a list of exceptions, see:
         * https://docs.aiohttp.org/en/stable/client_reference.html
@@ -91,11 +112,12 @@ class Authorization:
         response = await connection.request("GET", request_url, headers=headers)
         payload = await response.json()
 
-        return Authorization._build_authorization(payload)
+        return Authorization._build_authorization(connection, payload)
 
     @staticmethod
-    def _build_authorization(payload: dict) -> "Authorization":
+    def _build_authorization(connection: Connection, payload: dict) -> "Authorization":
         return Authorization(
+            connection=connection,
             id=payload["id"],
             status=payload["status"],
             org=Org(

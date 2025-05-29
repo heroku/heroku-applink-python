@@ -48,7 +48,9 @@ def get_client_context() -> ClientContext:
 
 def get_authorization(developer_name: str, attachment_or_url: str|None=None) -> Authorization:
     """
-    TODO: Add documentation.
+    Get an Authorization object for a given developer name and attachment or URL.
+    This Authorization object can be used to make SOQL queries to Salesforce via
+    DataAPI.
 
     ```python
     import heroku_applink as sdk
@@ -59,7 +61,7 @@ def get_authorization(developer_name: str, attachment_or_url: str|None=None) -> 
     )
 
     query = "SELECT Id, Name FROM Account"
-    result = await context.data_api.query(query)
+    result = await authorization.data_api.query(query)
     for record in result.records:
         print(f"Account: {record.get('Name')}")
     ```
@@ -74,13 +76,11 @@ __all__ = [
     "Connection",
     "client_context",
     "ClientContext",
-    "Org",
     "QueriedRecord",
     "Record",
     "RecordQueryResult",
     "ReferenceId",
     "UnitOfWork",
-    "User",
     "IntegrationWsgiMiddleware",
     "IntegrationAsgiMiddleware",
     "ClientError",

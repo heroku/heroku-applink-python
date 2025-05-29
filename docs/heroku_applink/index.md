@@ -23,24 +23,22 @@ Functions
 # `get_authorization`
 
 ```python
-def get_authorization(config: heroku_applink.config.Config) ‑> heroku_applink.context.ClientContext
+def get_authorization(developer_name: str, attachment_or_url: str | None = None) ‑> heroku_applink.authorization.Authorization
 ```
-Call `get_authorization` to get the client context for a given Heroku AppLink
-addon. This is useful when you want to query Salesforce data through a specific
-Heroku AppLink addon as opposed to getting information from the `x-client-context`
-header in a request from Salesforce.
+Get an Authorization object for a given developer name and attachment or URL.
+This Authorization object can be used to make SOQL queries to Salesforce via
+DataAPI.
 
 ```python
 import heroku_applink as sdk
 
-config = sdk.Config(
+authorization = await sdk.get_authorization(
     developer_name="my-developer-name",
     attachment_or_url="HEROKU_APPLINK_BLUE",
 )
-context = await sdk.get_authorization(config)
 
 query = "SELECT Id, Name FROM Account"
-result = await context.data_api.query(query)
+result = await authorization.data_api.query(query)
 for record in result.records:
     print(f"Account: {record.get('Name')}")
 ```
@@ -80,22 +78,65 @@ Classes
 # `Authorization`
 
 ```python
-class Authorization(config: heroku_applink.config.Config)
+class Authorization(connection: heroku_applink.connection.Connection, id: str, status: str, org: heroku_applink.authorization.Org, created_at: str, last_modified_at: str, created_by: str, last_modified_by: str)
 ```
+Authorization information for a Salesforce org with access to a Data API for
+making SOQL queries.
 
-## Methods
-
-### `get_client_context`
+## Static methods
 
 ```python
-def get_client_context(self) ‑> heroku_applink.context.ClientContext
+def find(developer_name: str, attachment_or_url: str | None = None, config: heroku_applink.config.Config = Config(request_timeout=5, connect_timeout=None, socket_connect=None, socket_read=None)) ‑> heroku_applink.authorization.Authorization
 ```
 Fetch authorization for a given Heroku AppLink developer.
 Uses GET {apiUrl}/authorizations/{developer_name}
 with a Bearer token from the add-on config.
 
+This function will raise aiohttp-specific exceptions for HTTP errors and
+any HTTP response other than 200 OK.
+
 For a list of exceptions, see:
-  * https://docs.aiohttp.org/en/stable/client_reference.html
+* https://docs.aiohttp.org/en/stable/client_reference.html
+
+## Instance variables
+
+* `connection: heroku_applink.connection.Connection`
+    The type of the None singleton.
+
+* `created_at: str`
+    The type of the None singleton.
+
+* `created_by: str`
+    The type of the None singleton.
+
+* `id: str`
+    The type of the None singleton.
+
+* `last_modified_at: str`
+    The type of the None singleton.
+
+* `last_modified_by: str`
+    Example usage:
+    
+    ```python
+    authorization = await Authorization.find(developer_name)
+    data_api = authorization.data_api()
+    result = await data_api.query("SELECT Id, Name FROM Account")
+    ```
+
+* `org: heroku_applink.authorization.Org`
+    The type of the None singleton.
+
+* `status: str`
+    The type of the None singleton.
+
+## Methods
+
+### `data_api`
+
+```python
+def data_api(self) ‑> heroku_applink.data_api.DataAPI
+```
 
 <!-- python-clientcontext.md -->
 # `ClientContext`
@@ -143,7 +184,7 @@ Raised when there is an error with the HTTP client.
 # `Config`
 
 ```python
-class Config(developer_name: str | None = None, attachment_or_url: str | None = None, request_timeout: float = 5, connect_timeout: float | None = None, socket_connect: float | None = None, socket_read: float | None = None)
+class Config(request_timeout: float = 5, connect_timeout: float | None = None, socket_connect: float | None = None, socket_read: float | None = None)
 ```
 Configuration for the Salesforce Data API client.
 
@@ -155,14 +196,8 @@ def default() ‑> heroku_applink.config.Config
 
 ## Instance variables
 
-* `attachment_or_url: str | None`
-    The type of the None singleton.
-
 * `connect_timeout: float | None`
     Timeout for connecting to the Salesforce Data API.
-
-* `developer_name: str | None`
-    The type of the None singleton.
 
 * `request_timeout: float`
     Timeout for requests to the Salesforce Data API. In most cases, you'll only
@@ -205,40 +240,15 @@ If a timeout is provided, it will be used to set the timeout for the request.
 # `IntegrationAsgiMiddleware`
 
 ```python
-class IntegrationAsgiMiddleware(app, config=Config(developer_name=None, attachment_or_url='HEROKU_APPLINK', request_timeout=5, connect_timeout=None, socket_connect=None, socket_read=None))
+class IntegrationAsgiMiddleware(app, config=Config(request_timeout=5, connect_timeout=None, socket_connect=None, socket_read=None))
 ```
 
 <!-- python-integrationwsgimiddleware.md -->
 # `IntegrationWsgiMiddleware`
 
 ```python
-class IntegrationWsgiMiddleware(app, config=Config(developer_name=None, attachment_or_url='HEROKU_APPLINK', request_timeout=5, connect_timeout=None, socket_connect=None, socket_read=None))
+class IntegrationWsgiMiddleware(app, config=Config(request_timeout=5, connect_timeout=None, socket_connect=None, socket_read=None))
 ```
-
-<!-- python-org.md -->
-# `Org`
-
-```python
-class Org(*, id: str, domain_url: str, user: heroku_applink.context.User)
-```
-Information about the Salesforce org and the user that made the request.
-
-## Instance variables
-
-* `domain_url: str`
-    The canonical URL of the Salesforce org.
-    
-    This URL never changes. Use this URL when making API calls to your org.
-    
-    For example: `https://example-domain-url.my.salesforce.com`
-
-* `id: str`
-    The Salesforce org ID.
-    
-    For example: `00DJS0000000123ABC`
-
-* `user: heroku_applink.context.User`
-    The currently logged in user.
 
 <!-- python-queriedrecord.md -->
 # `QueriedRecord`
@@ -451,23 +461,3 @@ reference_id = unit_of_work.register_update(
     )
 )
 ```
-
-<!-- python-user.md -->
-# `User`
-
-```python
-class User(*, id: str, username: str)
-```
-Information about the Salesforce user that made the request.
-
-## Instance variables
-
-* `id: str`
-    The user's ID.
-    
-    For example: `005JS000000H123`
-
-* `username: str`
-    The username of the user.
-    
-    For example: `user@example.tld`

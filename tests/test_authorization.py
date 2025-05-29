@@ -4,7 +4,8 @@ import aiohttp
 from aioresponses import aioresponses
 from typing import Dict, Any
 
-from heroku_applink.config import Config
+from heroku_applink.connection import Connection
+from heroku_applink.data_api import DataAPI
 from heroku_applink.authorization import (
     Authorization,
     _resolve_addon_config_by_attachment_or_color,
@@ -53,6 +54,9 @@ async def test_attachment_based_success(monkeypatch):
         authorization = await Authorization.find(developer_name)
 
         assert isinstance(authorization, Authorization)
+        assert isinstance(authorization.connection, Connection)
+        assert isinstance(authorization.data_api(), DataAPI)
+
         assert authorization is not None
 
         assert authorization.id is not None
