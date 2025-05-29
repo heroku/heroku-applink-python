@@ -77,11 +77,6 @@ async def test_attachment_with_server_side_error(monkeypatch):
     monkeypatch.setenv("HEROKU_APPLINK_API_URL", "https://api.test/")
     monkeypatch.setenv("HEROKU_APPLINK_TOKEN", "TOKEN")
 
-    authorization = Authorization(Config(
-        developer_name=developer_name,
-        attachment_or_url=None
-    ))
-
     with aioresponses() as m:
         m.get(
             f"https://api.test/authorizations/{developer_name}",
@@ -90,7 +85,7 @@ async def test_attachment_with_server_side_error(monkeypatch):
         )
 
         with pytest.raises(aiohttp.client_exceptions.ClientResponseError) as exc_info:
-            await authorization.get_client_context()
+            await Authorization.find(developer_name)
 
         assert exc_info.value.status, 500
 
@@ -101,11 +96,6 @@ async def test_attachment_with_client_side_error(monkeypatch):
     monkeypatch.setenv("HEROKU_APPLINK_API_URL", "https://api.test/")
     monkeypatch.setenv("HEROKU_APPLINK_TOKEN", "TOKEN")
 
-    authorization = Authorization(Config(
-        developer_name=developer_name,
-        attachment_or_url=None
-    ))
-
     with aioresponses() as m:
         m.get(
             f"https://api.test/authorizations/{developer_name}",
@@ -114,7 +104,7 @@ async def test_attachment_with_client_side_error(monkeypatch):
         )
 
         with pytest.raises(aiohttp.client_exceptions.ClientResponseError) as exc_info:
-            await authorization.get_client_context()
+            await Authorization.find(developer_name)
 
         assert exc_info.value.status, 400
 
@@ -125,11 +115,6 @@ async def test_attachment_with_timeout_error(monkeypatch):
     monkeypatch.setenv("HEROKU_APPLINK_API_URL", "https://api.test/")
     monkeypatch.setenv("HEROKU_APPLINK_TOKEN", "TOKEN")
 
-    authorization = Authorization(Config(
-        developer_name=developer_name,
-        attachment_or_url=None
-    ))
-
     with aioresponses() as m:
         m.get(
             f"https://api.test/authorizations/{developer_name}",
@@ -137,7 +122,7 @@ async def test_attachment_with_timeout_error(monkeypatch):
         )
 
         with pytest.raises(aiohttp.ServerTimeoutError) as exc_info:
-            await authorization.get_client_context()
+            await Authorization.find(developer_name)
 
         assert isinstance(exc_info.value, aiohttp.ServerTimeoutError)
 
