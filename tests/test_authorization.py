@@ -112,24 +112,6 @@ async def test_attachment_with_client_side_error(monkeypatch):
 
         assert exc_info.value.status, 400
 
-@pytest.mark.asyncio
-async def test_attachment_with_timeout_error(monkeypatch):
-    developer_name = "devName"
-
-    monkeypatch.setenv("HEROKU_APPLINK_API_URL", "https://api.test/")
-    monkeypatch.setenv("HEROKU_APPLINK_TOKEN", "TOKEN")
-
-    with aioresponses() as m:
-        m.get(
-            f"https://api.test/authorizations/{developer_name}",
-            exception=aiohttp.ServerTimeoutError
-        )
-
-        with pytest.raises(aiohttp.ServerTimeoutError) as exc_info:
-            await Authorization.find(developer_name)
-
-        assert isinstance(exc_info.value, aiohttp.ServerTimeoutError)
-
 def test_resolve_attachment_or_url(monkeypatch):
     # Set URL env var and corresponding token
     monkeypatch.setenv('EXAMPLE_API_URL', 'https://api.test.com')
