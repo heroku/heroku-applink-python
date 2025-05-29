@@ -43,7 +43,6 @@ def get_client_context() -> ClientContext:
     try:
       return client_context.get()
     except LookupError:
-        # TODO: Add a more specific error message.
         raise ValueError("No client context found")
 
 def get_authorization(developer_name: str, attachment_or_url: str|None=None) -> Authorization:
