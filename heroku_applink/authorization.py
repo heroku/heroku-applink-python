@@ -49,11 +49,23 @@ class Org:
 
 @dataclass
 class Authorization:
+    connection: Connection
     """
     Authorization information for a Salesforce org with access to a Data API for
     making SOQL queries.
     """
-    connection: Connection
+
+    data_api: DataAPI
+    """
+    An initialized data API client instance for interacting with data in the org.
+
+    Example usage:
+
+    ```python
+    authorization = await Authorization.find(developer_name)
+    result = await authorization.data_api.query("SELECT Id, Name FROM Account")
+    ```
+    """
 
     id: str
     status: str
@@ -62,23 +74,6 @@ class Authorization:
     last_modified_at: str
     created_by: str
     last_modified_by: str
-
-    """
-    Example usage:
-
-    ```python
-    authorization = await Authorization.find(developer_name)
-    data_api = authorization.data_api()
-    result = await data_api.query("SELECT Id, Name FROM Account")
-    ```
-    """
-    def data_api(self) -> DataAPI:
-        return DataAPI(
-            org_domain_url=self.org.instance_url,
-            api_version=self.org.api_version,
-            access_token=self.org.user_auth.access_token,
-            connection=self.connection,
-        )
 
     @staticmethod
     async def find(
@@ -118,6 +113,12 @@ class Authorization:
     def _build_authorization(connection: Connection, payload: dict) -> "Authorization":
         return Authorization(
             connection=connection,
+            data_api=DataAPI(
+                org_domain_url=payload["org"]["instance_url"],
+                api_version=payload["org"]["api_version"],
+                access_token=payload["org"]["user_auth"]["access_token"],
+                connection=connection,
+            ),
             id=payload["id"],
             status=payload["status"],
             org=Org(
