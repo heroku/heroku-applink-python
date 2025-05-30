@@ -1,5 +1,9 @@
 Module heroku_applink.connection
 ================================
+Copyright (c) 2025, salesforce.com, inc.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
+For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
 
 Classes
 -------
@@ -24,7 +28,7 @@ Close the connection.
 ### `request`
 
 ```python
-def request(self, method, url, headers=None, data=None, timeout: float | None = None) ‑> aiohttp.client_reqrep.ClientResponse
+def request(self, method, url, params=None, headers=None, data=None, timeout: float | None = None) ‑> aiohttp.client_reqrep.ClientResponse
 ```
 Make an HTTP request to the given URL.
 

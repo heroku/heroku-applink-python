@@ -1,3 +1,10 @@
+"""
+Copyright (c) 2025, salesforce.com, inc.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
+For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+"""
+
 import json
 import base64
 from dataclasses import dataclass
@@ -6,7 +13,6 @@ from .data_api import DataAPI
 from .connection import Connection
 
 __all__ = ["User", "Org", "ClientContext"]
-
 
 @dataclass(frozen=True, kw_only=True, slots=True)
 class User:
