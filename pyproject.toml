@@ -13,7 +13,10 @@ dependencies = [
 docs = ["pdoc3"]
 
 [tool.setuptools]
-packages = ["heroku_applink", "heroku_applink.data_api"]
+packages = [
+    "heroku_applink",
+    "heroku_applink.data_api",
+]
 
 [project.urls]
 Homepage = "https://github.com/heroku/heroku-applink-python"
@@ -40,13 +43,14 @@ test = [
 dev = [
     "tox>=4.0.0",
     "tox-uv>=0.1.0",
-    "ruff>=0.1.0"
+    "ruff>=0.1.0",
+    "pdoc3>=0.11.0",
 ]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
-addopts = "--cov=heroku_applink.data_api --cov-report=term-missing -v"
+addopts = "--cov=heroku_applink --cov-report=term-missing -v"
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 

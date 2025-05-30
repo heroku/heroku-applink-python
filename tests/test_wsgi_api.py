@@ -2,7 +2,7 @@ import pytest
 import json
 import base64
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify
 
 import heroku_applink as sdk
 

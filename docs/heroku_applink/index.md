@@ -1,9 +1,14 @@
 Module heroku_applink
 =====================
+Copyright (c) 2025, salesforce.com, inc.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
+For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
 
 Sub-modules
 -----------
 
+* heroku_applink.authorization
 * heroku_applink.config
 * heroku_applink.connection
 * heroku_applink.context
@@ -11,8 +16,127 @@ Sub-modules
 * heroku_applink.exceptions
 * heroku_applink.middleware
 
+Functions
+---------
+
+<!-- python-get_authorization.md -->
+# `get_authorization`
+
+```python
+def get_authorization(developer_name: str, attachment_or_url: str | None = None) ‑> heroku_applink.authorization.Authorization
+```
+Get an Authorization object for a given developer name and attachment or URL.
+This Authorization object can be used to make SOQL queries to Salesforce via
+DataAPI.
+
+```python
+import heroku_applink as sdk
+
+authorization = await sdk.get_authorization(
+    developer_name="my-developer-name",
+    attachment_or_url="HEROKU_APPLINK_BLUE",
+)
+
+query = "SELECT Id, Name FROM Account"
+result = await authorization.data_api.query(query)
+for record in result.records:
+    print(f"Account: {record.get('Name')}")
+```
+
+<!-- python-get_client_context.md -->
+# `get_client_context`
+
+```python
+def get_client_context() ‑> heroku_applink.context.ClientContext
+```
+Call `get_client_context` to get the client context for the current incoming
+request from Salesforce. This will be set by the `IntegrationWsgiMiddleware` or
+`IntegrationAsgiMiddleware` in your application and can only be used in requests
+that are routed through one of these middlewares.
+
+```python
+import heroku_applink as sdk
+from fastapi import FastAPI
+
+app = FastAPI()
+app.add_middleware(sdk.IntegrationAsgiMiddleware, config=sdk.Config(request_timeout=5))
+
+@app.get("/accounts")
+async def get_accounts():
+    context = sdk.get_client_context()
+
+    query = "SELECT Id, Name FROM Account"
+    result = await context.data_api.query(query)
+
+    return {"accounts": [record.get("Name") for record in result.records]}
+```
+
 Classes
 -------
+
+<!-- python-authorization.md -->
+# `Authorization`
+
+```python
+class Authorization(connection: heroku_applink.connection.Connection, id: str, status: str, org: heroku_applink.authorization.Org, created_at: str, last_modified_at: str, created_by: str, last_modified_by: str)
+```
+Authorization information for a Salesforce org with access to a Data API for
+making SOQL queries.
+
+## Static methods
+
+```python
+def find(developer_name: str, attachment_or_url: str | None = None, config: heroku_applink.config.Config = Config(request_timeout=5, connect_timeout=None, socket_connect=None, socket_read=None)) ‑> heroku_applink.authorization.Authorization
+```
+Fetch authorization for a given Heroku AppLink developer.
+Uses GET {apiUrl}/authorizations/{developer_name}
+with a Bearer token from the add-on config.
+
+This function will raise aiohttp-specific exceptions for HTTP errors and
+any HTTP response other than 200 OK.
+
+For a list of exceptions, see:
+* https://docs.aiohttp.org/en/stable/client_reference.html
+
+## Instance variables
+
+* `connection: heroku_applink.connection.Connection`
+    The type of the None singleton.
+
+* `created_at: str`
+    The type of the None singleton.
+
+* `created_by: str`
+    The type of the None singleton.
+
+* `id: str`
+    The type of the None singleton.
+
+* `last_modified_at: str`
+    The type of the None singleton.
+
+* `last_modified_by: str`
+    Example usage:
+    
+    ```python
+    authorization = await Authorization.find(developer_name)
+    data_api = authorization.data_api()
+    result = await data_api.query("SELECT Id, Name FROM Account")
+    ```
+
+* `org: heroku_applink.authorization.Org`
+    The type of the None singleton.
+
+* `status: str`
+    The type of the None singleton.
+
+## Methods
+
+### `data_api`
+
+```python
+def data_api(self) ‑> heroku_applink.data_api.DataAPI
+```
 
 <!-- python-clientcontext.md -->
 # `ClientContext`
@@ -106,7 +230,7 @@ Close the connection.
 ### `request`
 
 ```python
-def request(self, method, url, headers=None, data=None, timeout: float | None = None) ‑> aiohttp.client_reqrep.ClientResponse
+def request(self, method, url, params=None, headers=None, data=None, timeout: float | None = None) ‑> aiohttp.client_reqrep.ClientResponse
 ```
 Make an HTTP request to the given URL.
 
@@ -125,31 +249,6 @@ class IntegrationAsgiMiddleware(app, config=Config(request_timeout=5, connect_ti
 ```python
 class IntegrationWsgiMiddleware(app, config=Config(request_timeout=5, connect_timeout=None, socket_connect=None, socket_read=None))
 ```
-
-<!-- python-org.md -->
-# `Org`
-
-```python
-class Org(*, id: str, domain_url: str, user: heroku_applink.context.User)
-```
-Information about the Salesforce org and the user that made the request.
-
-## Instance variables
-
-* `domain_url: str`
-    The canonical URL of the Salesforce org.
-    
-    This URL never changes. Use this URL when making API calls to your org.
-    
-    For example: `https://example-domain-url.my.salesforce.com`
-
-* `id: str`
-    The Salesforce org ID.
-    
-    For example: `00DJS0000000123ABC`
-
-* `user: heroku_applink.context.User`
-    The currently logged in user.
 
 <!-- python-queriedrecord.md -->
 # `QueriedRecord`
@@ -362,23 +461,3 @@ reference_id = unit_of_work.register_update(
     )
 )
 ```
-
-<!-- python-user.md -->
-# `User`
-
-```python
-class User(*, id: str, username: str)
-```
-Information about the Salesforce user that made the request.
-
-## Instance variables
-
-* `id: str`
-    The user's ID.
-    
-    For example: `005JS000000H123`
-
-* `username: str`
-    The username of the user.
-    
-    For example: `user@example.tld`

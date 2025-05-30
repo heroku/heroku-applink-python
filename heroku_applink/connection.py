@@ -1,3 +1,10 @@
+"""
+Copyright (c) 2025, salesforce.com, inc.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
+For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+"""
+
 import aiohttp
 import asyncio
 
@@ -16,6 +23,7 @@ class Connection:
         self,
         method,
         url,
+        params=None,
         headers=None,
         data=None,
         timeout: float|None=None
@@ -31,6 +39,7 @@ class Connection:
         response = self._client().request(
             method,
             url,
+            params=params,
             headers=headers,
             data=data,
             timeout=timeout
@@ -66,6 +75,7 @@ class Connection:
                 # Disable cookie storage using `DummyCookieJar`, given that we
                 # don't need cookie support.
                 cookie_jar=aiohttp.DummyCookieJar(),
+                raise_for_status=True,
                 timeout=aiohttp.ClientTimeout(
                     total=self._config.request_timeout,
                     connect=self._config.connect_timeout,
