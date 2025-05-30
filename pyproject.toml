@@ -18,7 +18,6 @@ docs = ["pdoc3"]
 
 [tool.hatch.build]
 packages = ["heroku_applink", "heroku_applink.data_api"]
-]
 
 [project.urls]
 Homepage = "https://github.com/heroku/heroku-applink-python"
