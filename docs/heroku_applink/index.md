@@ -78,10 +78,9 @@ Classes
 # `Authorization`
 
 ```python
-class Authorization(connection: heroku_applink.connection.Connection, id: str, status: str, org: heroku_applink.authorization.Org, created_at: str, last_modified_at: str, created_by: str, last_modified_by: str)
+class Authorization(connection: heroku_applink.connection.Connection, data_api: heroku_applink.data_api.DataAPI, id: str, status: str, org: heroku_applink.authorization.Org, created_at: str, last_modified_at: str, created_by: str, last_modified_by: str)
 ```
-Authorization information for a Salesforce org with access to a Data API for
-making SOQL queries.
+Authorization(connection: heroku_applink.connection.Connection, data_api: heroku_applink.data_api.DataAPI, id: str, status: str, org: heroku_applink.authorization.Org, created_at: str, last_modified_at: str, created_by: str, last_modified_by: str)
 
 ## Static methods
 
@@ -101,13 +100,24 @@ For a list of exceptions, see:
 ## Instance variables
 
 * `connection: heroku_applink.connection.Connection`
-    The type of the None singleton.
+    Authorization information for a Salesforce org with access to a Data API for
+    making SOQL queries.
 
 * `created_at: str`
     The type of the None singleton.
 
 * `created_by: str`
     The type of the None singleton.
+
+* `data_api: heroku_applink.data_api.DataAPI`
+    An initialized data API client instance for interacting with data in the org.
+    
+    Example usage:
+    
+    ```python
+    authorization = await Authorization.find(developer_name)
+    result = await authorization.data_api.query("SELECT Id, Name FROM Account")
+    ```
 
 * `id: str`
     The type of the None singleton.
@@ -116,27 +126,13 @@ For a list of exceptions, see:
     The type of the None singleton.
 
 * `last_modified_by: str`
-    Example usage:
-    
-    ```python
-    authorization = await Authorization.find(developer_name)
-    data_api = authorization.data_api()
-    result = await data_api.query("SELECT Id, Name FROM Account")
-    ```
+    The type of the None singleton.
 
 * `org: heroku_applink.authorization.Org`
     The type of the None singleton.
 
 * `status: str`
     The type of the None singleton.
-
-## Methods
-
-### `data_api`
-
-```python
-def data_api(self) ‑> heroku_applink.data_api.DataAPI
-```
 
 <!-- python-clientcontext.md -->
 # `ClientContext`

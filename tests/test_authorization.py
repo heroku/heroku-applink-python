@@ -55,7 +55,7 @@ async def test_attachment_based_success(monkeypatch):
 
         assert isinstance(authorization, Authorization)
         assert isinstance(authorization.connection, Connection)
-        assert isinstance(authorization.data_api(), DataAPI)
+        assert isinstance(authorization.data_api, DataAPI)
 
         assert authorization is not None
 
