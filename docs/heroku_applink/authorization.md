@@ -29,9 +29,9 @@ class should not leak outside of the Authorization class.
 # `Authorization`
 
 ```python
-class Authorization(connection: heroku_applink.connection.Connection, data_api: heroku_applink.data_api.DataAPI, id: str, status: str, org: heroku_applink.authorization.Org, created_at: str, last_modified_at: str, created_by: str, last_modified_by: str)
+class Authorization(connection: heroku_applink.connection.Connection, data_api: heroku_applink.data_api.DataAPI, id: str, status: str, org: heroku_applink.authorization.Org, created_at: str, created_by: str, created_via_app: str, last_modified_at: str, last_modified_by: str, redirect_uri: str)
 ```
-Authorization(connection: heroku_applink.connection.Connection, data_api: heroku_applink.data_api.DataAPI, id: str, status: str, org: heroku_applink.authorization.Org, created_at: str, last_modified_at: str, created_by: str, last_modified_by: str)
+Authorization(connection: heroku_applink.connection.Connection, data_api: heroku_applink.data_api.DataAPI, id: str, status: str, org: heroku_applink.authorization.Org, created_at: str, created_by: str, created_via_app: str, last_modified_at: str, last_modified_by: str, redirect_uri: str)
 
 ## Static methods
 
@@ -55,10 +55,13 @@ For a list of exceptions, see:
     making SOQL queries.
 
 * `created_at: str`
-    The type of the None singleton.
+    The date and time the authorization was created.
 
 * `created_by: str`
-    The type of the None singleton.
+    The user who created the authorization.
+
+* `created_via_app: str`
+    The app that created the authorization.
 
 * `data_api: heroku_applink.data_api.DataAPI`
     An initialized data API client instance for interacting with data in the org.
@@ -71,19 +74,22 @@ For a list of exceptions, see:
     ```
 
 * `id: str`
-    The type of the None singleton.
+    The ID of the authorization.
 
 * `last_modified_at: str`
-    The type of the None singleton.
+    The date and time the authorization was last modified.
 
 * `last_modified_by: str`
-    The type of the None singleton.
+    The user who last modified the authorization.
 
 * `org: heroku_applink.authorization.Org`
-    The type of the None singleton.
+    The Salesforce Org associated with the authorization.
+
+* `redirect_uri: str`
+    The redirect URI for the authorization.
 
 * `status: str`
-    The type of the None singleton.
+    The status of the authorization.
 
 <!-- python-org.md -->
 # `Org`
