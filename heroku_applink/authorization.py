@@ -68,12 +68,49 @@ class Authorization:
     """
 
     id: str
+    """
+    The ID of the authorization.
+    """
+
     status: str
+    """
+    The status of the authorization.
+    """
+
     org: Org
+    """
+    The Salesforce Org associated with the authorization.
+    """
+
     created_at: str
-    last_modified_at: str
+    """
+    The date and time the authorization was created.
+    """
+
     created_by: str
+    """
+    The user who created the authorization.
+    """
+
+    created_via_app: str
+    """
+    The app that created the authorization.
+    """
+
+    last_modified_at: str
+    """
+    The date and time the authorization was last modified.
+    """
+
     last_modified_by: str
+    """
+    The user who last modified the authorization.
+    """
+
+    redirect_uri: str
+    """
+    The redirect URI for the authorization.
+    """
 
     @staticmethod
     async def find(
@@ -134,9 +171,11 @@ class Authorization:
                 ),
             ),
             created_at=payload["created_at"],
-            last_modified_at=payload["last_modified_at"],
             created_by=payload["created_by"],
+            created_via_app=payload["created_via_app"],
+            last_modified_at=payload["last_modified_at"],
             last_modified_by=payload["last_modified_by"],
+            redirect_uri=payload["redirect_uri"],
         )
 
 
