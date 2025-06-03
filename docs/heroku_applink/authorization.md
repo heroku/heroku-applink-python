@@ -29,9 +29,9 @@ class should not leak outside of the Authorization class.
 # `Authorization`
 
 ```python
-class Authorization(connection: heroku_applink.connection.Connection, data_api: heroku_applink.data_api.DataAPI, id: str, status: str, org: heroku_applink.authorization.Org, created_at: str, created_by: str, created_via_app: str, last_modified_at: str, last_modified_by: str, redirect_uri: str)
+class Authorization(connection: heroku_applink.connection.Connection, data_api: heroku_applink.data_api.DataAPI, id: str, status: str, org: heroku_applink.authorization.Org, created_at: str, created_by: str, created_via_app: str | None, last_modified_at: str, last_modified_by: str | None, redirect_uri: str | None)
 ```
-Authorization(connection: heroku_applink.connection.Connection, data_api: heroku_applink.data_api.DataAPI, id: str, status: str, org: heroku_applink.authorization.Org, created_at: str, created_by: str, created_via_app: str, last_modified_at: str, last_modified_by: str, redirect_uri: str)
+Authorization(connection: heroku_applink.connection.Connection, data_api: heroku_applink.data_api.DataAPI, id: str, status: str, org: heroku_applink.authorization.Org, created_at: str, created_by: str, created_via_app: str | None, last_modified_at: str, last_modified_by: str | None, redirect_uri: str | None)
 
 ## Static methods
 
@@ -60,7 +60,7 @@ For a list of exceptions, see:
 * `created_by: str`
     The user who created the authorization.
 
-* `created_via_app: str`
+* `created_via_app: str | None`
     The app that created the authorization.
 
 * `data_api: heroku_applink.data_api.DataAPI`
@@ -79,13 +79,13 @@ For a list of exceptions, see:
 * `last_modified_at: str`
     The date and time the authorization was last modified.
 
-* `last_modified_by: str`
+* `last_modified_by: str | None`
     The user who last modified the authorization.
 
 * `org: heroku_applink.authorization.Org`
     The Salesforce Org associated with the authorization.
 
-* `redirect_uri: str`
+* `redirect_uri: str | None`
     The redirect URI for the authorization.
 
 * `status: str`

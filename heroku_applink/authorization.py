@@ -92,7 +92,7 @@ class Authorization:
     The user who created the authorization.
     """
 
-    created_via_app: str
+    created_via_app: str|None
     """
     The app that created the authorization.
     """
@@ -102,12 +102,12 @@ class Authorization:
     The date and time the authorization was last modified.
     """
 
-    last_modified_by: str
+    last_modified_by: str|None
     """
     The user who last modified the authorization.
     """
 
-    redirect_uri: str
+    redirect_uri: str|None
     """
     The redirect URI for the authorization.
     """
