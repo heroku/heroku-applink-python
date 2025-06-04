@@ -57,13 +57,17 @@ For a list of exceptions, see:
 * `created_at: datetime.datetime`
     The date and time the authorization was created.
     
-    Format: "2025-03-06T18:20:42.226577Z"
+    For example: `2025-03-06T18:20:42.226577Z`
 
 * `created_by: str`
     The user who created the authorization.
+    
+    For example: `user@example.tld`
 
 * `created_via_app: str | None`
     The app that created the authorization.
+    
+    For example: `sushi`
 
 * `data_api: heroku_applink.data_api.DataAPI`
     An initialized data API client instance for interacting with data in the org.
@@ -79,15 +83,19 @@ For a list of exceptions, see:
     ```
 
 * `id: str`
-    The ID of the authorization.
+    The ID of the authorization in UUID format.
+    
+    For example: `e27e9be0-6dc4-430f-974d-584f5ff8e9e6`
 
 * `last_modified_at: datetime.datetime`
     The date and time the authorization was last modified.
     
-    Format: "2025-03-06T18:20:42.226577Z"
+    For example: `2025-03-06T18:20:42.226577Z`
 
 * `last_modified_by: str | None`
     The user who last modified the authorization.
+    
+    For example: `user@example.tld`
 
 * `org: heroku_applink.authorization.Org`
     The Salesforce Org associated with the authorization.
