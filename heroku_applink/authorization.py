@@ -203,7 +203,6 @@ def _parse_datetime(datetime_str: str) -> datetime:
     """
     return datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S.%fZ")
 
-
 def _resolve_attachment_or_url(attachment_or_url: Optional[str] = None) -> AuthBundle:
    if attachment_or_url:
       if _is_valid_url(attachment_or_url):
