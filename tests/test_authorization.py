@@ -13,6 +13,7 @@ from heroku_applink.authorization import (
     _resolve_attachment_or_url,
     _is_valid_url,
 )
+from heroku_applink.authorization import Org as AuthorizationOrg
 
 # A sample valid response payload from the add-on
 VALID_RESPONSE: Dict[str, Any] = {
@@ -38,6 +39,49 @@ VALID_RESPONSE: Dict[str, Any] = {
     "redirect_uri": "https://test-app.herokuapp.com",
 }
 
+VALID_RESPONSE_NO_REDIRECT_URI: Dict[str, Any] = {
+      "id": "b8bc7bcb-89c3-45c0-b7b7-4fb4427e598a",
+    "status": "authorized",
+    "org": {
+        "id": "00DSG00000DGEIr2AP",
+        "developer_name": "productionOrg2",
+        "instance_url": "https://dmomain.my.salesforce.com",
+        "type": "SalesforceOrg",
+        "api_version": "57.0",
+        "user_auth": {
+            "username": "admin@whatever.org",
+            "user_id": "005...",
+            "access_token": "00DSG00000DGEIr2AP!<token>"
+        }
+    },
+    "created_at": "2025-03-06T18:20:42.226577Z",
+    "created_by": "foo@heroku.com",
+    "created_via_app": "test-app",
+    "last_modified_at": "2025-03-09T18:20:42.226577Z",
+    "last_modified_by": "foo@heroku.com",
+}
+
+def assert_authorization_is_valid(authorization: Authorization):
+    assert isinstance(authorization, Authorization)
+    assert isinstance(authorization.connection, Connection)
+    assert isinstance(authorization.data_api, DataAPI)
+    assert isinstance(authorization.org, AuthorizationOrg)
+
+    assert authorization.id is not None
+    assert authorization.status is not None
+    assert authorization.org is not None
+
+    assert authorization.org.id is not None
+    assert authorization.org.developer_name is not None
+    assert authorization.org.instance_url is not None
+    assert authorization.org.type is not None
+    assert authorization.org.api_version is not None
+    assert authorization.org.user_auth is not None
+
+    assert authorization.org.user_auth.username is not None
+    assert authorization.org.user_auth.user_id is not None
+    assert authorization.org.user_auth.access_token is not None
+
 @pytest.mark.asyncio
 async def test_attachment_based_success(monkeypatch):
     developer_name = "devName"
@@ -55,26 +99,26 @@ async def test_attachment_based_success(monkeypatch):
 
         authorization = await Authorization.find(developer_name)
 
-        assert isinstance(authorization, Authorization)
-        assert isinstance(authorization.connection, Connection)
-        assert isinstance(authorization.data_api, DataAPI)
+        assert_authorization_is_valid(authorization)
 
-        assert authorization is not None
+@pytest.mark.asyncio
+async def test_attachment_based_success_no_redirect_uri(monkeypatch):
+    developer_name = "devName"
 
-        assert authorization.id is not None
-        assert authorization.status is not None
-        assert authorization.org is not None
+    monkeypatch.setenv("HEROKU_APPLINK_API_URL", "https://api.test/")
+    monkeypatch.setenv("HEROKU_APPLINK_TOKEN", "TOKEN")
 
-        assert authorization.org.id is not None
-        assert authorization.org.developer_name is not None
-        assert authorization.org.instance_url is not None
-        assert authorization.org.type is not None
-        assert authorization.org.api_version is not None
-        assert authorization.org.user_auth is not None
+    with aioresponses() as m:
+        m.get(
+            f"https://api.test/authorizations/{developer_name}",
+            status=200,
+            payload=VALID_RESPONSE_NO_REDIRECT_URI
+        )
 
-        assert authorization.org.user_auth.username is not None
-        assert authorization.org.user_auth.user_id is not None
-        assert authorization.org.user_auth.access_token is not None
+        authorization = await Authorization.find(developer_name)
+
+        assert_authorization_is_valid(authorization)
+        assert authorization.redirect_uri is None
 
 @pytest.mark.asyncio
 async def test_attachment_with_server_side_error(monkeypatch):

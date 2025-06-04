@@ -148,6 +148,10 @@ class Authorization:
 
     @staticmethod
     def _build_authorization(connection: Connection, payload: dict) -> "Authorization":
+        """
+        Build an Authorization object from a payload. Some fields are optional,
+        so we use get() to handle the case where they are not present.
+        """
         return Authorization(
             connection=connection,
             data_api=DataAPI(
@@ -172,10 +176,10 @@ class Authorization:
             ),
             created_at=payload["created_at"],
             created_by=payload["created_by"],
-            created_via_app=payload["created_via_app"],
+            created_via_app=payload.get("created_via_app"),
             last_modified_at=payload["last_modified_at"],
-            last_modified_by=payload["last_modified_by"],
-            redirect_uri=payload["redirect_uri"],
+            last_modified_by=payload.get("last_modified_by"),
+            redirect_uri=payload.get("redirect_uri"),
         )
 
 
