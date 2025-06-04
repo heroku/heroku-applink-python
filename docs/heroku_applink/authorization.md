@@ -29,9 +29,10 @@ class should not leak outside of the Authorization class.
 # `Authorization`
 
 ```python
-class Authorization(connection: heroku_applink.connection.Connection, data_api: heroku_applink.data_api.DataAPI, id: str, status: str, org: heroku_applink.authorization.Org, created_at: str, last_modified_at: str, created_by: str, last_modified_by: str)
+class Authorization(connection: heroku_applink.connection.Connection, data_api: heroku_applink.data_api.DataAPI, id: str, status: str, org: heroku_applink.authorization.Org, created_at: datetime.datetime, created_by: str, created_via_app: str | None, last_modified_at: datetime.datetime, last_modified_by: str | None, redirect_uri: str | None)
 ```
-Authorization(connection: heroku_applink.connection.Connection, data_api: heroku_applink.data_api.DataAPI, id: str, status: str, org: heroku_applink.authorization.Org, created_at: str, last_modified_at: str, created_by: str, last_modified_by: str)
+Authorization information for a Salesforce org with access to a Data API for
+making SOQL queries.
 
 ## Static methods
 
@@ -42,6 +43,17 @@ Fetch authorization for a given Heroku AppLink developer.
 Uses GET {apiUrl}/authorizations/{developer_name}
 with a Bearer token from the add-on config.
 
+Example usage:
+
+```python
+authorization = await Authorization.find(developer_name)
+result = await authorization.data_api.query("SELECT Id, Name FROM Account")
+
+# Or use the attachment or URL of the add-on
+authorization = await Authorization.find(developer_name, attachment_or_url="HEROKU_APPLINK_PURPLE")
+result = await authorization.data_api.query("SELECT Id, Name FROM Account")
+```
+
 This function will raise aiohttp-specific exceptions for HTTP errors and
 any HTTP response other than 200 OK.
 
@@ -51,14 +63,22 @@ For a list of exceptions, see:
 ## Instance variables
 
 * `connection: heroku_applink.connection.Connection`
-    Authorization information for a Salesforce org with access to a Data API for
-    making SOQL queries.
+    Object responsible for making HTTP requests to the Salesforce API.
 
-* `created_at: str`
-    The type of the None singleton.
+* `created_at: datetime.datetime`
+    The date and time the authorization was created.
+    
+    For example: `2025-03-06T18:20:42.226577Z`
 
 * `created_by: str`
-    The type of the None singleton.
+    The user who created the authorization.
+    
+    For example: `user@example.tld`
+
+* `created_via_app: str | None`
+    The app that created the authorization.
+    
+    For example: `sushi`
 
 * `data_api: heroku_applink.data_api.DataAPI`
     An initialized data API client instance for interacting with data in the org.
@@ -68,22 +88,40 @@ For a list of exceptions, see:
     ```python
     authorization = await Authorization.find(developer_name)
     result = await authorization.data_api.query("SELECT Id, Name FROM Account")
+    
+    for record in result.records:
+        print(f"Account: {record}")
     ```
 
 * `id: str`
-    The type of the None singleton.
+    The ID of the authorization in UUID format.
+    
+    For example: `e27e9be0-6dc4-430f-974d-584f5ff8e9e6`
 
-* `last_modified_at: str`
-    The type of the None singleton.
+* `last_modified_at: datetime.datetime`
+    The date and time the authorization was last modified.
+    
+    For example: `2025-03-06T18:20:42.226577Z`
 
-* `last_modified_by: str`
-    The type of the None singleton.
+* `last_modified_by: str | None`
+    The user who last modified the authorization.
+    
+    For example: `user@example.tld`
 
 * `org: heroku_applink.authorization.Org`
-    The type of the None singleton.
+    The Salesforce Org associated with the authorization.
+
+* `redirect_uri: str | None`
+    The redirect URI for the authorization.
 
 * `status: str`
-    The type of the None singleton.
+    The status of the authorization.
+    
+    Possible values:
+    * "authorized"
+    * "authorizing"
+    * "disconnected"
+    * "error"
 
 <!-- python-org.md -->
 # `Org`

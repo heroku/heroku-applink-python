@@ -8,6 +8,7 @@ For full license text, see the LICENSE file in the repo root or https://opensour
 import os
 
 from dataclasses import dataclass
+from datetime import datetime
 from functools import lru_cache
 from typing import Optional
 from urllib.parse import urlparse, urljoin
@@ -49,10 +50,14 @@ class Org:
 
 @dataclass
 class Authorization:
-    connection: Connection
     """
     Authorization information for a Salesforce org with access to a Data API for
     making SOQL queries.
+    """
+
+    connection: Connection
+    """
+    Object responsible for making HTTP requests to the Salesforce API.
     """
 
     data_api: DataAPI
@@ -64,16 +69,74 @@ class Authorization:
     ```python
     authorization = await Authorization.find(developer_name)
     result = await authorization.data_api.query("SELECT Id, Name FROM Account")
+
+    for record in result.records:
+        print(f"Account: {record}")
     ```
     """
 
     id: str
+    """
+    The ID of the authorization in UUID format.
+
+    For example: `e27e9be0-6dc4-430f-974d-584f5ff8e9e6`
+    """
+
     status: str
+    """
+    The status of the authorization.
+
+    Possible values:
+    * "authorized"
+    * "authorizing"
+    * "disconnected"
+    * "error"
+    """
+
     org: Org
-    created_at: str
-    last_modified_at: str
+    """
+    The Salesforce Org associated with the authorization.
+    """
+
+    created_at: datetime
+    """
+    The date and time the authorization was created.
+
+    For example: `2025-03-06T18:20:42.226577Z`
+    """
+
     created_by: str
-    last_modified_by: str
+    """
+    The user who created the authorization.
+
+    For example: `user@example.tld`
+    """
+
+    created_via_app: str|None
+    """
+    The app that created the authorization.
+
+    For example: `sushi`
+    """
+
+    last_modified_at: datetime
+    """
+    The date and time the authorization was last modified.
+
+    For example: `2025-03-06T18:20:42.226577Z`
+    """
+
+    last_modified_by: str|None
+    """
+    The user who last modified the authorization.
+
+    For example: `user@example.tld`
+    """
+
+    redirect_uri: str|None
+    """
+    The redirect URI for the authorization.
+    """
 
     @staticmethod
     async def find(
@@ -85,6 +148,17 @@ class Authorization:
         Fetch authorization for a given Heroku AppLink developer.
         Uses GET {apiUrl}/authorizations/{developer_name}
         with a Bearer token from the add-on config.
+
+        Example usage:
+
+        ```python
+        authorization = await Authorization.find(developer_name)
+        result = await authorization.data_api.query("SELECT Id, Name FROM Account")
+
+        # Or use the attachment or URL of the add-on
+        authorization = await Authorization.find(developer_name, attachment_or_url="HEROKU_APPLINK_PURPLE")
+        result = await authorization.data_api.query("SELECT Id, Name FROM Account")
+        ```
 
         This function will raise aiohttp-specific exceptions for HTTP errors and
         any HTTP response other than 200 OK.
@@ -111,6 +185,10 @@ class Authorization:
 
     @staticmethod
     def _build_authorization(connection: Connection, payload: dict) -> "Authorization":
+        """
+        Build an Authorization object from a payload. Some fields are optional,
+        so we use get() to handle the case where they are not present.
+        """
         return Authorization(
             connection=connection,
             data_api=DataAPI(
@@ -133,12 +211,19 @@ class Authorization:
                     access_token=payload["org"]["user_auth"]["access_token"],
                 ),
             ),
-            created_at=payload["created_at"],
-            last_modified_at=payload["last_modified_at"],
+            created_at=_parse_datetime(payload["created_at"]),
             created_by=payload["created_by"],
-            last_modified_by=payload["last_modified_by"],
+            created_via_app=payload.get("created_via_app"),
+            last_modified_at=_parse_datetime(payload["last_modified_at"]),
+            last_modified_by=payload.get("last_modified_by"),
+            redirect_uri=payload.get("redirect_uri"),
         )
 
+def _parse_datetime(datetime_str: str) -> datetime:
+    """
+    Parse a datetime string into a datetime object.
+    """
+    return datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S.%fZ")
 
 def _resolve_attachment_or_url(attachment_or_url: Optional[str] = None) -> AuthBundle:
    if attachment_or_url:
