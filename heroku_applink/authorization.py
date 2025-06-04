@@ -50,6 +50,11 @@ class Org:
 
 @dataclass
 class Authorization:
+    """
+    Authorization information for a Salesforce org with access to a Data API for
+    making SOQL queries.
+    """
+
     connection: Connection
     """
     Authorization information for a Salesforce org with access to a Data API for
