@@ -92,6 +92,17 @@ Fetch authorization for a given Heroku AppLink developer.
 Uses GET {apiUrl}/authorizations/{developer_name}
 with a Bearer token from the add-on config.
 
+Example usage:
+
+```python
+authorization = await Authorization.find(developer_name)
+result = await authorization.data_api.query("SELECT Id, Name FROM Account")
+
+# Or use the attachment or URL of the add-on
+authorization = await Authorization.find(developer_name, attachment_or_url="HEROKU_APPLINK_PURPLE")
+result = await authorization.data_api.query("SELECT Id, Name FROM Account")
+```
+
 This function will raise aiohttp-specific exceptions for HTTP errors and
 any HTTP response other than 200 OK.
 
