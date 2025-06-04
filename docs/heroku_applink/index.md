@@ -122,6 +122,9 @@ For a list of exceptions, see:
     ```python
     authorization = await Authorization.find(developer_name)
     result = await authorization.data_api.query("SELECT Id, Name FROM Account")
+    
+    for record in result.records:
+        print(f"Account: {record}")
     ```
 
 * `id: str`
