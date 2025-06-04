@@ -78,9 +78,9 @@ Classes
 # `Authorization`
 
 ```python
-class Authorization(connection: heroku_applink.connection.Connection, data_api: heroku_applink.data_api.DataAPI, id: str, status: str, org: heroku_applink.authorization.Org, created_at: str, created_by: str, created_via_app: str | None, last_modified_at: str, last_modified_by: str | None, redirect_uri: str | None)
+class Authorization(connection: heroku_applink.connection.Connection, data_api: heroku_applink.data_api.DataAPI, id: str, status: str, org: heroku_applink.authorization.Org, created_at: datetime.datetime, created_by: str, created_via_app: str | None, last_modified_at: datetime.datetime, last_modified_by: str | None, redirect_uri: str | None)
 ```
-Authorization(connection: heroku_applink.connection.Connection, data_api: heroku_applink.data_api.DataAPI, id: str, status: str, org: heroku_applink.authorization.Org, created_at: str, created_by: str, created_via_app: str | None, last_modified_at: str, last_modified_by: str | None, redirect_uri: str | None)
+Authorization(connection: heroku_applink.connection.Connection, data_api: heroku_applink.data_api.DataAPI, id: str, status: str, org: heroku_applink.authorization.Org, created_at: datetime.datetime, created_by: str, created_via_app: str | None, last_modified_at: datetime.datetime, last_modified_by: str | None, redirect_uri: str | None)
 
 ## Static methods
 
@@ -103,8 +103,10 @@ For a list of exceptions, see:
     Authorization information for a Salesforce org with access to a Data API for
     making SOQL queries.
 
-* `created_at: str`
+* `created_at: datetime.datetime`
     The date and time the authorization was created.
+    
+    Format: "2025-03-06T18:20:42.226577Z"
 
 * `created_by: str`
     The user who created the authorization.
@@ -125,8 +127,10 @@ For a list of exceptions, see:
 * `id: str`
     The ID of the authorization.
 
-* `last_modified_at: str`
+* `last_modified_at: datetime.datetime`
     The date and time the authorization was last modified.
+    
+    Format: "2025-03-06T18:20:42.226577Z"
 
 * `last_modified_by: str | None`
     The user who last modified the authorization.
@@ -139,6 +143,12 @@ For a list of exceptions, see:
 
 * `status: str`
     The status of the authorization.
+    
+    Possible values:
+    * "authorized"
+    * "authorizing"
+    * "disconnected"
+    * "error"
 
 <!-- python-clientcontext.md -->
 # `ClientContext`

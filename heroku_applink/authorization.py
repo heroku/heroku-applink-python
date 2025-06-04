@@ -79,6 +79,9 @@ class Authorization:
 
     Possible values:
     * "authorized"
+    * "authorizing"
+    * "disconnected"
+    * "error"
     """
 
     org: Org
