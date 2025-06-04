@@ -126,28 +126,6 @@ except RuntimeError as e:
     print(f"API error: {e}")
 ```
 
-**Common Issues and Solutions:**
-
-1. **Authorization Failures**
-   - Problem: "Authorization request failed" error
-   - Solutions:
-     - Verify environment variables are set correctly
-     - Check if token is valid and not expired
-     - Ensure API URL is correct and accessible
-
-2. **Connection Timeouts**
-   - Problem: Connection timeout errors
-   - Solutions:
-     - Check network connection
-     - Verify API endpoint accessibility
-     - Check firewall settings
-   - Configuration:
-     - Default timeout is 5 seconds
-     - Can be adjusted in `addons/heroku_applink.py`:
-     ```python
-     HTTP_TIMEOUT_SECONDS = 10.0  # Increase for slow networks
-     ```
-
 ### How do I integrate the SDK into my application?
 Use the provided middleware to populate a ContextVar with your ClientContext:
 
@@ -235,6 +213,111 @@ pytest tests/addons/test_addons.py
 pytest -m functional
 ```
 
+## **Common Issues and Solutions:**
+
+### 1. Missing or Incorrect Environment Variables
+**Symptom**: `EnvironmentError` raised during `Authorization.find(...)`.
+
+**Root Cause**:
+- Missing required env vars like `HEROKU_APPLINK_<COLOR>_API_URL` and `_TOKEN`, or custom attachment names.
+
+**Fix**:
+- Double-check the presence of:
+  - `HEROKU_APPLINK_<COLOR>_API_URL`
+  - `HEROKU_APPLINK_<COLOR>_TOKEN`
+  - Or `<ATTACHMENT>_API_URL` / `_TOKEN`
+
+---
+
+### 2. Invalid `attachment_or_url` Argument
+**Symptom**: Unexpected token resolution failure or URL not found error.
+
+**Fix**:
+- Use valid attachment names or full URLs.
+- Ensure URLs exactly match env values (case-insensitive, including trailing slashes).
+
+---
+
+### 3. Forgetting to `await` the `Connection.request(...)` Call
+**Symptom**: Warning: coroutine was never awaited.
+
+**Fix**:
+- Always `await` the result of `request()`:
+  ```python
+  response = await connection.request(...)
+  ```
+
+---
+
+### 4. Unclosed `aiohttp.ClientSession`
+**Symptom**: Resource warnings / connection pool errors.
+
+**Fix**:
+- Call `await connection.close()` explicitly when you're done (or trust middleware to manage it).
+- Ensure sessions are not garbage collected in unexpected ways.
+
+---
+
+### 5. Missing `x-client-context` Header
+**Symptom**: `ValueError: x-client-context not set`
+
+**Cause**:
+- Middleware (`IntegrationAsgiMiddleware` or `IntegrationWsgiMiddleware`) not installed or header missing.
+
+**Fix**:
+- Ensure you're using the appropriate middleware for your framework:
+  ```python
+  app.add_middleware(sdk.IntegrationAsgiMiddleware, config=sdk.Config(...))
+  ```
+
+---
+
+### 6. Using `get_client_context()` Outside a Middleware Context
+**Symptom**: `ValueError: No client context found`
+
+**Fix**:
+- Call `get_client_context()` only during a request routed through the middleware.
+
+---
+
+### 7. Missing `"Id"` Field on `update()` Operations
+**Symptom**: `MissingFieldError`
+
+**Fix**:
+- Make sure the `Record` passed to `.update(...)` contains a valid `"Id"`:
+  ```python
+  Record(type="Account", fields={"Id": "...", "Name": "Updated"})
+  ```
+
+---
+
+### 8. Incorrect Field Nesting or Binary Data Format
+**Symptom**: Salesforce API errors / decoding errors.
+
+**Fix**:
+- Ensure binary fields (e.g., `VersionData` in `ContentVersion`) are passed as `bytes` — the SDK base64 encodes them.
+- Nested records and subqueries are automatically parsed, but manual construction must respect Salesforce’s expected structure.
+
+---
+
+### 9. Reusing or Mutating `ReferenceId` Objects
+**Symptom**: Unexpected overwrite or graph resolution errors.
+
+**Fix**:
+- Treat `ReferenceId` as immutable. Let `UnitOfWork` generate and manage them.
+
+---
+
+### 10. Missing `await` on `commit_unit_of_work(...)`
+**Symptom**: Unit of work never runs or throws coroutine warnings.
+
+**Fix**:
+- Always `await`:
+  ```python
+  result = await data_api.commit_unit_of_work(uow)
+  ```
+
+---
 ## Best Practices
 
 ### Performance
