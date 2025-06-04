@@ -8,6 +8,7 @@ For full license text, see the LICENSE file in the repo root or https://opensour
 import os
 
 from dataclasses import dataclass
+from datetime import datetime
 from functools import lru_cache
 from typing import Optional
 from urllib.parse import urlparse, urljoin
@@ -75,6 +76,9 @@ class Authorization:
     status: str
     """
     The status of the authorization.
+
+    Possible values:
+    * "authorized"
     """
 
     org: Org
@@ -82,9 +86,11 @@ class Authorization:
     The Salesforce Org associated with the authorization.
     """
 
-    created_at: str
+    created_at: datetime
     """
     The date and time the authorization was created.
+
+    Format: "2025-03-06T18:20:42.226577Z"
     """
 
     created_by: str
@@ -97,9 +103,11 @@ class Authorization:
     The app that created the authorization.
     """
 
-    last_modified_at: str
+    last_modified_at: datetime
     """
     The date and time the authorization was last modified.
+
+    Format: "2025-03-06T18:20:42.226577Z"
     """
 
     last_modified_by: str|None
@@ -174,13 +182,19 @@ class Authorization:
                     access_token=payload["org"]["user_auth"]["access_token"],
                 ),
             ),
-            created_at=payload["created_at"],
+            created_at=_parse_datetime(payload["created_at"]),
             created_by=payload["created_by"],
             created_via_app=payload.get("created_via_app"),
-            last_modified_at=payload["last_modified_at"],
+            last_modified_at=_parse_datetime(payload["last_modified_at"]),
             last_modified_by=payload.get("last_modified_by"),
             redirect_uri=payload.get("redirect_uri"),
         )
+
+def _parse_datetime(datetime_str: str) -> datetime:
+    """
+    Parse a datetime string into a datetime object.
+    """
+    return datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S.%fZ")
 
 
 def _resolve_attachment_or_url(attachment_or_url: Optional[str] = None) -> AuthBundle:

@@ -1,6 +1,7 @@
 import pytest
-
+import datetime
 import aiohttp
+
 from aioresponses import aioresponses
 from typing import Dict, Any
 
@@ -40,7 +41,7 @@ VALID_RESPONSE: Dict[str, Any] = {
 }
 
 VALID_RESPONSE_NO_REDIRECT_URI: Dict[str, Any] = {
-      "id": "b8bc7bcb-89c3-45c0-b7b7-4fb4427e598a",
+    "id": "b8bc7bcb-89c3-45c0-b7b7-4fb4427e598a",
     "status": "authorized",
     "org": {
         "id": "00DSG00000DGEIr2AP",
@@ -69,7 +70,9 @@ def assert_authorization_is_valid(authorization: Authorization):
 
     assert authorization.id is not None
     assert authorization.status is not None
-    assert authorization.org is not None
+
+    assert isinstance(authorization.created_at, datetime.datetime)
+    assert isinstance(authorization.last_modified_at, datetime.datetime)
 
     assert authorization.org.id is not None
     assert authorization.org.developer_name is not None
