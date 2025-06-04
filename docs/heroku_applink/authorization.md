@@ -52,8 +52,7 @@ For a list of exceptions, see:
 ## Instance variables
 
 * `connection: heroku_applink.connection.Connection`
-    Authorization information for a Salesforce org with access to a Data API for
-    making SOQL queries.
+    Object responsible for making HTTP requests to the Salesforce API.
 
 * `created_at: datetime.datetime`
     The date and time the authorization was created.

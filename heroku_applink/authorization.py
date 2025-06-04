@@ -57,8 +57,7 @@ class Authorization:
 
     connection: Connection
     """
-    Authorization information for a Salesforce org with access to a Data API for
-    making SOQL queries.
+    Object responsible for making HTTP requests to the Salesforce API.
     """
 
     data_api: DataAPI
