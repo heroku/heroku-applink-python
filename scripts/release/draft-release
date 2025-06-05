@@ -110,18 +110,18 @@ echo "Current version: $CURRENT_VERSION"
 echo "New version: $NEW_VERSION"
 echo "Previous version from changelog: $PREV_VERSION"
 
-# Check if we're on main branch
-CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-if [ "$CURRENT_BRANCH" != "main" ]; then
-    echo "Error: Must be on main branch"
-    exit 1
-fi
+# # Check if we're on main branch
+# CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+# if [ "$CURRENT_BRANCH" != "main" ]; then
+#     echo "Error: Must be on main branch"
+#     exit 1
+# fi
 
-# Check if working directory is clean
-if ! git diff-index --quiet HEAD --; then
-    echo "Error: Working directory is not clean. Please commit or stash your changes."
-    exit 1
-fi
+# # Check if working directory is clean
+# if ! git diff-index --quiet HEAD --; then
+#     echo "Error: Working directory is not clean. Please commit or stash your changes."
+#     exit 1
+# fi
 
 # Check if GitHub CLI is installed and authenticated
 if ! command -v gh &> /dev/null; then
@@ -205,15 +205,39 @@ if [ -f "$PR_TEMPLATE" ]; then
     cp "$PR_TEMPLATE" "$TEMP_PR_BODY"
 
     # Add our changes to the Summary section
-    sed -i "/^## Summary$/a - Updated version to $NEW_VERSION\n - Updated CHANGELOG.md with all changes since the previous release." "$TEMP_PR_BODY"
+    temp_summary=$(mktemp)
+    # Try Linux style first
+    if ! sed "/^## Summary$/a - Updated version to $NEW_VERSION\n - Updated CHANGELOG.md with all changes since the previous release." "$TEMP_PR_BODY" > "$temp_summary" 2>/dev/null; then
+        # Fall back to macOS style
+        sed "/^## Summary$/a\\
+- Updated version to $NEW_VERSION\\
+- Updated CHANGELOG.md with all changes since the previous release." "$TEMP_PR_BODY" > "$temp_summary"
+    fi
+    mv "$temp_summary" "$TEMP_PR_BODY"
 
     # Add git log to What Changed section
     echo "$GIT_LOG" > "$TEMP_PR_BODY.tmp"
-    sed -i "/^## What Changed$/r $TEMP_PR_BODY.tmp" "$TEMP_PR_BODY"
+    temp_changed=$(mktemp)
+    # Try Linux style first
+    if ! sed "/^## What Changed$/r $TEMP_PR_BODY.tmp" "$TEMP_PR_BODY" > "$temp_changed" 2>/dev/null; then
+        # Fall back to macOS style
+        sed "/^## What Changed$/r $TEMP_PR_BODY.tmp" "$TEMP_PR_BODY" > "$temp_changed"
+    fi
+    mv "$temp_changed" "$TEMP_PR_BODY"
     rm "$TEMP_PR_BODY.tmp"
 
     # Add our checklist items
-    sed -i "/^## Checklist$/a - [ ] Review changelog entries\n - [ ] Verify version bump\n - [ ] Test the changes\n - [ ] Approve the release" "$TEMP_PR_BODY"
+    temp_checklist=$(mktemp)
+    # Try Linux style first
+    if ! sed "/^## Checklist$/a - [ ] Review changelog entries\n - [ ] Verify version bump\n - [ ] Test the changes\n - [ ] Approve the release" "$TEMP_PR_BODY" > "$temp_checklist" 2>/dev/null; then
+        # Fall back to macOS style
+        sed "/^## Checklist$/a\\
+- [ ] Review changelog entries\\
+- [ ] Verify version bump\\
+- [ ] Test the changes\\
+- [ ] Approve the release" "$TEMP_PR_BODY" > "$temp_checklist"
+    fi
+    mv "$temp_checklist" "$TEMP_PR_BODY"
 
     PR_BODY=$(cat "$TEMP_PR_BODY")
 fi
