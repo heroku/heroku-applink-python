@@ -37,8 +37,10 @@ update_pyproject_version() {
         exit 1
     fi
     
-    # Update version in pyproject.toml
-    sed -i '' "s/^version = \".*\"/version = \"$version\"/" "$pyproject_file"
+    # Try Linux style first, fall back to macOS style if it fails
+    if ! sed -i "s/^version = \".*\"/version = \"$version\"/" "$pyproject_file" 2>/dev/null; then
+        sed -i '' "s/^version = \".*\"/version = \"$version\"/" "$pyproject_file"
+    fi
     echo "Updated version to $version in $pyproject_file"
 }
 
