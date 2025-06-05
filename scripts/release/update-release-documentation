@@ -37,13 +37,10 @@ update_pyproject_version() {
         exit 1
     fi
     
-    # Create a temporary file for the update
-    local temp_file=$(mktemp)
-    
     # Update version in pyproject.toml
-    sed "s/^version = \".*\"/version = \"$version\"/" "$pyproject_file" > "$temp_file"
-    mv "$temp_file" "$pyproject_file"
-    
+    if ! sed -i "s/^version = \".*\"/version = \"$version\"/" "$pyproject_file" 2>/dev/null; then
+        sed -i '' "s/^version = \".*\"/version = \"$version\"/" "$pyproject_file"
+    fi
     echo "Updated version to $version in $pyproject_file"
 }
 
