@@ -60,8 +60,3 @@ jobs:
       - name: Release to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
 
-      - name: Publish To Change Management
-        env:
-          ACTOR_EMAIL: ${{ secrets.TPS_API_RELEASE_ACTOR_EMAIL }}
-          TPS_API_TOKEN: ${{ secrets.TPS_API_TOKEN_PARAM }}
-        run: ./scripts/release/tps-record-release heroku-applink-python ${{ github.sha }}
