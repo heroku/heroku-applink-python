@@ -1,0 +1,61 @@
+name: Publish to PyPI and Change Management
+
+on:
+  workflow_run:
+    workflows: ["Create Github Tag and Release"]
+    types:
+      - completed
+    branches:
+      - main
+
+permissions:
+  contents: write
+  actions: read
+  id-token: write
+
+jobs:
+  check_for_moratorium:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    environment: change_management
+    steps:
+      - uses: actions/checkout@v4
+      - env:
+          TPS_API_TOKEN: ${{ secrets.TPS_API_TOKEN_PARAM }}
+        run: ./scripts/release/tps-check-lock heroku-applink-python ${{ github.sha }}
+
+  publish:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    needs: check_for_moratorium
+    runs-on: ubuntu-latest
+    environment: change_management
+    permissions:
+      id-token: write  # IMPORTANT: this permission is mandatory for Trusted Publishing
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get latest build workflow run
+        id: get_workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Get the most recent successful build workflow run for this commit
+          RUN_ID=$(gh run list --workflow "test-lint-build.yml" --branch main --json databaseId,conclusion,headSha --jq ".[] | select(.headSha == \"${{ github.sha }}\" and .conclusion == \"success\") | .databaseId" | head -n 1)
+          
+          if [ -z "$RUN_ID" ]; then
+            echo "No successful build found for commit ${{ github.sha }}"
+            exit 1
+          fi
+          
+          echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
+          echo "Found build workflow run: $RUN_ID"
+
+      - name: Download build artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p dist
+          gh run download ${{ steps.get_workflow.outputs.run_id }} --name release-artifacts-main --dir dist/
+
+      - name: Release to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
