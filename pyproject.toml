@@ -1,3 +1,7 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "heroku_applink"
 version = "0.1.0"
@@ -12,7 +16,7 @@ dependencies = [
 [dependency-groups]
 docs = ["pdoc3"]
 
-[tool.setuptools]
+[tool.hatch.build]
 packages = ["heroku_applink", "heroku_applink.data_api"]
 
 [project.urls]
@@ -22,7 +26,6 @@ Repository = "https://github.com/heroku/heroku-applink-python.git"
 "Bug Tracker" = "https://github.com/heroku/heroku-applink-python/issues"
 Changelog = "https://github.com/heroku/heroku-applink-python/CHANGELOG.md"
 
-
 [project.optional-dependencies]
 test = [
     "pytest>=7.0.0",
@@ -30,13 +33,24 @@ test = [
     "pytest-cov>=4.0.0",
     "pytest-mock>=3.10.0",
     "ruff>=0.1.0",
-    "coverage>=7.0.0"
+    "coverage>=7.0.0",
+    "aioresponses>=0.7.8",
+    "fastapi>=0.115.0",
+    "uvicorn>=0.34.0",
+    "httpx>=0.28.1",
+    "flask>=3.1.1",
+]
+dev = [
+    "tox>=4.0.0",
+    "tox-uv>=0.1.0",
+    "ruff>=0.1.0",
+    "pdoc3>=0.11.0",
 ]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
-addopts = "--cov=heroku_applink.data_api --cov-report=term-missing -v"
+addopts = "--cov=heroku_applink --cov-report=term-missing -v"
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 

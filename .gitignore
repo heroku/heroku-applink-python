@@ -7,13 +7,15 @@ venv/
 .tool-versions
 .python-version
 dist/
+build/
 **.egg-info/
 _build/
 .tox
 .ruff_cache
 .pytest_cache
 .mypy_cache
-
+uv.lock
+.coverage
 # Salesforce
 .codegenie/
 

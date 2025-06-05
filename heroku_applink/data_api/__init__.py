@@ -1,8 +1,17 @@
+"""
+Copyright (c) 2025, salesforce.com, inc.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
+For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+"""
+
 from typing import Any, TypeVar
 
 import aiohttp
 import orjson
 from aiohttp.payload import BytesPayload
+
+from heroku_applink.connection import Connection
 
 from ._requests import (
     CompositeGraphRestApiRequest,
@@ -37,15 +46,14 @@ class DataAPI:
         org_domain_url: str,
         api_version: str,
         access_token: str,
-        session: aiohttp.ClientSession | None = None,
+        connection: Connection,
     ) -> None:
         self._api_version = api_version
         self._org_domain_url = org_domain_url
-        self._shared_session = session
-
         self.access_token = access_token
+        self._connection = connection
 
-    async def query(self, soql: str) -> RecordQueryResult:
+    async def query(self, soql: str, timeout: float|None=None) -> RecordQueryResult:
         """
         Query for records using the given SOQL string.
 
@@ -64,10 +72,11 @@ class DataAPI:
         For more information, see the [Query REST API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_query.htm).
         """  # noqa: E501 pylint: disable=line-too-long
         return await self._execute(
-            QueryRecordsRestApiRequest(soql, self._download_file)
+            QueryRecordsRestApiRequest(soql, self._download_file),
+            timeout=timeout,
         )
 
-    async def query_more(self, result: RecordQueryResult) -> RecordQueryResult:
+    async def query_more(self, result: RecordQueryResult, timeout: float|None=None) -> RecordQueryResult:
         """
         Query for more records, based on the given `RecordQueryResult`.
 
@@ -91,10 +100,11 @@ class DataAPI:
             )
 
         return await self._execute(
-            QueryNextRecordsRestApiRequest(result.next_records_url, self._download_file)
+            QueryNextRecordsRestApiRequest(result.next_records_url, self._download_file),
+            timeout=timeout,
         )
 
-    async def create(self, record: Record) -> str:
+    async def create(self, record: Record, timeout: float|None=None) -> str:
         """
         Create a new record based on the given `Record` object.
 
@@ -113,9 +123,12 @@ class DataAPI:
         )
         ```
         """
-        return await self._execute(CreateRecordRestApiRequest(record))
+        return await self._execute(
+            CreateRecordRestApiRequest(record),
+            timeout=timeout,
+        )
 
-    async def update(self, record: Record) -> str:
+    async def update(self, record: Record, timeout: float|None=None) -> str:
         """
         Update an existing record based on the given `Record` object.
 
@@ -135,9 +148,12 @@ class DataAPI:
         )
         ```
         """
-        return await self._execute(UpdateRecordRestApiRequest(record))
+        return await self._execute(
+            UpdateRecordRestApiRequest(record),
+            timeout=timeout,
+        )
 
-    async def delete(self, object_type: str, record_id: str) -> str:
+    async def delete(self, object_type: str, record_id: str, timeout: float|None=None) -> str:
         """
         Delete an existing record of the given Salesforce object type and ID.
 
@@ -149,10 +165,13 @@ class DataAPI:
         await data_api.delete("Account", "001B000001Lp1FxIAJ")
         ```
         """
-        return await self._execute(DeleteRecordRestApiRequest(object_type, record_id))
+        return await self._execute(
+            DeleteRecordRestApiRequest(object_type, record_id),
+            timeout=timeout,
+        )
 
     async def commit_unit_of_work(
-        self, unit_of_work: UnitOfWork
+        self, unit_of_work: UnitOfWork, timeout: float|None=None
     ) -> dict[ReferenceId, str]:
         """
         Commit a `UnitOfWork`, which executes all operations registered with it.
@@ -186,22 +205,22 @@ class DataAPI:
             CompositeGraphRestApiRequest(
                 self._api_version,
                 unit_of_work._sub_requests,  # pyright: ignore [reportPrivateUsage] pylint:disable=protected-access
-            )
+            ),
+            timeout=timeout,
         )
 
-    async def _execute(self, rest_api_request: RestApiRequest[T]) -> T:
+    async def _execute(self, rest_api_request: RestApiRequest[T], timeout: float|None=None) -> T:
         url: str = rest_api_request.url(self._org_domain_url, self._api_version)
         method: str = rest_api_request.http_method()
         body = rest_api_request.request_body()
 
-        session = self._shared_session or _create_session()
-
         try:
-            response = await session.request(
+            response = await self._connection.request(
                 method,
                 url,
                 headers=self._default_headers(),
                 data=None if body is None else _json_serialize(body),
+                timeout=timeout,
             )
 
             # Using orjson for faster JSON deserialization over the stdlib.
@@ -221,34 +240,20 @@ class DataAPI:
             raise UnexpectedRestApiResponsePayload(
                 f"The server didn't respond with valid JSON: {e.__class__.__name__}: {e}"
             ) from e
-        finally:
-            if session != self._shared_session:
-                await session.close()
 
         return await rest_api_request.process_response(response.status, json_body)
 
     async def _download_file(self, url: str) -> bytes:
-        session = self._shared_session or _create_session()
+        response = await self._connection.request(
+            "GET", f"{self._org_domain_url}{url}", headers=self._default_headers()
+        )
 
-        try:
-            response = await session.request(
-                "GET", f"{self._org_domain_url}{url}", headers=self._default_headers()
-            )
-
-            return await response.read()
-        finally:
-            if session != self._shared_session:
-                await session.close()
+        return await response.read()
 
     def _default_headers(self) -> dict[str, str]:
         return {
             "Authorization": f"Bearer {self.access_token}",
         }
-
-
-def _create_session() -> aiohttp.ClientSession:
-    # Disable cookie storage using `DummyCookieJar`, given that we don't need cookie support.
-    return aiohttp.ClientSession(cookie_jar=aiohttp.DummyCookieJar())
 
 
 def _json_serialize(data: Any) -> BytesPayload:

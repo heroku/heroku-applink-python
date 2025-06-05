@@ -1,32 +1,39 @@
-import contextvars
+"""
+Copyright (c) 2025, salesforce.com, inc.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
+For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+"""
+
+from contextvars import ContextVar
+
+from .config import Config
 from .context import ClientContext
+from .connection import Connection
 
-client_context: contextvars.ContextVar = contextvars.ContextVar("client_context")
-
-def from_request(request) -> ClientContext:
-    header = request.headers.get("x-client-context")
-
-    if not header:
-        raise ValueError("x-client-context not set")
-
-    return ClientContext.from_http(header)
-
+client_context: ContextVar[ClientContext] = ContextVar("client_context")
 
 class IntegrationWsgiMiddleware:
+    def __init__(self, app, config=Config.default()):
+        self.app = app
+        self.config = config
+        self.connection = Connection(self.config)
 
-    def __init__(self, get_response) -> None:
-        self.get_response = get_response
+    def __call__(self, environ, start_response):
+        header = environ.get("HTTP_X_CLIENT_CONTEXT")
 
-    def __call__(self, request):
-        ctx = from_request(request)
-        client_context.set(ctx)
+        if not header:
+            raise ValueError("x-client-context not set")
 
-        response = self.get_response(request)
-        return response
+        client_context.set(ClientContext.from_header(header, self.connection))
+
+        return self.app(environ, start_response)
 
 class IntegrationAsgiMiddleware:
-    def __init__(self, app):
+    def __init__(self, app, config=Config.default()):
         self.app = app
+        self.config = config
+        self.connection = Connection(self.config)
 
     async def __call__(self, scope, receive, send):
         if scope["type"] != "http":
@@ -38,8 +45,6 @@ class IntegrationAsgiMiddleware:
         if not header:
             raise ValueError("x-client-context not set")
 
-        ctx = ClientContext.from_header(header)
-        client_context.set(ctx)
-        scope["client-context"] = ctx
+        client_context.set(ClientContext.from_header(header, self.connection))
 
         await self.app(scope, receive, send)
