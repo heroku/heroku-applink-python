@@ -205,27 +205,21 @@ if [ -f "$PR_TEMPLATE" ]; then
     cp "$PR_TEMPLATE" "$TEMP_PR_BODY"
 
     # Add our changes to the Summary section
-    if ! sed -i "/^## Summary$/a - Updated version to $NEW_VERSION\n - Updated CHANGELOG.md with all changes since the previous release." "$TEMP_PR_BODY" 2>/dev/null; then
-        sed -i '' "/^## Summary$/a\\
-- Updated version to $NEW_VERSION\\
-- Updated CHANGELOG.md with all changes since the previous release." "$TEMP_PR_BODY"
-    fi
+    local temp_summary=$(mktemp)
+    sed "/^## Summary$/a - Updated version to $NEW_VERSION\n - Updated CHANGELOG.md with all changes since the previous release." "$TEMP_PR_BODY" > "$temp_summary"
+    mv "$temp_summary" "$TEMP_PR_BODY"
 
     # Add git log to What Changed section
     echo "$GIT_LOG" > "$TEMP_PR_BODY.tmp"
-    if ! sed -i "/^## What Changed$/r $TEMP_PR_BODY.tmp" "$TEMP_PR_BODY" 2>/dev/null; then
-        sed -i '' "/^## What Changed$/r $TEMP_PR_BODY.tmp" "$TEMP_PR_BODY"
-    fi
+    local temp_changed=$(mktemp)
+    sed "/^## What Changed$/r $TEMP_PR_BODY.tmp" "$TEMP_PR_BODY" > "$temp_changed"
+    mv "$temp_changed" "$TEMP_PR_BODY"
     rm "$TEMP_PR_BODY.tmp"
 
     # Add our checklist items
-    if ! sed -i "/^## Checklist$/a - [ ] Review changelog entries\n - [ ] Verify version bump\n - [ ] Test the changes\n - [ ] Approve the release" "$TEMP_PR_BODY" 2>/dev/null; then
-        sed -i '' "/^## Checklist$/a\\
-- [ ] Review changelog entries\\
-- [ ] Verify version bump\\
-- [ ] Test the changes\\
-- [ ] Approve the release" "$TEMP_PR_BODY"
-    fi
+    local temp_checklist=$(mktemp)
+    sed "/^## Checklist$/a - [ ] Review changelog entries\n - [ ] Verify version bump\n - [ ] Test the changes\n - [ ] Approve the release" "$TEMP_PR_BODY" > "$temp_checklist"
+    mv "$temp_checklist" "$TEMP_PR_BODY"
 
     PR_BODY=$(cat "$TEMP_PR_BODY")
 fi
