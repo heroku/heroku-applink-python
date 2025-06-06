@@ -68,6 +68,10 @@ def monkeypatch_app_id(monkeypatch):
 
 APPLINK_URL = "https://applink.staging.herokudev.com/addons/97a3472c-a724-4bb5-b02a-c55f94d25700"
 
+@pytest.fixture
+def monkeypatch_app_id(monkeypatch):
+    monkeypatch.setenv("HEROKU_APP_ID", "f208caa9-3d49-4660-a2cf-80cd8dde7492")
+
 def assert_authorization_is_valid(authorization: Authorization):
     assert isinstance(authorization, Authorization)
     assert isinstance(authorization.connection, Connection)
