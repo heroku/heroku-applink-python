@@ -46,6 +46,15 @@ analogous to a row in a database table.
     
     For example: `Account`
 
+## Methods
+
+### `get`
+
+```python
+def get(self, field_name: str) ‑> Any
+```
+Get the value of a field from the record.
+
 <!-- python-recordqueryresult.md -->
 # `RecordQueryResult`
 

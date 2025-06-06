@@ -30,6 +30,12 @@ class Record:
     fields: dict[str, Any]
     """The fields belonging to the record."""
 
+    def get(self, field_name: str) -> Any:
+        """
+        Get the value of a field from the record.
+        """
+        return self.fields[field_name]
+
 
 @dataclass(frozen=True, kw_only=True, slots=True)
 class QueriedRecord(Record):
