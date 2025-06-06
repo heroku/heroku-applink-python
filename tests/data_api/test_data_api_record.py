@@ -1,3 +1,4 @@
+import pytest
 from heroku_applink.data_api.record import Record, QueriedRecord, RecordQueryResult
 
 def test_record_structure():
@@ -9,6 +10,15 @@ def test_queried_record_structure():
     qrec = QueriedRecord(type="Contact", fields={"Name": "Joe"}, sub_query_results={})
     assert qrec.type == "Contact"
     assert qrec.fields["Name"] == "Joe"
+
+def test_queried_record_get():
+    qrec = QueriedRecord(type="Contact", fields={"Name": "Joe"}, sub_query_results={})
+    assert qrec.get("Name") == "Joe"
+
+def test_queried_record_get_missing():
+    qrec = QueriedRecord(type="Contact", fields={"Name": "Joe"}, sub_query_results={})
+    with pytest.raises(KeyError):
+        qrec.get("Missing")
 
 def test_record_query_result():
     result = RecordQueryResult(done=False, total_size=10, records=[], next_records_url="/next")
