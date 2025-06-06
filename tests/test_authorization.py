@@ -87,16 +87,16 @@ def assert_authorization_is_valid(authorization: Authorization):
 
 @pytest.mark.asyncio
 async def test_find_authorization(monkeypatch):
-    monkeypatch.setenv("HEROKU_APPLINK_API_URL", "https://applink.staging.herokudev.com/addons/1234567890")
-    monkeypatch.setenv("HEROKU_APPLINK_STAGING_API_URL", "https://applink.staging.herokudev.com/addons/1234567890")
-    monkeypatch.setenv("HEROKU_APPLINK_STAGING_TOKEN", "1234567890")
-    monkeypatch.setenv("HEROKU_APPLINK_TOKEN", "1234567890")
-
+    applink_url = "https://applink.staging.herokudev.com/addons/1234567890"
     developer_name = "TESTING_APPLINK_AUTHS"
+
+    monkeypatch.setenv("HEROKU_APPLINK_STAGING_API_URL", applink_url)
+    monkeypatch.setenv("HEROKU_APPLINK_STAGING_TOKEN", "1234567890")
+    monkeypatch.setenv("HEROKU_APP_ID", "1234567890")
 
     with aioresponses() as m:
         m.get(
-            f"https://applink.staging.herokudev.com/addons/1234567890/authorizations/{developer_name}",
+            f"{applink_url}/authorizations/{developer_name}",
             status=200,
             payload=VALID_RESPONSE
         )
