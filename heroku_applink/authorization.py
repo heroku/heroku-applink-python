@@ -11,7 +11,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from functools import lru_cache
 from typing import Optional
-from urllib.parse import urlparse, urljoin
+from urllib.parse import urlparse
+from yarl import URL
 
 from .config import Config
 from .connection import Connection
@@ -173,7 +174,8 @@ class Authorization:
 
         connection = Connection(config)
         auth_bundle = _resolve_attachment_or_url(attachment_or_url)
-        request_url = urljoin(auth_bundle.api_url, f"authorizations/{developer_name}")
+        request_url = URL(auth_bundle.api_url) / f"authorizations/{developer_name}"
+
         headers = {
             "Authorization": f"Bearer {auth_bundle.token}",
             "Content-Type": "application/json",
