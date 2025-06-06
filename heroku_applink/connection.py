@@ -37,7 +37,7 @@ class Connection:
             timeout = aiohttp.ClientTimeout(total=timeout)
 
         default_headers = {
-            "User-Agent": "heroku-applink-python-sdk/0.1.0",
+            "User-Agent": self._config.user_agent,
         }
 
         response = self._client().request(
