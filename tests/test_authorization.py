@@ -62,6 +62,8 @@ VALID_RESPONSE_NO_REDIRECT_URI: Dict[str, Any] = {
     "last_modified_by": "foo@heroku.com",
 }
 
+APPLINK_URL = "https://applink.staging.herokudev.com/addons/97a3472c-a724-4bb5-b02a-c55f94d25700"
+
 def assert_authorization_is_valid(authorization: Authorization):
     assert isinstance(authorization, Authorization)
     assert isinstance(authorization.connection, Connection)
@@ -84,6 +86,25 @@ def assert_authorization_is_valid(authorization: Authorization):
     assert authorization.org.user_auth.username is not None
     assert authorization.org.user_auth.user_id is not None
     assert authorization.org.user_auth.access_token is not None
+
+@pytest.mark.asyncio
+async def test_find_authorization(monkeypatch):
+    developer_name = "TESTING_APPLINK_AUTHS"
+
+    monkeypatch.setenv("HEROKU_APPLINK_STAGING_API_URL", APPLINK_URL)
+    monkeypatch.setenv("HEROKU_APPLINK_STAGING_TOKEN", "1234567890")
+    monkeypatch.setenv("HEROKU_APP_ID", "1234567890")
+
+    with aioresponses() as m:
+        m.get(
+            f"{APPLINK_URL}/authorizations/{developer_name}",
+            status=200,
+            payload=VALID_RESPONSE
+        )
+
+        authorization = await Authorization.find(developer_name, "HEROKU_APPLINK_STAGING")
+
+        assert_authorization_is_valid(authorization)
 
 @pytest.mark.asyncio
 async def test_attachment_based_success(monkeypatch):
