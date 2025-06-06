@@ -86,6 +86,27 @@ def assert_authorization_is_valid(authorization: Authorization):
     assert authorization.org.user_auth.access_token is not None
 
 @pytest.mark.asyncio
+async def test_find_authorization(monkeypatch):
+    monkeypatch.setenv("HEROKU_APPLINK_API_URL", "https://applink.staging.herokudev.com/addons/1234567890")
+    monkeypatch.setenv("HEROKU_APPLINK_STAGING_API_URL", "https://applink.staging.herokudev.com/addons/1234567890")
+    monkeypatch.setenv("HEROKU_APPLINK_STAGING_TOKEN", "1234567890")
+    monkeypatch.setenv("HEROKU_APPLINK_TOKEN", "1234567890")
+
+    developer_name = "TESTING_APPLINK_AUTHS"
+
+    with aioresponses() as m:
+        m.get(
+            f"https://applink.staging.herokudev.com/addons/1234567890/authorizations/{developer_name}",
+            status=200,
+            payload=VALID_RESPONSE
+        )
+
+        authorization = await Authorization.find(developer_name, "HEROKU_APPLINK_STAGING")
+
+        assert_authorization_is_valid(authorization)
+
+
+@pytest.mark.asyncio
 async def test_attachment_based_success(monkeypatch):
     developer_name = "devName"
 
