@@ -26,6 +26,7 @@ class AuthBundle:
     """
     api_url: str
     token: str
+    app_uuid: str
 
 @dataclass(frozen=True, kw_only=True, slots=True)
 class UserAuth:
@@ -176,6 +177,7 @@ class Authorization:
         headers = {
             "Authorization": f"Bearer {auth_bundle.token}",
             "Content-Type": "application/json",
+            "X-App-UUID": auth_bundle.app_uuid,
         }
 
         response = await connection.request("GET", request_url, headers=headers)
@@ -251,6 +253,10 @@ def _resolve_addon_config_by_attachment_or_color(attachment_or_color: str) -> Au
 
     api_url = os.getenv(f"{key}_API_URL")
     token   = os.getenv(f"{key}_TOKEN")
+    app_uuid = os.getenv("HEROKU_APP_ID")
+
+    if not app_uuid:
+        raise EnvironmentError("HEROKU_APP_ID is not set")
 
     if not api_url or not token:
         # fallback: color under the main addon prefix
@@ -264,7 +270,7 @@ def _resolve_addon_config_by_attachment_or_color(attachment_or_color: str) -> Au
             f"{addon_prefix}_{key}_API_URL / {addon_prefix}_{key}_TOKEN"
         )
 
-    return AuthBundle(api_url=api_url, token=token)
+    return AuthBundle(api_url=api_url, token=token, app_uuid=app_uuid)
 
 @lru_cache(maxsize=None)
 def _resolve_addon_config_by_url(url: str) -> AuthBundle:
@@ -272,6 +278,11 @@ def _resolve_addon_config_by_url(url: str) -> AuthBundle:
     Match an env var ending in _API_URL to the given URL, then
     pull the corresponding _TOKEN.
     """
+    app_uuid = os.getenv("HEROKU_APP_ID")
+
+    if not app_uuid:
+        raise EnvironmentError("HEROKU_APP_ID is not set")
+
     for var, val in os.environ.items():
         if var.endswith("_API_URL") and val.lower() == url.lower():
             prefix = var[: -len("_API_URL")]
@@ -280,6 +291,6 @@ def _resolve_addon_config_by_url(url: str) -> AuthBundle:
             if not token:
                 raise EnvironmentError(f"Missing token for API URL: {url}")
 
-            return AuthBundle(api_url=val, token=token)
+            return AuthBundle(api_url=val, token=token, app_uuid=app_uuid)
 
     raise EnvironmentError(f"Heroku Applink config not found for API URL: {url}")
