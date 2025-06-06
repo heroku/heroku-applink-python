@@ -60,6 +60,7 @@ test = [
 Required environment variables:
 - `HEROKU_APPLINK_API_URL`: Your Heroku Applink endpoint URL
 - `HEROKU_APPLINK_TOKEN`: Your authentication token
+- `HEROKU_APP_ID`: The UUID of your Heroku app - see [Heroku Labs: Dyno Metadata](https://devcenter.heroku.com/articles/dyno-metadata)
 
 Optional environment variables:
 - `HEROKU_APPLINK_STAGING_API_URL`: Staging endpoint URL (if using staging environment)
