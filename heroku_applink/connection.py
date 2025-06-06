@@ -36,11 +36,15 @@ class Connection:
         if timeout is not None:
             timeout = aiohttp.ClientTimeout(total=timeout)
 
+        default_headers = {
+            "User-Agent": self._config.user_agent,
+        }
+
         response = self._client().request(
             method,
             url,
             params=params,
-            headers=headers,
+            headers=default_headers | (headers or {}),
             data=data,
             timeout=timeout
         )

@@ -7,6 +7,7 @@ For full license text, see the LICENSE file in the repo root or https://opensour
 
 from dataclasses import dataclass
 
+__version__ = "0.1.0"
 
 @dataclass
 class Config:
@@ -34,6 +35,11 @@ class Config:
     socket_read: float|None = None
     """
     Timeout for reading from the Salesforce Data API.
+    """
+
+    user_agent: str = f"heroku-applink-python-sdk/{__version__}"
+    """
+    User agent for the Salesforce Data API.
     """
 
     @classmethod

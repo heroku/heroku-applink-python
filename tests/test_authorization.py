@@ -62,6 +62,10 @@ VALID_RESPONSE_NO_REDIRECT_URI: Dict[str, Any] = {
     "last_modified_by": "foo@heroku.com",
 }
 
+@pytest.fixture
+def monkeypatch_app_id(monkeypatch):
+    monkeypatch.setenv("HEROKU_APP_ID", "f208caa9-3d49-4660-a2cf-80cd8dde7492")
+
 APPLINK_URL = "https://applink.staging.herokudev.com/addons/97a3472c-a724-4bb5-b02a-c55f94d25700"
 
 def assert_authorization_is_valid(authorization: Authorization):
@@ -88,7 +92,7 @@ def assert_authorization_is_valid(authorization: Authorization):
     assert authorization.org.user_auth.access_token is not None
 
 @pytest.mark.asyncio
-async def test_find_authorization(monkeypatch):
+async def test_find_authorization(monkeypatch, monkeypatch_app_id):
     developer_name = "TESTING_APPLINK_AUTHS"
 
     monkeypatch.setenv("HEROKU_APPLINK_STAGING_API_URL", APPLINK_URL)
@@ -107,7 +111,7 @@ async def test_find_authorization(monkeypatch):
         assert_authorization_is_valid(authorization)
 
 @pytest.mark.asyncio
-async def test_attachment_based_success(monkeypatch):
+async def test_attachment_based_success(monkeypatch, monkeypatch_app_id):
     developer_name = "devName"
 
     # Call without trailing slash base, ensure rstrip
@@ -126,7 +130,7 @@ async def test_attachment_based_success(monkeypatch):
         assert_authorization_is_valid(authorization)
 
 @pytest.mark.asyncio
-async def test_attachment_based_success_no_redirect_uri(monkeypatch):
+async def test_attachment_based_success_no_redirect_uri(monkeypatch, monkeypatch_app_id):
     developer_name = "devName"
 
     monkeypatch.setenv("HEROKU_APPLINK_API_URL", "https://api.test/")
@@ -145,7 +149,7 @@ async def test_attachment_based_success_no_redirect_uri(monkeypatch):
         assert authorization.redirect_uri is None
 
 @pytest.mark.asyncio
-async def test_attachment_with_server_side_error(monkeypatch):
+async def test_attachment_with_server_side_error(monkeypatch, monkeypatch_app_id):
     developer_name = "devName"
 
     monkeypatch.setenv("HEROKU_APPLINK_API_URL", "https://api.test/")
@@ -164,7 +168,7 @@ async def test_attachment_with_server_side_error(monkeypatch):
         assert exc_info.value.status, 500
 
 @pytest.mark.asyncio
-async def test_attachment_with_client_side_error(monkeypatch):
+async def test_attachment_with_client_side_error(monkeypatch, monkeypatch_app_id):
     developer_name = "devName"
 
     monkeypatch.setenv("HEROKU_APPLINK_API_URL", "https://api.test/")
@@ -182,7 +186,7 @@ async def test_attachment_with_client_side_error(monkeypatch):
 
         assert exc_info.value.status, 400
 
-def test_resolve_attachment_or_url(monkeypatch):
+def test_resolve_attachment_or_url(monkeypatch, monkeypatch_app_id):
     # Set URL env var and corresponding token
     monkeypatch.setenv('EXAMPLE_API_URL', 'https://api.test.com')
     monkeypatch.setenv('EXAMPLE_TOKEN', 'url-token')
@@ -199,7 +203,7 @@ def test_resolve_attachment_or_url(monkeypatch):
     assert auth.api_url == "https://api.test.com"
     assert auth.token == "url-token"
 
-def test_resolve_addon_config_by_url(monkeypatch):
+def test_resolve_addon_config_by_url(monkeypatch, monkeypatch_app_id):
     # Set URL env var and corresponding token
     monkeypatch.setenv('EXAMPLE_API_URL', 'https://api.test.com')
     monkeypatch.setenv('EXAMPLE_TOKEN', 'url-token')
@@ -210,7 +214,7 @@ def test_resolve_addon_config_by_url(monkeypatch):
     assert auth.api_url == "https://api.test.com"
     assert auth.token == "url-token"
 
-def test_resolve_by_url_case_insensitive(monkeypatch):
+def test_resolve_by_url_case_insensitive(monkeypatch, monkeypatch_app_id):
     # URL matching should be case-insensitive
     monkeypatch.setenv('CASE_API_URL', 'https://Case.Example.COM')
     monkeypatch.setenv('CASE_TOKEN', 'case-token')
@@ -221,7 +225,7 @@ def test_resolve_by_url_case_insensitive(monkeypatch):
     assert auth.api_url == 'https://Case.Example.COM'
     assert auth.token == 'case-token'
 
-def test_resolve_by_url_missing(monkeypatch):
+def test_resolve_by_url_missing(monkeypatch, monkeypatch_app_id):
     monkeypatch.delenv('MISSING_API_URL', raising=False)
 
     with pytest.raises(EnvironmentError) as exc_info:
@@ -229,7 +233,15 @@ def test_resolve_by_url_missing(monkeypatch):
 
     assert 'Heroku Applink config not found for API URL' in str(exc_info.value)
 
-def test_resolve_addon_config_by_attachment_or_color_direct(monkeypatch):
+def test_resolve_by_url_missing_app_id(monkeypatch):
+    monkeypatch.delenv('HEROKU_APP_ID', raising=False)
+
+    with pytest.raises(EnvironmentError) as exc_info:
+        _resolve_addon_config_by_url('https://doesnotexist')
+
+    assert 'HEROKU_APP_ID is not set' in str(exc_info.value)
+
+def test_resolve_addon_config_by_attachment_or_color_direct(monkeypatch, monkeypatch_app_id):
     # Set direct attachment env vars
     monkeypatch.setenv('MYADDON_API_URL', 'https://api.example.com')
     monkeypatch.setenv('MYADDON_TOKEN', 'secret-token')
@@ -240,7 +252,7 @@ def test_resolve_addon_config_by_attachment_or_color_direct(monkeypatch):
     assert auth.api_url == "https://api.example.com"
     assert auth.token == "secret-token"
 
-def test_resolve_by_attachment_or_color_missing(monkeypatch):
+def test_resolve_by_attachment_or_color_missing(monkeypatch, monkeypatch_app_id):
     monkeypatch.delenv('HEROKU_APPLINK_BLUE_API_URL', raising=False)
     monkeypatch.delenv('HEROKU_APPLINK_BLUE_TOKEN', raising=False)
 
@@ -249,7 +261,7 @@ def test_resolve_by_attachment_or_color_missing(monkeypatch):
 
     assert 'Heroku Applink config not found for \'HEROKU_APPLINK_BLUE\'' in str(exc_info.value)
 
-def test_resolve_by_color_fallback(monkeypatch):
+def test_resolve_by_color_fallback(monkeypatch, monkeypatch_app_id):
     # Remove direct and set fallback under HEROKU_APPLINK
     monkeypatch.delenv('COLOR_API_URL', raising=False)
     monkeypatch.delenv('COLOR_TOKEN', raising=False)

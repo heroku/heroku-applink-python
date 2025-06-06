@@ -12,7 +12,7 @@ Classes
 # `AuthBundle`
 
 ```python
-class AuthBundle(*, api_url: str, token: str)
+class AuthBundle(*, api_url: str, token: str, app_uuid: str)
 ```
 A bundle of authentication information for the Salesforce Data API. This
 class should not leak outside of the Authorization class.
@@ -20,6 +20,9 @@ class should not leak outside of the Authorization class.
 ## Instance variables
 
 * `api_url: str`
+    
+
+* `app_uuid: str`
     
 
 * `token: str`
