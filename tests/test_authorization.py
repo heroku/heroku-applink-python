@@ -106,7 +106,6 @@ async def test_find_authorization(monkeypatch):
 
         assert_authorization_is_valid(authorization)
 
-
 @pytest.mark.asyncio
 async def test_attachment_based_success(monkeypatch):
     developer_name = "devName"
