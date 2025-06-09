@@ -1,0 +1,747 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>heroku_applink.authorization API documentation</title>
+<meta name="description" content="Copyright (c) 2025, salesforce.com, inc.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
+For full license text, see the LICENSE file in the …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>heroku_applink.authorization</code></h1>
+</header>
+<section id="section-intro">
+<p>Copyright (c) 2025, salesforce.com, inc.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
+For full license text, see the LICENSE file in the repo root or <a href="https://opensource.org/licenses/BSD-3-Clause">https://opensource.org/licenses/BSD-3-Clause</a></p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="heroku_applink.authorization.AuthBundle"><code class="flex name class">
+<span>class <span class="ident">AuthBundle</span></span>
+<span>(</span><span>*, api_url: str, token: str, app_uuid: str)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class AuthBundle:
+    &#34;&#34;&#34;
+    A bundle of authentication information for the Salesforce Data API. This
+    class should not leak outside of the Authorization class.
+    &#34;&#34;&#34;
+    api_url: str
+    token: str
+    app_uuid: str</code></pre>
+</details>
+<div class="desc"><p>A bundle of authentication information for the Salesforce Data API. This
+class should not leak outside of the Authorization class.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="heroku_applink.authorization.AuthBundle.api_url"><code class="name">var <span class="ident">api_url</span> : str</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class AuthBundle:
+    &#34;&#34;&#34;
+    A bundle of authentication information for the Salesforce Data API. This
+    class should not leak outside of the Authorization class.
+    &#34;&#34;&#34;
+    api_url: str
+    token: str
+    app_uuid: str</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="heroku_applink.authorization.AuthBundle.app_uuid"><code class="name">var <span class="ident">app_uuid</span> : str</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class AuthBundle:
+    &#34;&#34;&#34;
+    A bundle of authentication information for the Salesforce Data API. This
+    class should not leak outside of the Authorization class.
+    &#34;&#34;&#34;
+    api_url: str
+    token: str
+    app_uuid: str</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="heroku_applink.authorization.AuthBundle.token"><code class="name">var <span class="ident">token</span> : str</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class AuthBundle:
+    &#34;&#34;&#34;
+    A bundle of authentication information for the Salesforce Data API. This
+    class should not leak outside of the Authorization class.
+    &#34;&#34;&#34;
+    api_url: str
+    token: str
+    app_uuid: str</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="heroku_applink.authorization.Authorization"><code class="flex name class">
+<span>class <span class="ident">Authorization</span></span>
+<span>(</span><span>connection: <a title="heroku_applink.connection.Connection" href="connection.html#heroku_applink.connection.Connection">Connection</a>,<br>data_api: <a title="heroku_applink.data_api.DataAPI" href="data_api/index.html#heroku_applink.data_api.DataAPI">DataAPI</a>,<br>id: str,<br>status: str,<br>org: <a title="heroku_applink.authorization.Org" href="#heroku_applink.authorization.Org">Org</a>,<br>created_at: datetime.datetime,<br>created_by: str,<br>created_via_app: str | None,<br>last_modified_at: datetime.datetime,<br>last_modified_by: str | None,<br>redirect_uri: str | None)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class Authorization:
+    &#34;&#34;&#34;
+    Authorization information for a Salesforce org with access to a Data API for
+    making SOQL queries.
+    &#34;&#34;&#34;
+
+    connection: Connection
+    &#34;&#34;&#34;
+    Object responsible for making HTTP requests to the Salesforce API.
+    &#34;&#34;&#34;
+
+    data_api: DataAPI
+    &#34;&#34;&#34;
+    An initialized data API client instance for interacting with data in the org.
+
+    Example usage:
+
+    ```python
+    authorization = await Authorization.find(developer_name)
+    result = await authorization.data_api.query(&#34;SELECT Id, Name FROM Account&#34;)
+
+    for record in result.records:
+        print(f&#34;Account: {record}&#34;)
+    ```
+    &#34;&#34;&#34;
+
+    id: str
+    &#34;&#34;&#34;
+    The ID of the authorization in UUID format.
+
+    For example: `e27e9be0-6dc4-430f-974d-584f5ff8e9e6`
+    &#34;&#34;&#34;
+
+    status: str
+    &#34;&#34;&#34;
+    The status of the authorization.
+
+    Possible values:
+    * &#34;authorized&#34;
+    * &#34;authorizing&#34;
+    * &#34;disconnected&#34;
+    * &#34;error&#34;
+    &#34;&#34;&#34;
+
+    org: Org
+    &#34;&#34;&#34;
+    The Salesforce Org associated with the authorization.
+    &#34;&#34;&#34;
+
+    created_at: datetime
+    &#34;&#34;&#34;
+    The date and time the authorization was created.
+
+    For example: `2025-03-06T18:20:42.226577Z`
+    &#34;&#34;&#34;
+
+    created_by: str
+    &#34;&#34;&#34;
+    The user who created the authorization.
+
+    For example: `user@example.tld`
+    &#34;&#34;&#34;
+
+    created_via_app: str|None
+    &#34;&#34;&#34;
+    The app that created the authorization.
+
+    For example: `sushi`
+    &#34;&#34;&#34;
+
+    last_modified_at: datetime
+    &#34;&#34;&#34;
+    The date and time the authorization was last modified.
+
+    For example: `2025-03-06T18:20:42.226577Z`
+    &#34;&#34;&#34;
+
+    last_modified_by: str|None
+    &#34;&#34;&#34;
+    The user who last modified the authorization.
+
+    For example: `user@example.tld`
+    &#34;&#34;&#34;
+
+    redirect_uri: str|None
+    &#34;&#34;&#34;
+    The redirect URI for the authorization.
+    &#34;&#34;&#34;
+
+    @staticmethod
+    async def find(
+        developer_name: str,
+        attachment_or_url: str|None=None,
+        config: Config=Config.default()
+    ) -&gt; &#34;Authorization&#34;:
+        &#34;&#34;&#34;
+        Fetch authorization for a given Heroku AppLink developer.
+        Uses GET {apiUrl}/authorizations/{developer_name}
+        with a Bearer token from the add-on config.
+
+        Example usage:
+
+        ```python
+        authorization = await Authorization.find(developer_name)
+        result = await authorization.data_api.query(&#34;SELECT Id, Name FROM Account&#34;)
+
+        # Or use the attachment or URL of the add-on
+        authorization = await Authorization.find(developer_name, attachment_or_url=&#34;HEROKU_APPLINK_PURPLE&#34;)
+        result = await authorization.data_api.query(&#34;SELECT Id, Name FROM Account&#34;)
+        ```
+
+        This function will raise aiohttp-specific exceptions for HTTP errors and
+        any HTTP response other than 200 OK.
+
+        For a list of exceptions, see:
+        * https://docs.aiohttp.org/en/stable/client_reference.html
+        &#34;&#34;&#34;
+
+        if not developer_name:
+            raise ValueError(&#34;Developer name must be provided&#34;)
+
+        connection = Connection(config)
+        auth_bundle = _resolve_attachment_or_url(attachment_or_url)
+        request_url = URL(auth_bundle.api_url) / f&#34;authorizations/{developer_name}&#34;
+
+        headers = {
+            &#34;Authorization&#34;: f&#34;Bearer {auth_bundle.token}&#34;,
+            &#34;Content-Type&#34;: &#34;application/json&#34;,
+            &#34;X-App-UUID&#34;: auth_bundle.app_uuid,
+        }
+
+        response = await connection.request(&#34;GET&#34;, request_url, headers=headers)
+        payload = await response.json()
+
+        return Authorization._build_authorization(connection, payload)
+
+    @staticmethod
+    def _build_authorization(connection: Connection, payload: dict) -&gt; &#34;Authorization&#34;:
+        &#34;&#34;&#34;
+        Build an Authorization object from a payload. Some fields are optional,
+        so we use get() to handle the case where they are not present.
+        &#34;&#34;&#34;
+        return Authorization(
+            connection=connection,
+            data_api=DataAPI(
+                org_domain_url=payload[&#34;org&#34;][&#34;instance_url&#34;],
+                api_version=payload[&#34;org&#34;][&#34;api_version&#34;],
+                access_token=payload[&#34;org&#34;][&#34;user_auth&#34;][&#34;access_token&#34;],
+                connection=connection,
+            ),
+            id=payload[&#34;id&#34;],
+            status=payload[&#34;status&#34;],
+            org=Org(
+                id=payload[&#34;org&#34;][&#34;id&#34;],
+                developer_name=payload[&#34;org&#34;][&#34;developer_name&#34;],
+                instance_url=payload[&#34;org&#34;][&#34;instance_url&#34;],
+                type=payload[&#34;org&#34;][&#34;type&#34;],
+                api_version=payload[&#34;org&#34;][&#34;api_version&#34;],
+                user_auth=UserAuth(
+                    username=payload[&#34;org&#34;][&#34;user_auth&#34;][&#34;username&#34;],
+                    user_id=payload[&#34;org&#34;][&#34;user_auth&#34;][&#34;user_id&#34;],
+                    access_token=payload[&#34;org&#34;][&#34;user_auth&#34;][&#34;access_token&#34;],
+                ),
+            ),
+            created_at=_parse_datetime(payload[&#34;created_at&#34;]),
+            created_by=payload[&#34;created_by&#34;],
+            created_via_app=payload.get(&#34;created_via_app&#34;),
+            last_modified_at=_parse_datetime(payload[&#34;last_modified_at&#34;]),
+            last_modified_by=payload.get(&#34;last_modified_by&#34;),
+            redirect_uri=payload.get(&#34;redirect_uri&#34;),
+        )</code></pre>
+</details>
+<div class="desc"><p>Authorization information for a Salesforce org with access to a Data API for
+making SOQL queries.</p></div>
+<h3>Static methods</h3>
+<dl>
+<dt id="heroku_applink.authorization.Authorization.find"><code class="name flex">
+<span>async def <span class="ident">find</span></span>(<span>developer_name: str,<br>attachment_or_url: str | None = None,<br>config: <a title="heroku_applink.config.Config" href="config.html#heroku_applink.config.Config">Config</a> = Config(request_timeout=5, connect_timeout=None, socket_connect=None, socket_read=None, user_agent='heroku-applink-python-sdk/0.1.0')) ‑> <a title="heroku_applink.authorization.Authorization" href="#heroku_applink.authorization.Authorization">Authorization</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+async def find(
+    developer_name: str,
+    attachment_or_url: str|None=None,
+    config: Config=Config.default()
+) -&gt; &#34;Authorization&#34;:
+    &#34;&#34;&#34;
+    Fetch authorization for a given Heroku AppLink developer.
+    Uses GET {apiUrl}/authorizations/{developer_name}
+    with a Bearer token from the add-on config.
+
+    Example usage:
+
+    ```python
+    authorization = await Authorization.find(developer_name)
+    result = await authorization.data_api.query(&#34;SELECT Id, Name FROM Account&#34;)
+
+    # Or use the attachment or URL of the add-on
+    authorization = await Authorization.find(developer_name, attachment_or_url=&#34;HEROKU_APPLINK_PURPLE&#34;)
+    result = await authorization.data_api.query(&#34;SELECT Id, Name FROM Account&#34;)
+    ```
+
+    This function will raise aiohttp-specific exceptions for HTTP errors and
+    any HTTP response other than 200 OK.
+
+    For a list of exceptions, see:
+    * https://docs.aiohttp.org/en/stable/client_reference.html
+    &#34;&#34;&#34;
+
+    if not developer_name:
+        raise ValueError(&#34;Developer name must be provided&#34;)
+
+    connection = Connection(config)
+    auth_bundle = _resolve_attachment_or_url(attachment_or_url)
+    request_url = URL(auth_bundle.api_url) / f&#34;authorizations/{developer_name}&#34;
+
+    headers = {
+        &#34;Authorization&#34;: f&#34;Bearer {auth_bundle.token}&#34;,
+        &#34;Content-Type&#34;: &#34;application/json&#34;,
+        &#34;X-App-UUID&#34;: auth_bundle.app_uuid,
+    }
+
+    response = await connection.request(&#34;GET&#34;, request_url, headers=headers)
+    payload = await response.json()
+
+    return Authorization._build_authorization(connection, payload)</code></pre>
+</details>
+<div class="desc"><p>Fetch authorization for a given Heroku AppLink developer.
+Uses GET {apiUrl}/authorizations/{developer_name}
+with a Bearer token from the add-on config.</p>
+<p>Example usage:</p>
+<pre><code class="language-python">authorization = await Authorization.find(developer_name)
+result = await authorization.data_api.query(&quot;SELECT Id, Name FROM Account&quot;)
+
+# Or use the attachment or URL of the add-on
+authorization = await Authorization.find(developer_name, attachment_or_url=&quot;HEROKU_APPLINK_PURPLE&quot;)
+result = await authorization.data_api.query(&quot;SELECT Id, Name FROM Account&quot;)
+</code></pre>
+<p>This function will raise aiohttp-specific exceptions for HTTP errors and
+any HTTP response other than 200 OK.</p>
+<p>For a list of exceptions, see:
+* <a href="https://docs.aiohttp.org/en/stable/client_reference.html">https://docs.aiohttp.org/en/stable/client_reference.html</a></p></div>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="heroku_applink.authorization.Authorization.connection"><code class="name">var <span class="ident">connection</span> : <a title="heroku_applink.connection.Connection" href="connection.html#heroku_applink.connection.Connection">Connection</a></code></dt>
+<dd>
+<div class="desc"><p>Object responsible for making HTTP requests to the Salesforce API.</p></div>
+</dd>
+<dt id="heroku_applink.authorization.Authorization.created_at"><code class="name">var <span class="ident">created_at</span> : datetime.datetime</code></dt>
+<dd>
+<div class="desc"><p>The date and time the authorization was created.</p>
+<p>For example: <code>2025-03-06T18:20:42.226577Z</code></p></div>
+</dd>
+<dt id="heroku_applink.authorization.Authorization.created_by"><code class="name">var <span class="ident">created_by</span> : str</code></dt>
+<dd>
+<div class="desc"><p>The user who created the authorization.</p>
+<p>For example: <code>user@example.tld</code></p></div>
+</dd>
+<dt id="heroku_applink.authorization.Authorization.created_via_app"><code class="name">var <span class="ident">created_via_app</span> : str | None</code></dt>
+<dd>
+<div class="desc"><p>The app that created the authorization.</p>
+<p>For example: <code>sushi</code></p></div>
+</dd>
+<dt id="heroku_applink.authorization.Authorization.data_api"><code class="name">var <span class="ident">data_api</span> : <a title="heroku_applink.data_api.DataAPI" href="data_api/index.html#heroku_applink.data_api.DataAPI">DataAPI</a></code></dt>
+<dd>
+<div class="desc"><p>An initialized data API client instance for interacting with data in the org.</p>
+<p>Example usage:</p>
+<pre><code class="language-python">authorization = await Authorization.find(developer_name)
+result = await authorization.data_api.query(&quot;SELECT Id, Name FROM Account&quot;)
+
+for record in result.records:
+    print(f&quot;Account: {record}&quot;)
+</code></pre></div>
+</dd>
+<dt id="heroku_applink.authorization.Authorization.id"><code class="name">var <span class="ident">id</span> : str</code></dt>
+<dd>
+<div class="desc"><p>The ID of the authorization in UUID format.</p>
+<p>For example: <code>e27e9be0-6dc4-430f-974d-584f5ff8e9e6</code></p></div>
+</dd>
+<dt id="heroku_applink.authorization.Authorization.last_modified_at"><code class="name">var <span class="ident">last_modified_at</span> : datetime.datetime</code></dt>
+<dd>
+<div class="desc"><p>The date and time the authorization was last modified.</p>
+<p>For example: <code>2025-03-06T18:20:42.226577Z</code></p></div>
+</dd>
+<dt id="heroku_applink.authorization.Authorization.last_modified_by"><code class="name">var <span class="ident">last_modified_by</span> : str | None</code></dt>
+<dd>
+<div class="desc"><p>The user who last modified the authorization.</p>
+<p>For example: <code>user@example.tld</code></p></div>
+</dd>
+<dt id="heroku_applink.authorization.Authorization.org"><code class="name">var <span class="ident">org</span> : <a title="heroku_applink.authorization.Org" href="#heroku_applink.authorization.Org">Org</a></code></dt>
+<dd>
+<div class="desc"><p>The Salesforce Org associated with the authorization.</p></div>
+</dd>
+<dt id="heroku_applink.authorization.Authorization.redirect_uri"><code class="name">var <span class="ident">redirect_uri</span> : str | None</code></dt>
+<dd>
+<div class="desc"><p>The redirect URI for the authorization.</p></div>
+</dd>
+<dt id="heroku_applink.authorization.Authorization.status"><code class="name">var <span class="ident">status</span> : str</code></dt>
+<dd>
+<div class="desc"><p>The status of the authorization.</p>
+<p>Possible values:
+* "authorized"
+* "authorizing"
+* "disconnected"
+* "error"</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="heroku_applink.authorization.Org"><code class="flex name class">
+<span>class <span class="ident">Org</span></span>
+<span>(</span><span>*,<br>id: str,<br>developer_name: str,<br>instance_url: str,<br>type: str,<br>api_version: str,<br>user_auth: <a title="heroku_applink.authorization.UserAuth" href="#heroku_applink.authorization.UserAuth">UserAuth</a>)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class Org:
+    &#34;&#34;&#34;
+    Salesforce org information.
+    &#34;&#34;&#34;
+    id: str
+    developer_name: str
+    instance_url: str
+    type: str
+    api_version: str
+    user_auth: UserAuth</code></pre>
+</details>
+<div class="desc"><p>Salesforce org information.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="heroku_applink.authorization.Org.api_version"><code class="name">var <span class="ident">api_version</span> : str</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class Org:
+    &#34;&#34;&#34;
+    Salesforce org information.
+    &#34;&#34;&#34;
+    id: str
+    developer_name: str
+    instance_url: str
+    type: str
+    api_version: str
+    user_auth: UserAuth</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="heroku_applink.authorization.Org.developer_name"><code class="name">var <span class="ident">developer_name</span> : str</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class Org:
+    &#34;&#34;&#34;
+    Salesforce org information.
+    &#34;&#34;&#34;
+    id: str
+    developer_name: str
+    instance_url: str
+    type: str
+    api_version: str
+    user_auth: UserAuth</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="heroku_applink.authorization.Org.id"><code class="name">var <span class="ident">id</span> : str</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class Org:
+    &#34;&#34;&#34;
+    Salesforce org information.
+    &#34;&#34;&#34;
+    id: str
+    developer_name: str
+    instance_url: str
+    type: str
+    api_version: str
+    user_auth: UserAuth</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="heroku_applink.authorization.Org.instance_url"><code class="name">var <span class="ident">instance_url</span> : str</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class Org:
+    &#34;&#34;&#34;
+    Salesforce org information.
+    &#34;&#34;&#34;
+    id: str
+    developer_name: str
+    instance_url: str
+    type: str
+    api_version: str
+    user_auth: UserAuth</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="heroku_applink.authorization.Org.type"><code class="name">var <span class="ident">type</span> : str</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class Org:
+    &#34;&#34;&#34;
+    Salesforce org information.
+    &#34;&#34;&#34;
+    id: str
+    developer_name: str
+    instance_url: str
+    type: str
+    api_version: str
+    user_auth: UserAuth</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="heroku_applink.authorization.Org.user_auth"><code class="name">var <span class="ident">user_auth</span> : <a title="heroku_applink.authorization.UserAuth" href="#heroku_applink.authorization.UserAuth">UserAuth</a></code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class Org:
+    &#34;&#34;&#34;
+    Salesforce org information.
+    &#34;&#34;&#34;
+    id: str
+    developer_name: str
+    instance_url: str
+    type: str
+    api_version: str
+    user_auth: UserAuth</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="heroku_applink.authorization.UserAuth"><code class="flex name class">
+<span>class <span class="ident">UserAuth</span></span>
+<span>(</span><span>*, username: str, user_id: str, access_token: str)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class UserAuth:
+    &#34;&#34;&#34;
+    User authentication information for the Salesforce org.
+    &#34;&#34;&#34;
+    username: str
+    user_id: str
+    access_token: str</code></pre>
+</details>
+<div class="desc"><p>User authentication information for the Salesforce org.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="heroku_applink.authorization.UserAuth.access_token"><code class="name">var <span class="ident">access_token</span> : str</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class UserAuth:
+    &#34;&#34;&#34;
+    User authentication information for the Salesforce org.
+    &#34;&#34;&#34;
+    username: str
+    user_id: str
+    access_token: str</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="heroku_applink.authorization.UserAuth.user_id"><code class="name">var <span class="ident">user_id</span> : str</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class UserAuth:
+    &#34;&#34;&#34;
+    User authentication information for the Salesforce org.
+    &#34;&#34;&#34;
+    username: str
+    user_id: str
+    access_token: str</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="heroku_applink.authorization.UserAuth.username"><code class="name">var <span class="ident">username</span> : str</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class UserAuth:
+    &#34;&#34;&#34;
+    User authentication information for the Salesforce org.
+    &#34;&#34;&#34;
+    username: str
+    user_id: str
+    access_token: str</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="heroku_applink" href="index.html">heroku_applink</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="heroku_applink.authorization.AuthBundle" href="#heroku_applink.authorization.AuthBundle">AuthBundle</a></code></h4>
+<ul class="">
+<li><code><a title="heroku_applink.authorization.AuthBundle.api_url" href="#heroku_applink.authorization.AuthBundle.api_url">api_url</a></code></li>
+<li><code><a title="heroku_applink.authorization.AuthBundle.app_uuid" href="#heroku_applink.authorization.AuthBundle.app_uuid">app_uuid</a></code></li>
+<li><code><a title="heroku_applink.authorization.AuthBundle.token" href="#heroku_applink.authorization.AuthBundle.token">token</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="heroku_applink.authorization.Authorization" href="#heroku_applink.authorization.Authorization">Authorization</a></code></h4>
+<ul class="two-column">
+<li><code><a title="heroku_applink.authorization.Authorization.connection" href="#heroku_applink.authorization.Authorization.connection">connection</a></code></li>
+<li><code><a title="heroku_applink.authorization.Authorization.created_at" href="#heroku_applink.authorization.Authorization.created_at">created_at</a></code></li>
+<li><code><a title="heroku_applink.authorization.Authorization.created_by" href="#heroku_applink.authorization.Authorization.created_by">created_by</a></code></li>
+<li><code><a title="heroku_applink.authorization.Authorization.created_via_app" href="#heroku_applink.authorization.Authorization.created_via_app">created_via_app</a></code></li>
+<li><code><a title="heroku_applink.authorization.Authorization.data_api" href="#heroku_applink.authorization.Authorization.data_api">data_api</a></code></li>
+<li><code><a title="heroku_applink.authorization.Authorization.find" href="#heroku_applink.authorization.Authorization.find">find</a></code></li>
+<li><code><a title="heroku_applink.authorization.Authorization.id" href="#heroku_applink.authorization.Authorization.id">id</a></code></li>
+<li><code><a title="heroku_applink.authorization.Authorization.last_modified_at" href="#heroku_applink.authorization.Authorization.last_modified_at">last_modified_at</a></code></li>
+<li><code><a title="heroku_applink.authorization.Authorization.last_modified_by" href="#heroku_applink.authorization.Authorization.last_modified_by">last_modified_by</a></code></li>
+<li><code><a title="heroku_applink.authorization.Authorization.org" href="#heroku_applink.authorization.Authorization.org">org</a></code></li>
+<li><code><a title="heroku_applink.authorization.Authorization.redirect_uri" href="#heroku_applink.authorization.Authorization.redirect_uri">redirect_uri</a></code></li>
+<li><code><a title="heroku_applink.authorization.Authorization.status" href="#heroku_applink.authorization.Authorization.status">status</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="heroku_applink.authorization.Org" href="#heroku_applink.authorization.Org">Org</a></code></h4>
+<ul class="two-column">
+<li><code><a title="heroku_applink.authorization.Org.api_version" href="#heroku_applink.authorization.Org.api_version">api_version</a></code></li>
+<li><code><a title="heroku_applink.authorization.Org.developer_name" href="#heroku_applink.authorization.Org.developer_name">developer_name</a></code></li>
+<li><code><a title="heroku_applink.authorization.Org.id" href="#heroku_applink.authorization.Org.id">id</a></code></li>
+<li><code><a title="heroku_applink.authorization.Org.instance_url" href="#heroku_applink.authorization.Org.instance_url">instance_url</a></code></li>
+<li><code><a title="heroku_applink.authorization.Org.type" href="#heroku_applink.authorization.Org.type">type</a></code></li>
+<li><code><a title="heroku_applink.authorization.Org.user_auth" href="#heroku_applink.authorization.Org.user_auth">user_auth</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="heroku_applink.authorization.UserAuth" href="#heroku_applink.authorization.UserAuth">UserAuth</a></code></h4>
+<ul class="">
+<li><code><a title="heroku_applink.authorization.UserAuth.access_token" href="#heroku_applink.authorization.UserAuth.access_token">access_token</a></code></li>
+<li><code><a title="heroku_applink.authorization.UserAuth.user_id" href="#heroku_applink.authorization.UserAuth.user_id">user_id</a></code></li>
+<li><code><a title="heroku_applink.authorization.UserAuth.username" href="#heroku_applink.authorization.UserAuth.username">username</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

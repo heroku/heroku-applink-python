@@ -1,0 +1,697 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>heroku_applink.context API documentation</title>
+<meta name="description" content="Copyright (c) 2025, salesforce.com, inc.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
+For full license text, see the LICENSE file in the …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>heroku_applink.context</code></h1>
+</header>
+<section id="section-intro">
+<p>Copyright (c) 2025, salesforce.com, inc.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
+For full license text, see the LICENSE file in the repo root or <a href="https://opensource.org/licenses/BSD-3-Clause">https://opensource.org/licenses/BSD-3-Clause</a></p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="heroku_applink.context.ClientContext"><code class="flex name class">
+<span>class <span class="ident">ClientContext</span></span>
+<span>(</span><span>*,<br>org: <a title="heroku_applink.context.Org" href="#heroku_applink.context.Org">Org</a>,<br>data_api: <a title="heroku_applink.data_api.DataAPI" href="data_api/index.html#heroku_applink.data_api.DataAPI">DataAPI</a>,<br>request_id: str,<br>access_token: str,<br>api_version: str,<br>namespace: str)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class ClientContext:
+    &#34;&#34;&#34;Information about the Salesforce org that made the request.&#34;&#34;&#34;
+
+    org: Org
+    &#34;&#34;&#34;Information about the Salesforce org and the user that made the request.&#34;&#34;&#34;
+    data_api: DataAPI
+    &#34;&#34;&#34;An initialized data API client instance for interacting with data in the org.&#34;&#34;&#34;
+    request_id: str
+    &#34;&#34;&#34;Request ID from the Salesforce org.&#34;&#34;&#34;
+    access_token: str
+    &#34;&#34;&#34;Valid access token for the current context org/user.&#34;&#34;&#34;
+    api_version: str
+    &#34;&#34;&#34;API version of the Salesforce component that made the request.&#34;&#34;&#34;
+    namespace: str
+    &#34;&#34;&#34;Namespace of the Salesforce component that made the request.&#34;&#34;&#34;
+
+    @classmethod
+    def from_header(cls, header: str, connection: Connection):
+        decoded = base64.b64decode(header)
+        data = json.loads(decoded)
+
+        return cls(
+            org=Org(
+                id=data[&#34;orgId&#34;],
+                domain_url=data[&#34;orgDomainUrl&#34;],
+                user=User(
+                    id=data[&#34;userContext&#34;][&#34;userId&#34;],
+                    username=data[&#34;userContext&#34;][&#34;username&#34;],
+                ),
+            ),
+            request_id=data[&#34;requestId&#34;],
+            access_token=data[&#34;accessToken&#34;],
+            api_version=data[&#34;apiVersion&#34;],
+            namespace=data[&#34;namespace&#34;],
+            data_api=DataAPI(
+                org_domain_url=data[&#34;orgDomainUrl&#34;],
+                api_version=data[&#34;apiVersion&#34;],
+                access_token=data[&#34;accessToken&#34;],
+                connection=connection,
+            ),
+        )</code></pre>
+</details>
+<div class="desc"><p>Information about the Salesforce org that made the request.</p></div>
+<h3>Static methods</h3>
+<dl>
+<dt id="heroku_applink.context.ClientContext.from_header"><code class="name flex">
+<span>def <span class="ident">from_header</span></span>(<span>header: str,<br>connection: <a title="heroku_applink.connection.Connection" href="connection.html#heroku_applink.connection.Connection">Connection</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="heroku_applink.context.ClientContext.access_token"><code class="name">var <span class="ident">access_token</span> : str</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class ClientContext:
+    &#34;&#34;&#34;Information about the Salesforce org that made the request.&#34;&#34;&#34;
+
+    org: Org
+    &#34;&#34;&#34;Information about the Salesforce org and the user that made the request.&#34;&#34;&#34;
+    data_api: DataAPI
+    &#34;&#34;&#34;An initialized data API client instance for interacting with data in the org.&#34;&#34;&#34;
+    request_id: str
+    &#34;&#34;&#34;Request ID from the Salesforce org.&#34;&#34;&#34;
+    access_token: str
+    &#34;&#34;&#34;Valid access token for the current context org/user.&#34;&#34;&#34;
+    api_version: str
+    &#34;&#34;&#34;API version of the Salesforce component that made the request.&#34;&#34;&#34;
+    namespace: str
+    &#34;&#34;&#34;Namespace of the Salesforce component that made the request.&#34;&#34;&#34;
+
+    @classmethod
+    def from_header(cls, header: str, connection: Connection):
+        decoded = base64.b64decode(header)
+        data = json.loads(decoded)
+
+        return cls(
+            org=Org(
+                id=data[&#34;orgId&#34;],
+                domain_url=data[&#34;orgDomainUrl&#34;],
+                user=User(
+                    id=data[&#34;userContext&#34;][&#34;userId&#34;],
+                    username=data[&#34;userContext&#34;][&#34;username&#34;],
+                ),
+            ),
+            request_id=data[&#34;requestId&#34;],
+            access_token=data[&#34;accessToken&#34;],
+            api_version=data[&#34;apiVersion&#34;],
+            namespace=data[&#34;namespace&#34;],
+            data_api=DataAPI(
+                org_domain_url=data[&#34;orgDomainUrl&#34;],
+                api_version=data[&#34;apiVersion&#34;],
+                access_token=data[&#34;accessToken&#34;],
+                connection=connection,
+            ),
+        )</code></pre>
+</details>
+<div class="desc"><p>Valid access token for the current context org/user.</p></div>
+</dd>
+<dt id="heroku_applink.context.ClientContext.api_version"><code class="name">var <span class="ident">api_version</span> : str</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class ClientContext:
+    &#34;&#34;&#34;Information about the Salesforce org that made the request.&#34;&#34;&#34;
+
+    org: Org
+    &#34;&#34;&#34;Information about the Salesforce org and the user that made the request.&#34;&#34;&#34;
+    data_api: DataAPI
+    &#34;&#34;&#34;An initialized data API client instance for interacting with data in the org.&#34;&#34;&#34;
+    request_id: str
+    &#34;&#34;&#34;Request ID from the Salesforce org.&#34;&#34;&#34;
+    access_token: str
+    &#34;&#34;&#34;Valid access token for the current context org/user.&#34;&#34;&#34;
+    api_version: str
+    &#34;&#34;&#34;API version of the Salesforce component that made the request.&#34;&#34;&#34;
+    namespace: str
+    &#34;&#34;&#34;Namespace of the Salesforce component that made the request.&#34;&#34;&#34;
+
+    @classmethod
+    def from_header(cls, header: str, connection: Connection):
+        decoded = base64.b64decode(header)
+        data = json.loads(decoded)
+
+        return cls(
+            org=Org(
+                id=data[&#34;orgId&#34;],
+                domain_url=data[&#34;orgDomainUrl&#34;],
+                user=User(
+                    id=data[&#34;userContext&#34;][&#34;userId&#34;],
+                    username=data[&#34;userContext&#34;][&#34;username&#34;],
+                ),
+            ),
+            request_id=data[&#34;requestId&#34;],
+            access_token=data[&#34;accessToken&#34;],
+            api_version=data[&#34;apiVersion&#34;],
+            namespace=data[&#34;namespace&#34;],
+            data_api=DataAPI(
+                org_domain_url=data[&#34;orgDomainUrl&#34;],
+                api_version=data[&#34;apiVersion&#34;],
+                access_token=data[&#34;accessToken&#34;],
+                connection=connection,
+            ),
+        )</code></pre>
+</details>
+<div class="desc"><p>API version of the Salesforce component that made the request.</p></div>
+</dd>
+<dt id="heroku_applink.context.ClientContext.data_api"><code class="name">var <span class="ident">data_api</span> : <a title="heroku_applink.data_api.DataAPI" href="data_api/index.html#heroku_applink.data_api.DataAPI">DataAPI</a></code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class ClientContext:
+    &#34;&#34;&#34;Information about the Salesforce org that made the request.&#34;&#34;&#34;
+
+    org: Org
+    &#34;&#34;&#34;Information about the Salesforce org and the user that made the request.&#34;&#34;&#34;
+    data_api: DataAPI
+    &#34;&#34;&#34;An initialized data API client instance for interacting with data in the org.&#34;&#34;&#34;
+    request_id: str
+    &#34;&#34;&#34;Request ID from the Salesforce org.&#34;&#34;&#34;
+    access_token: str
+    &#34;&#34;&#34;Valid access token for the current context org/user.&#34;&#34;&#34;
+    api_version: str
+    &#34;&#34;&#34;API version of the Salesforce component that made the request.&#34;&#34;&#34;
+    namespace: str
+    &#34;&#34;&#34;Namespace of the Salesforce component that made the request.&#34;&#34;&#34;
+
+    @classmethod
+    def from_header(cls, header: str, connection: Connection):
+        decoded = base64.b64decode(header)
+        data = json.loads(decoded)
+
+        return cls(
+            org=Org(
+                id=data[&#34;orgId&#34;],
+                domain_url=data[&#34;orgDomainUrl&#34;],
+                user=User(
+                    id=data[&#34;userContext&#34;][&#34;userId&#34;],
+                    username=data[&#34;userContext&#34;][&#34;username&#34;],
+                ),
+            ),
+            request_id=data[&#34;requestId&#34;],
+            access_token=data[&#34;accessToken&#34;],
+            api_version=data[&#34;apiVersion&#34;],
+            namespace=data[&#34;namespace&#34;],
+            data_api=DataAPI(
+                org_domain_url=data[&#34;orgDomainUrl&#34;],
+                api_version=data[&#34;apiVersion&#34;],
+                access_token=data[&#34;accessToken&#34;],
+                connection=connection,
+            ),
+        )</code></pre>
+</details>
+<div class="desc"><p>An initialized data API client instance for interacting with data in the org.</p></div>
+</dd>
+<dt id="heroku_applink.context.ClientContext.namespace"><code class="name">var <span class="ident">namespace</span> : str</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class ClientContext:
+    &#34;&#34;&#34;Information about the Salesforce org that made the request.&#34;&#34;&#34;
+
+    org: Org
+    &#34;&#34;&#34;Information about the Salesforce org and the user that made the request.&#34;&#34;&#34;
+    data_api: DataAPI
+    &#34;&#34;&#34;An initialized data API client instance for interacting with data in the org.&#34;&#34;&#34;
+    request_id: str
+    &#34;&#34;&#34;Request ID from the Salesforce org.&#34;&#34;&#34;
+    access_token: str
+    &#34;&#34;&#34;Valid access token for the current context org/user.&#34;&#34;&#34;
+    api_version: str
+    &#34;&#34;&#34;API version of the Salesforce component that made the request.&#34;&#34;&#34;
+    namespace: str
+    &#34;&#34;&#34;Namespace of the Salesforce component that made the request.&#34;&#34;&#34;
+
+    @classmethod
+    def from_header(cls, header: str, connection: Connection):
+        decoded = base64.b64decode(header)
+        data = json.loads(decoded)
+
+        return cls(
+            org=Org(
+                id=data[&#34;orgId&#34;],
+                domain_url=data[&#34;orgDomainUrl&#34;],
+                user=User(
+                    id=data[&#34;userContext&#34;][&#34;userId&#34;],
+                    username=data[&#34;userContext&#34;][&#34;username&#34;],
+                ),
+            ),
+            request_id=data[&#34;requestId&#34;],
+            access_token=data[&#34;accessToken&#34;],
+            api_version=data[&#34;apiVersion&#34;],
+            namespace=data[&#34;namespace&#34;],
+            data_api=DataAPI(
+                org_domain_url=data[&#34;orgDomainUrl&#34;],
+                api_version=data[&#34;apiVersion&#34;],
+                access_token=data[&#34;accessToken&#34;],
+                connection=connection,
+            ),
+        )</code></pre>
+</details>
+<div class="desc"><p>Namespace of the Salesforce component that made the request.</p></div>
+</dd>
+<dt id="heroku_applink.context.ClientContext.org"><code class="name">var <span class="ident">org</span> : <a title="heroku_applink.context.Org" href="#heroku_applink.context.Org">Org</a></code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class ClientContext:
+    &#34;&#34;&#34;Information about the Salesforce org that made the request.&#34;&#34;&#34;
+
+    org: Org
+    &#34;&#34;&#34;Information about the Salesforce org and the user that made the request.&#34;&#34;&#34;
+    data_api: DataAPI
+    &#34;&#34;&#34;An initialized data API client instance for interacting with data in the org.&#34;&#34;&#34;
+    request_id: str
+    &#34;&#34;&#34;Request ID from the Salesforce org.&#34;&#34;&#34;
+    access_token: str
+    &#34;&#34;&#34;Valid access token for the current context org/user.&#34;&#34;&#34;
+    api_version: str
+    &#34;&#34;&#34;API version of the Salesforce component that made the request.&#34;&#34;&#34;
+    namespace: str
+    &#34;&#34;&#34;Namespace of the Salesforce component that made the request.&#34;&#34;&#34;
+
+    @classmethod
+    def from_header(cls, header: str, connection: Connection):
+        decoded = base64.b64decode(header)
+        data = json.loads(decoded)
+
+        return cls(
+            org=Org(
+                id=data[&#34;orgId&#34;],
+                domain_url=data[&#34;orgDomainUrl&#34;],
+                user=User(
+                    id=data[&#34;userContext&#34;][&#34;userId&#34;],
+                    username=data[&#34;userContext&#34;][&#34;username&#34;],
+                ),
+            ),
+            request_id=data[&#34;requestId&#34;],
+            access_token=data[&#34;accessToken&#34;],
+            api_version=data[&#34;apiVersion&#34;],
+            namespace=data[&#34;namespace&#34;],
+            data_api=DataAPI(
+                org_domain_url=data[&#34;orgDomainUrl&#34;],
+                api_version=data[&#34;apiVersion&#34;],
+                access_token=data[&#34;accessToken&#34;],
+                connection=connection,
+            ),
+        )</code></pre>
+</details>
+<div class="desc"><p>Information about the Salesforce org and the user that made the request.</p></div>
+</dd>
+<dt id="heroku_applink.context.ClientContext.request_id"><code class="name">var <span class="ident">request_id</span> : str</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class ClientContext:
+    &#34;&#34;&#34;Information about the Salesforce org that made the request.&#34;&#34;&#34;
+
+    org: Org
+    &#34;&#34;&#34;Information about the Salesforce org and the user that made the request.&#34;&#34;&#34;
+    data_api: DataAPI
+    &#34;&#34;&#34;An initialized data API client instance for interacting with data in the org.&#34;&#34;&#34;
+    request_id: str
+    &#34;&#34;&#34;Request ID from the Salesforce org.&#34;&#34;&#34;
+    access_token: str
+    &#34;&#34;&#34;Valid access token for the current context org/user.&#34;&#34;&#34;
+    api_version: str
+    &#34;&#34;&#34;API version of the Salesforce component that made the request.&#34;&#34;&#34;
+    namespace: str
+    &#34;&#34;&#34;Namespace of the Salesforce component that made the request.&#34;&#34;&#34;
+
+    @classmethod
+    def from_header(cls, header: str, connection: Connection):
+        decoded = base64.b64decode(header)
+        data = json.loads(decoded)
+
+        return cls(
+            org=Org(
+                id=data[&#34;orgId&#34;],
+                domain_url=data[&#34;orgDomainUrl&#34;],
+                user=User(
+                    id=data[&#34;userContext&#34;][&#34;userId&#34;],
+                    username=data[&#34;userContext&#34;][&#34;username&#34;],
+                ),
+            ),
+            request_id=data[&#34;requestId&#34;],
+            access_token=data[&#34;accessToken&#34;],
+            api_version=data[&#34;apiVersion&#34;],
+            namespace=data[&#34;namespace&#34;],
+            data_api=DataAPI(
+                org_domain_url=data[&#34;orgDomainUrl&#34;],
+                api_version=data[&#34;apiVersion&#34;],
+                access_token=data[&#34;accessToken&#34;],
+                connection=connection,
+            ),
+        )</code></pre>
+</details>
+<div class="desc"><p>Request ID from the Salesforce org.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="heroku_applink.context.Org"><code class="flex name class">
+<span>class <span class="ident">Org</span></span>
+<span>(</span><span>*,<br>id: str,<br>domain_url: str,<br>user: <a title="heroku_applink.context.User" href="#heroku_applink.context.User">User</a>)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class Org:
+    &#34;&#34;&#34;Information about the Salesforce org and the user that made the request.&#34;&#34;&#34;
+
+    id: str
+    &#34;&#34;&#34;
+    The Salesforce org ID.
+
+    For example: `00DJS0000000123ABC`
+    &#34;&#34;&#34;
+
+    domain_url: str
+    &#34;&#34;&#34;
+    The canonical URL of the Salesforce org.
+
+    This URL never changes. Use this URL when making API calls to your org.
+
+    For example: `https://example-domain-url.my.salesforce.com`
+    &#34;&#34;&#34;
+    user: User
+    &#34;&#34;&#34;The currently logged in user.&#34;&#34;&#34;</code></pre>
+</details>
+<div class="desc"><p>Information about the Salesforce org and the user that made the request.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="heroku_applink.context.Org.domain_url"><code class="name">var <span class="ident">domain_url</span> : str</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class Org:
+    &#34;&#34;&#34;Information about the Salesforce org and the user that made the request.&#34;&#34;&#34;
+
+    id: str
+    &#34;&#34;&#34;
+    The Salesforce org ID.
+
+    For example: `00DJS0000000123ABC`
+    &#34;&#34;&#34;
+
+    domain_url: str
+    &#34;&#34;&#34;
+    The canonical URL of the Salesforce org.
+
+    This URL never changes. Use this URL when making API calls to your org.
+
+    For example: `https://example-domain-url.my.salesforce.com`
+    &#34;&#34;&#34;
+    user: User
+    &#34;&#34;&#34;The currently logged in user.&#34;&#34;&#34;</code></pre>
+</details>
+<div class="desc"><p>The canonical URL of the Salesforce org.</p>
+<p>This URL never changes. Use this URL when making API calls to your org.</p>
+<p>For example: <code>https://example-domain-url.my.salesforce.com</code></p></div>
+</dd>
+<dt id="heroku_applink.context.Org.id"><code class="name">var <span class="ident">id</span> : str</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class Org:
+    &#34;&#34;&#34;Information about the Salesforce org and the user that made the request.&#34;&#34;&#34;
+
+    id: str
+    &#34;&#34;&#34;
+    The Salesforce org ID.
+
+    For example: `00DJS0000000123ABC`
+    &#34;&#34;&#34;
+
+    domain_url: str
+    &#34;&#34;&#34;
+    The canonical URL of the Salesforce org.
+
+    This URL never changes. Use this URL when making API calls to your org.
+
+    For example: `https://example-domain-url.my.salesforce.com`
+    &#34;&#34;&#34;
+    user: User
+    &#34;&#34;&#34;The currently logged in user.&#34;&#34;&#34;</code></pre>
+</details>
+<div class="desc"><p>The Salesforce org ID.</p>
+<p>For example: <code>00DJS0000000123ABC</code></p></div>
+</dd>
+<dt id="heroku_applink.context.Org.user"><code class="name">var <span class="ident">user</span> : <a title="heroku_applink.context.User" href="#heroku_applink.context.User">User</a></code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class Org:
+    &#34;&#34;&#34;Information about the Salesforce org and the user that made the request.&#34;&#34;&#34;
+
+    id: str
+    &#34;&#34;&#34;
+    The Salesforce org ID.
+
+    For example: `00DJS0000000123ABC`
+    &#34;&#34;&#34;
+
+    domain_url: str
+    &#34;&#34;&#34;
+    The canonical URL of the Salesforce org.
+
+    This URL never changes. Use this URL when making API calls to your org.
+
+    For example: `https://example-domain-url.my.salesforce.com`
+    &#34;&#34;&#34;
+    user: User
+    &#34;&#34;&#34;The currently logged in user.&#34;&#34;&#34;</code></pre>
+</details>
+<div class="desc"><p>The currently logged in user.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="heroku_applink.context.User"><code class="flex name class">
+<span>class <span class="ident">User</span></span>
+<span>(</span><span>*, id: str, username: str)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class User:
+    &#34;&#34;&#34;
+    Information about the Salesforce user that made the request.
+    &#34;&#34;&#34;
+
+    id: str
+    &#34;&#34;&#34;
+    The user&#39;s ID.
+
+    For example: `005JS000000H123`
+    &#34;&#34;&#34;
+    username: str
+    &#34;&#34;&#34;
+    The username of the user.
+
+    For example: `user@example.tld`
+    &#34;&#34;&#34;</code></pre>
+</details>
+<div class="desc"><p>Information about the Salesforce user that made the request.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="heroku_applink.context.User.id"><code class="name">var <span class="ident">id</span> : str</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class User:
+    &#34;&#34;&#34;
+    Information about the Salesforce user that made the request.
+    &#34;&#34;&#34;
+
+    id: str
+    &#34;&#34;&#34;
+    The user&#39;s ID.
+
+    For example: `005JS000000H123`
+    &#34;&#34;&#34;
+    username: str
+    &#34;&#34;&#34;
+    The username of the user.
+
+    For example: `user@example.tld`
+    &#34;&#34;&#34;</code></pre>
+</details>
+<div class="desc"><p>The user's ID.</p>
+<p>For example: <code>005JS000000H123</code></p></div>
+</dd>
+<dt id="heroku_applink.context.User.username"><code class="name">var <span class="ident">username</span> : str</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class User:
+    &#34;&#34;&#34;
+    Information about the Salesforce user that made the request.
+    &#34;&#34;&#34;
+
+    id: str
+    &#34;&#34;&#34;
+    The user&#39;s ID.
+
+    For example: `005JS000000H123`
+    &#34;&#34;&#34;
+    username: str
+    &#34;&#34;&#34;
+    The username of the user.
+
+    For example: `user@example.tld`
+    &#34;&#34;&#34;</code></pre>
+</details>
+<div class="desc"><p>The username of the user.</p>
+<p>For example: <code>user@example.tld</code></p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="heroku_applink" href="index.html">heroku_applink</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="heroku_applink.context.ClientContext" href="#heroku_applink.context.ClientContext">ClientContext</a></code></h4>
+<ul class="two-column">
+<li><code><a title="heroku_applink.context.ClientContext.access_token" href="#heroku_applink.context.ClientContext.access_token">access_token</a></code></li>
+<li><code><a title="heroku_applink.context.ClientContext.api_version" href="#heroku_applink.context.ClientContext.api_version">api_version</a></code></li>
+<li><code><a title="heroku_applink.context.ClientContext.data_api" href="#heroku_applink.context.ClientContext.data_api">data_api</a></code></li>
+<li><code><a title="heroku_applink.context.ClientContext.from_header" href="#heroku_applink.context.ClientContext.from_header">from_header</a></code></li>
+<li><code><a title="heroku_applink.context.ClientContext.namespace" href="#heroku_applink.context.ClientContext.namespace">namespace</a></code></li>
+<li><code><a title="heroku_applink.context.ClientContext.org" href="#heroku_applink.context.ClientContext.org">org</a></code></li>
+<li><code><a title="heroku_applink.context.ClientContext.request_id" href="#heroku_applink.context.ClientContext.request_id">request_id</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="heroku_applink.context.Org" href="#heroku_applink.context.Org">Org</a></code></h4>
+<ul class="">
+<li><code><a title="heroku_applink.context.Org.domain_url" href="#heroku_applink.context.Org.domain_url">domain_url</a></code></li>
+<li><code><a title="heroku_applink.context.Org.id" href="#heroku_applink.context.Org.id">id</a></code></li>
+<li><code><a title="heroku_applink.context.Org.user" href="#heroku_applink.context.Org.user">user</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="heroku_applink.context.User" href="#heroku_applink.context.User">User</a></code></h4>
+<ul class="">
+<li><code><a title="heroku_applink.context.User.id" href="#heroku_applink.context.User.id">id</a></code></li>
+<li><code><a title="heroku_applink.context.User.username" href="#heroku_applink.context.User.username">username</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,649 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>heroku_applink.data_api API documentation</title>
+<meta name="description" content="Copyright (c) 2025, salesforce.com, inc.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
+For full license text, see the LICENSE file in the …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>heroku_applink.data_api</code></h1>
+</header>
+<section id="section-intro">
+<p>Copyright (c) 2025, salesforce.com, inc.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
+For full license text, see the LICENSE file in the repo root or <a href="https://opensource.org/licenses/BSD-3-Clause">https://opensource.org/licenses/BSD-3-Clause</a></p>
+</section>
+<section>
+<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+<dl>
+<dt><code class="name"><a title="heroku_applink.data_api.exceptions" href="exceptions.html">heroku_applink.data_api.exceptions</a></code></dt>
+<dd>
+<div class="desc"><p>Copyright (c) 2025, salesforce.com, inc.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
+For full license text, see the LICENSE file in the …</p></div>
+</dd>
+<dt><code class="name"><a title="heroku_applink.data_api.record" href="record.html">heroku_applink.data_api.record</a></code></dt>
+<dd>
+<div class="desc"><p>Copyright (c) 2025, salesforce.com, inc.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
+For full license text, see the LICENSE file in the …</p></div>
+</dd>
+<dt><code class="name"><a title="heroku_applink.data_api.reference_id" href="reference_id.html">heroku_applink.data_api.reference_id</a></code></dt>
+<dd>
+<div class="desc"><p>Copyright (c) 2025, salesforce.com, inc.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
+For full license text, see the LICENSE file in the …</p></div>
+</dd>
+<dt><code class="name"><a title="heroku_applink.data_api.unit_of_work" href="unit_of_work.html">heroku_applink.data_api.unit_of_work</a></code></dt>
+<dd>
+<div class="desc"><p>Copyright (c) 2025, salesforce.com, inc.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
+For full license text, see the LICENSE file in the …</p></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="heroku_applink.data_api.DataAPI"><code class="flex name class">
+<span>class <span class="ident">DataAPI</span></span>
+<span>(</span><span>*,<br>org_domain_url: str,<br>api_version: str,<br>access_token: str,<br>connection: <a title="heroku_applink.connection.Connection" href="../connection.html#heroku_applink.connection.Connection">Connection</a>)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class DataAPI:
+    &#34;&#34;&#34;
+    Data API client to interact with data in a Salesforce org.
+
+    We provide a preconfigured instance of this client at `context.org.data_api`
+    to make it easier for you to query, insert, and update records.
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        *,
+        org_domain_url: str,
+        api_version: str,
+        access_token: str,
+        connection: Connection,
+    ) -&gt; None:
+        self._api_version = api_version
+        self._org_domain_url = org_domain_url
+        self.access_token = access_token
+        self._connection = connection
+
+    async def query(self, soql: str, timeout: float|None=None) -&gt; RecordQueryResult:
+        &#34;&#34;&#34;
+        Query for records using the given SOQL string.
+
+        For example:
+
+        ```python
+        result = await context.org.data_api.query(&#34;SELECT Id, Name FROM Account&#34;)
+
+        for record in result.records:
+            # ...
+        ```
+
+        If the returned `RecordQueryResult`&#39;s `done` attribute is `False`, there are more
+        records to be returned. To retrieve these, use `DataAPI.query_more()`.
+
+        For more information, see the [Query REST API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_query.htm).
+        &#34;&#34;&#34;  # noqa: E501 pylint: disable=line-too-long
+        return await self._execute(
+            QueryRecordsRestApiRequest(soql, self._download_file),
+            timeout=timeout,
+        )
+
+    async def query_more(self, result: RecordQueryResult, timeout: float|None=None) -&gt; RecordQueryResult:
+        &#34;&#34;&#34;
+        Query for more records, based on the given `RecordQueryResult`.
+
+        For example:
+
+        ```python
+        result = await context.org.data_api.query(&#34;SELECT Id, Name FROM Account&#34;)
+
+        if not result.done:
+            query_more_result = await context.org.data_api.query_more(result)
+        ```
+
+        For more information, see the [Query More Results REST API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_query_more_results.htm).
+        &#34;&#34;&#34;  # noqa: E501 pylint: disable=line-too-long
+        if result.next_records_url is None:
+            return RecordQueryResult(
+                done=True,
+                total_size=result.total_size,
+                records=[],
+                next_records_url=None,
+            )
+
+        return await self._execute(
+            QueryNextRecordsRestApiRequest(result.next_records_url, self._download_file),
+            timeout=timeout,
+        )
+
+    async def create(self, record: Record, timeout: float|None=None) -&gt; str:
+        &#34;&#34;&#34;
+        Create a new record based on the given `Record` object.
+
+        Returns the ID of the new record.
+
+        For example:
+
+        ```python
+        record_id = await context.org.data_api.create(
+            Record(
+                type=&#34;Account&#34;,
+                fields={
+                    &#34;Name&#34;: &#34;Example Account&#34;,
+                },
+            )
+        )
+        ```
+        &#34;&#34;&#34;
+        return await self._execute(
+            CreateRecordRestApiRequest(record),
+            timeout=timeout,
+        )
+
+    async def update(self, record: Record, timeout: float|None=None) -&gt; str:
+        &#34;&#34;&#34;
+        Update an existing record based on the given `Record` object.
+
+        The given `Record` must contain an `Id` field. Returns the ID of the record that was updated.
+
+        For example:
+
+        ```python
+        await context.org.data_api.update(
+            Record(
+                type=&#34;Account&#34;,
+                fields={
+                    &#34;Id&#34;: &#34;001B000001Lp1FxIAJ&#34;,
+                    &#34;Name&#34;: &#34;New Name&#34;,
+                },
+            )
+        )
+        ```
+        &#34;&#34;&#34;
+        return await self._execute(
+            UpdateRecordRestApiRequest(record),
+            timeout=timeout,
+        )
+
+    async def delete(self, object_type: str, record_id: str, timeout: float|None=None) -&gt; str:
+        &#34;&#34;&#34;
+        Delete an existing record of the given Salesforce object type and ID.
+
+        Returns the ID of the record that was deleted.
+
+        For example:
+
+        ```python
+        await data_api.delete(&#34;Account&#34;, &#34;001B000001Lp1FxIAJ&#34;)
+        ```
+        &#34;&#34;&#34;
+        return await self._execute(
+            DeleteRecordRestApiRequest(object_type, record_id),
+            timeout=timeout,
+        )
+
+    async def commit_unit_of_work(
+        self, unit_of_work: UnitOfWork, timeout: float|None=None
+    ) -&gt; dict[ReferenceId, str]:
+        &#34;&#34;&#34;
+        Commit a `UnitOfWork`, which executes all operations registered with it.
+
+        If any of these operations fail, the whole unit is rolled back. To examine results for a
+        single operation, inspect the returned dict (which is keyed with `ReferenceId` objects
+        returned from the `register*` functions on `UnitOfWork`).
+
+        For example:
+
+        ```python
+        # Create a unit of work, against which multiple operations can be registered.
+        unit_of_work = UnitOfWork()
+
+        first_reference_id = unit_of_work.register_create(
+            # ...
+        )
+        second_reference_id = unit_of_work.register_create(
+            # ...
+        )
+
+        # Commit the unit of work, executing all of the operations registered above.
+        result = await context.org.data_api.commit_unit_of_work(unit_of_work)
+
+        # The result of each operation.
+        first_record_id = result[first_create_reference_id]
+        second_record_id = result[second_create_reference_id]
+        ```
+        &#34;&#34;&#34;
+        return await self._execute(
+            CompositeGraphRestApiRequest(
+                self._api_version,
+                unit_of_work._sub_requests,  # pyright: ignore [reportPrivateUsage] pylint:disable=protected-access
+            ),
+            timeout=timeout,
+        )
+
+    async def _execute(self, rest_api_request: RestApiRequest[T], timeout: float|None=None) -&gt; T:
+        url: str = rest_api_request.url(self._org_domain_url, self._api_version)
+        method: str = rest_api_request.http_method()
+        body = rest_api_request.request_body()
+
+        try:
+            response = await self._connection.request(
+                method,
+                url,
+                headers=self._default_headers(),
+                data=None if body is None else _json_serialize(body),
+                timeout=timeout,
+            )
+
+            # Using orjson for faster JSON deserialization over the stdlib.
+            # This is not implemented using the `loads` argument to `Response.json` since:
+            # - We don&#39;t want the content type validation, since some successful requests.py return 204
+            #   (No Content) which will not have an `application/json`` content type header. However,
+            #   these parse just fine as JSON helping to unify the interface to the REST request classes.
+            # - Orjson&#39;s performance/memory usage is better if it is passed bytes directly instead of `str`.
+            response_body = await response.read()
+            json_body = orjson.loads(response_body) if response_body else None
+        except aiohttp.ClientError as e:
+            # https://docs.aiohttp.org/en/stable/client_reference.html#client-exceptions
+            raise ClientError(
+                f&#34;An error occurred while making the request: {e.__class__.__name__}: {e}&#34;
+            ) from e
+        except orjson.JSONDecodeError as e:
+            raise UnexpectedRestApiResponsePayload(
+                f&#34;The server didn&#39;t respond with valid JSON: {e.__class__.__name__}: {e}&#34;
+            ) from e
+
+        return await rest_api_request.process_response(response.status, json_body)
+
+    async def _download_file(self, url: str) -&gt; bytes:
+        response = await self._connection.request(
+            &#34;GET&#34;, f&#34;{self._org_domain_url}{url}&#34;, headers=self._default_headers()
+        )
+
+        return await response.read()
+
+    def _default_headers(self) -&gt; dict[str, str]:
+        return {
+            &#34;Authorization&#34;: f&#34;Bearer {self.access_token}&#34;,
+        }</code></pre>
+</details>
+<div class="desc"><p>Data API client to interact with data in a Salesforce org.</p>
+<p>We provide a preconfigured instance of this client at <code>context.org.data_api</code>
+to make it easier for you to query, insert, and update records.</p></div>
+<h3>Methods</h3>
+<dl>
+<dt id="heroku_applink.data_api.DataAPI.commit_unit_of_work"><code class="name flex">
+<span>async def <span class="ident">commit_unit_of_work</span></span>(<span>self,<br>unit_of_work: <a title="heroku_applink.data_api.unit_of_work.UnitOfWork" href="unit_of_work.html#heroku_applink.data_api.unit_of_work.UnitOfWork">UnitOfWork</a>,<br>timeout: float | None = None) ‑> dict[<a title="heroku_applink.data_api.reference_id.ReferenceId" href="reference_id.html#heroku_applink.data_api.reference_id.ReferenceId">ReferenceId</a>, str]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def commit_unit_of_work(
+    self, unit_of_work: UnitOfWork, timeout: float|None=None
+) -&gt; dict[ReferenceId, str]:
+    &#34;&#34;&#34;
+    Commit a `UnitOfWork`, which executes all operations registered with it.
+
+    If any of these operations fail, the whole unit is rolled back. To examine results for a
+    single operation, inspect the returned dict (which is keyed with `ReferenceId` objects
+    returned from the `register*` functions on `UnitOfWork`).
+
+    For example:
+
+    ```python
+    # Create a unit of work, against which multiple operations can be registered.
+    unit_of_work = UnitOfWork()
+
+    first_reference_id = unit_of_work.register_create(
+        # ...
+    )
+    second_reference_id = unit_of_work.register_create(
+        # ...
+    )
+
+    # Commit the unit of work, executing all of the operations registered above.
+    result = await context.org.data_api.commit_unit_of_work(unit_of_work)
+
+    # The result of each operation.
+    first_record_id = result[first_create_reference_id]
+    second_record_id = result[second_create_reference_id]
+    ```
+    &#34;&#34;&#34;
+    return await self._execute(
+        CompositeGraphRestApiRequest(
+            self._api_version,
+            unit_of_work._sub_requests,  # pyright: ignore [reportPrivateUsage] pylint:disable=protected-access
+        ),
+        timeout=timeout,
+    )</code></pre>
+</details>
+<div class="desc"><p>Commit a <code>UnitOfWork</code>, which executes all operations registered with it.</p>
+<p>If any of these operations fail, the whole unit is rolled back. To examine results for a
+single operation, inspect the returned dict (which is keyed with <code>ReferenceId</code> objects
+returned from the <code>register*</code> functions on <code>UnitOfWork</code>).</p>
+<p>For example:</p>
+<pre><code class="language-python"># Create a unit of work, against which multiple operations can be registered.
+unit_of_work = UnitOfWork()
+
+first_reference_id = unit_of_work.register_create(
+    # ...
+)
+second_reference_id = unit_of_work.register_create(
+    # ...
+)
+
+# Commit the unit of work, executing all of the operations registered above.
+result = await context.org.data_api.commit_unit_of_work(unit_of_work)
+
+# The result of each operation.
+first_record_id = result[first_create_reference_id]
+second_record_id = result[second_create_reference_id]
+</code></pre></div>
+</dd>
+<dt id="heroku_applink.data_api.DataAPI.create"><code class="name flex">
+<span>async def <span class="ident">create</span></span>(<span>self,<br>record: <a title="heroku_applink.data_api.record.Record" href="record.html#heroku_applink.data_api.record.Record">Record</a>,<br>timeout: float | None = None) ‑> str</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def create(self, record: Record, timeout: float|None=None) -&gt; str:
+    &#34;&#34;&#34;
+    Create a new record based on the given `Record` object.
+
+    Returns the ID of the new record.
+
+    For example:
+
+    ```python
+    record_id = await context.org.data_api.create(
+        Record(
+            type=&#34;Account&#34;,
+            fields={
+                &#34;Name&#34;: &#34;Example Account&#34;,
+            },
+        )
+    )
+    ```
+    &#34;&#34;&#34;
+    return await self._execute(
+        CreateRecordRestApiRequest(record),
+        timeout=timeout,
+    )</code></pre>
+</details>
+<div class="desc"><p>Create a new record based on the given <code>Record</code> object.</p>
+<p>Returns the ID of the new record.</p>
+<p>For example:</p>
+<pre><code class="language-python">record_id = await context.org.data_api.create(
+    Record(
+        type=&quot;Account&quot;,
+        fields={
+            &quot;Name&quot;: &quot;Example Account&quot;,
+        },
+    )
+)
+</code></pre></div>
+</dd>
+<dt id="heroku_applink.data_api.DataAPI.delete"><code class="name flex">
+<span>async def <span class="ident">delete</span></span>(<span>self, object_type: str, record_id: str, timeout: float | None = None) ‑> str</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def delete(self, object_type: str, record_id: str, timeout: float|None=None) -&gt; str:
+    &#34;&#34;&#34;
+    Delete an existing record of the given Salesforce object type and ID.
+
+    Returns the ID of the record that was deleted.
+
+    For example:
+
+    ```python
+    await data_api.delete(&#34;Account&#34;, &#34;001B000001Lp1FxIAJ&#34;)
+    ```
+    &#34;&#34;&#34;
+    return await self._execute(
+        DeleteRecordRestApiRequest(object_type, record_id),
+        timeout=timeout,
+    )</code></pre>
+</details>
+<div class="desc"><p>Delete an existing record of the given Salesforce object type and ID.</p>
+<p>Returns the ID of the record that was deleted.</p>
+<p>For example:</p>
+<pre><code class="language-python">await data_api.delete(&quot;Account&quot;, &quot;001B000001Lp1FxIAJ&quot;)
+</code></pre></div>
+</dd>
+<dt id="heroku_applink.data_api.DataAPI.query"><code class="name flex">
+<span>async def <span class="ident">query</span></span>(<span>self, soql: str, timeout: float | None = None) ‑> <a title="heroku_applink.data_api.record.RecordQueryResult" href="record.html#heroku_applink.data_api.record.RecordQueryResult">RecordQueryResult</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def query(self, soql: str, timeout: float|None=None) -&gt; RecordQueryResult:
+    &#34;&#34;&#34;
+    Query for records using the given SOQL string.
+
+    For example:
+
+    ```python
+    result = await context.org.data_api.query(&#34;SELECT Id, Name FROM Account&#34;)
+
+    for record in result.records:
+        # ...
+    ```
+
+    If the returned `RecordQueryResult`&#39;s `done` attribute is `False`, there are more
+    records to be returned. To retrieve these, use `DataAPI.query_more()`.
+
+    For more information, see the [Query REST API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_query.htm).
+    &#34;&#34;&#34;  # noqa: E501 pylint: disable=line-too-long
+    return await self._execute(
+        QueryRecordsRestApiRequest(soql, self._download_file),
+        timeout=timeout,
+    )</code></pre>
+</details>
+<div class="desc"><p>Query for records using the given SOQL string.</p>
+<p>For example:</p>
+<pre><code class="language-python">result = await context.org.data_api.query(&quot;SELECT Id, Name FROM Account&quot;)
+
+for record in result.records:
+    # ...
+</code></pre>
+<p>If the returned <code>RecordQueryResult</code>'s <code>done</code> attribute is <code>False</code>, there are more
+records to be returned. To retrieve these, use <code><a title="heroku_applink.data_api.DataAPI.query_more" href="#heroku_applink.data_api.DataAPI.query_more">DataAPI.query_more()</a></code>.</p>
+<p>For more information, see the <a href="https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_query.htm">Query REST API documentation</a>.</p></div>
+</dd>
+<dt id="heroku_applink.data_api.DataAPI.query_more"><code class="name flex">
+<span>async def <span class="ident">query_more</span></span>(<span>self,<br>result: <a title="heroku_applink.data_api.record.RecordQueryResult" href="record.html#heroku_applink.data_api.record.RecordQueryResult">RecordQueryResult</a>,<br>timeout: float | None = None) ‑> <a title="heroku_applink.data_api.record.RecordQueryResult" href="record.html#heroku_applink.data_api.record.RecordQueryResult">RecordQueryResult</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def query_more(self, result: RecordQueryResult, timeout: float|None=None) -&gt; RecordQueryResult:
+    &#34;&#34;&#34;
+    Query for more records, based on the given `RecordQueryResult`.
+
+    For example:
+
+    ```python
+    result = await context.org.data_api.query(&#34;SELECT Id, Name FROM Account&#34;)
+
+    if not result.done:
+        query_more_result = await context.org.data_api.query_more(result)
+    ```
+
+    For more information, see the [Query More Results REST API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_query_more_results.htm).
+    &#34;&#34;&#34;  # noqa: E501 pylint: disable=line-too-long
+    if result.next_records_url is None:
+        return RecordQueryResult(
+            done=True,
+            total_size=result.total_size,
+            records=[],
+            next_records_url=None,
+        )
+
+    return await self._execute(
+        QueryNextRecordsRestApiRequest(result.next_records_url, self._download_file),
+        timeout=timeout,
+    )</code></pre>
+</details>
+<div class="desc"><p>Query for more records, based on the given <code>RecordQueryResult</code>.</p>
+<p>For example:</p>
+<pre><code class="language-python">result = await context.org.data_api.query(&quot;SELECT Id, Name FROM Account&quot;)
+
+if not result.done:
+    query_more_result = await context.org.data_api.query_more(result)
+</code></pre>
+<p>For more information, see the <a href="https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_query_more_results.htm">Query More Results REST API documentation</a>.</p></div>
+</dd>
+<dt id="heroku_applink.data_api.DataAPI.update"><code class="name flex">
+<span>async def <span class="ident">update</span></span>(<span>self,<br>record: <a title="heroku_applink.data_api.record.Record" href="record.html#heroku_applink.data_api.record.Record">Record</a>,<br>timeout: float | None = None) ‑> str</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def update(self, record: Record, timeout: float|None=None) -&gt; str:
+    &#34;&#34;&#34;
+    Update an existing record based on the given `Record` object.
+
+    The given `Record` must contain an `Id` field. Returns the ID of the record that was updated.
+
+    For example:
+
+    ```python
+    await context.org.data_api.update(
+        Record(
+            type=&#34;Account&#34;,
+            fields={
+                &#34;Id&#34;: &#34;001B000001Lp1FxIAJ&#34;,
+                &#34;Name&#34;: &#34;New Name&#34;,
+            },
+        )
+    )
+    ```
+    &#34;&#34;&#34;
+    return await self._execute(
+        UpdateRecordRestApiRequest(record),
+        timeout=timeout,
+    )</code></pre>
+</details>
+<div class="desc"><p>Update an existing record based on the given <code>Record</code> object.</p>
+<p>The given <code>Record</code> must contain an <code>Id</code> field. Returns the ID of the record that was updated.</p>
+<p>For example:</p>
+<pre><code class="language-python">await context.org.data_api.update(
+    Record(
+        type=&quot;Account&quot;,
+        fields={
+            &quot;Id&quot;: &quot;001B000001Lp1FxIAJ&quot;,
+            &quot;Name&quot;: &quot;New Name&quot;,
+        },
+    )
+)
+</code></pre></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="heroku_applink" href="../index.html">heroku_applink</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<ul>
+<li><code><a title="heroku_applink.data_api.exceptions" href="exceptions.html">heroku_applink.data_api.exceptions</a></code></li>
+<li><code><a title="heroku_applink.data_api.record" href="record.html">heroku_applink.data_api.record</a></code></li>
+<li><code><a title="heroku_applink.data_api.reference_id" href="reference_id.html">heroku_applink.data_api.reference_id</a></code></li>
+<li><code><a title="heroku_applink.data_api.unit_of_work" href="unit_of_work.html">heroku_applink.data_api.unit_of_work</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="heroku_applink.data_api.DataAPI" href="#heroku_applink.data_api.DataAPI">DataAPI</a></code></h4>
+<ul class="two-column">
+<li><code><a title="heroku_applink.data_api.DataAPI.commit_unit_of_work" href="#heroku_applink.data_api.DataAPI.commit_unit_of_work">commit_unit_of_work</a></code></li>
+<li><code><a title="heroku_applink.data_api.DataAPI.create" href="#heroku_applink.data_api.DataAPI.create">create</a></code></li>
+<li><code><a title="heroku_applink.data_api.DataAPI.delete" href="#heroku_applink.data_api.DataAPI.delete">delete</a></code></li>
+<li><code><a title="heroku_applink.data_api.DataAPI.query" href="#heroku_applink.data_api.DataAPI.query">query</a></code></li>
+<li><code><a title="heroku_applink.data_api.DataAPI.query_more" href="#heroku_applink.data_api.DataAPI.query_more">query_more</a></code></li>
+<li><code><a title="heroku_applink.data_api.DataAPI.update" href="#heroku_applink.data_api.DataAPI.update">update</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

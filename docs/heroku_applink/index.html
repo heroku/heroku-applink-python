@@ -1,0 +1,2114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>heroku_applink API documentation</title>
+<meta name="description" content="Copyright (c) 2025, salesforce.com, inc.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
+For full license text, see the LICENSE file in the …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Package <code>heroku_applink</code></h1>
+</header>
+<section id="section-intro">
+<p>Copyright (c) 2025, salesforce.com, inc.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
+For full license text, see the LICENSE file in the repo root or <a href="https://opensource.org/licenses/BSD-3-Clause">https://opensource.org/licenses/BSD-3-Clause</a></p>
+</section>
+<section>
+<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+<dl>
+<dt><code class="name"><a title="heroku_applink.authorization" href="authorization.html">heroku_applink.authorization</a></code></dt>
+<dd>
+<div class="desc"><p>Copyright (c) 2025, salesforce.com, inc.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
+For full license text, see the LICENSE file in the …</p></div>
+</dd>
+<dt><code class="name"><a title="heroku_applink.config" href="config.html">heroku_applink.config</a></code></dt>
+<dd>
+<div class="desc"><p>Copyright (c) 2025, salesforce.com, inc.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
+For full license text, see the LICENSE file in the …</p></div>
+</dd>
+<dt><code class="name"><a title="heroku_applink.connection" href="connection.html">heroku_applink.connection</a></code></dt>
+<dd>
+<div class="desc"><p>Copyright (c) 2025, salesforce.com, inc.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
+For full license text, see the LICENSE file in the …</p></div>
+</dd>
+<dt><code class="name"><a title="heroku_applink.context" href="context.html">heroku_applink.context</a></code></dt>
+<dd>
+<div class="desc"><p>Copyright (c) 2025, salesforce.com, inc.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
+For full license text, see the LICENSE file in the …</p></div>
+</dd>
+<dt><code class="name"><a title="heroku_applink.data_api" href="data_api/index.html">heroku_applink.data_api</a></code></dt>
+<dd>
+<div class="desc"><p>Copyright (c) 2025, salesforce.com, inc.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
+For full license text, see the LICENSE file in the …</p></div>
+</dd>
+<dt><code class="name"><a title="heroku_applink.exceptions" href="exceptions.html">heroku_applink.exceptions</a></code></dt>
+<dd>
+<div class="desc"><p>Copyright (c) 2025, salesforce.com, inc.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
+For full license text, see the LICENSE file in the …</p></div>
+</dd>
+<dt><code class="name"><a title="heroku_applink.middleware" href="middleware.html">heroku_applink.middleware</a></code></dt>
+<dd>
+<div class="desc"><p>Copyright (c) 2025, salesforce.com, inc.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
+For full license text, see the LICENSE file in the …</p></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="heroku_applink.get_authorization"><code class="name flex">
+<span>def <span class="ident">get_authorization</span></span>(<span>developer_name: str, attachment_or_url: str | None = None) ‑> <a title="heroku_applink.authorization.Authorization" href="authorization.html#heroku_applink.authorization.Authorization">Authorization</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_authorization(developer_name: str, attachment_or_url: str|None=None) -&gt; Authorization:
+    &#34;&#34;&#34;
+    Get an Authorization object for a given developer name and attachment or URL.
+    This Authorization object can be used to make SOQL queries to Salesforce via
+    DataAPI.
+
+    ```python
+    import heroku_applink as sdk
+
+    authorization = await sdk.get_authorization(
+        developer_name=&#34;my-developer-name&#34;,
+        attachment_or_url=&#34;HEROKU_APPLINK_BLUE&#34;,
+    )
+
+    query = &#34;SELECT Id, Name FROM Account&#34;
+    result = await authorization.data_api.query(query)
+    for record in result.records:
+        print(f&#34;Account: {record.get(&#39;Name&#39;)}&#34;)
+    ```
+    &#34;&#34;&#34;
+    return Authorization.find(developer_name, attachment_or_url)</code></pre>
+</details>
+<div class="desc"><p>Get an Authorization object for a given developer name and attachment or URL.
+This Authorization object can be used to make SOQL queries to Salesforce via
+DataAPI.</p>
+<pre><code class="language-python">import heroku_applink as sdk
+
+authorization = await sdk.get_authorization(
+    developer_name=&quot;my-developer-name&quot;,
+    attachment_or_url=&quot;HEROKU_APPLINK_BLUE&quot;,
+)
+
+query = &quot;SELECT Id, Name FROM Account&quot;
+result = await authorization.data_api.query(query)
+for record in result.records:
+    print(f&quot;Account: {record.get('Name')}&quot;)
+</code></pre></div>
+</dd>
+<dt id="heroku_applink.get_client_context"><code class="name flex">
+<span>def <span class="ident">get_client_context</span></span>(<span>) ‑> <a title="heroku_applink.context.ClientContext" href="context.html#heroku_applink.context.ClientContext">ClientContext</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_client_context() -&gt; ClientContext:
+    &#34;&#34;&#34;
+    Call `get_client_context` to get the client context for the current incoming
+    request from Salesforce. This will be set by the `IntegrationWsgiMiddleware` or
+    `IntegrationAsgiMiddleware` in your application and can only be used in requests
+    that are routed through one of these middlewares.
+
+    ```python
+    import heroku_applink as sdk
+    from fastapi import FastAPI
+
+    app = FastAPI()
+    app.add_middleware(sdk.IntegrationAsgiMiddleware, config=sdk.Config(request_timeout=5))
+
+    @app.get(&#34;/accounts&#34;)
+    async def get_accounts():
+        context = sdk.get_client_context()
+
+        query = &#34;SELECT Id, Name FROM Account&#34;
+        result = await context.data_api.query(query)
+
+        return {&#34;accounts&#34;: [record.get(&#34;Name&#34;) for record in result.records]}
+    ```
+    &#34;&#34;&#34;
+    try:
+      return client_context.get()
+    except LookupError:
+        raise ValueError(&#34;No client context found&#34;)</code></pre>
+</details>
+<div class="desc"><p>Call <code><a title="heroku_applink.get_client_context" href="#heroku_applink.get_client_context">get_client_context()</a></code> to get the client context for the current incoming
+request from Salesforce. This will be set by the <code><a title="heroku_applink.IntegrationWsgiMiddleware" href="#heroku_applink.IntegrationWsgiMiddleware">IntegrationWsgiMiddleware</a></code> or
+<code><a title="heroku_applink.IntegrationAsgiMiddleware" href="#heroku_applink.IntegrationAsgiMiddleware">IntegrationAsgiMiddleware</a></code> in your application and can only be used in requests
+that are routed through one of these middlewares.</p>
+<pre><code class="language-python">import heroku_applink as sdk
+from fastapi import FastAPI
+
+app = FastAPI()
+app.add_middleware(sdk.IntegrationAsgiMiddleware, config=sdk.Config(request_timeout=5))
+
+@app.get(&quot;/accounts&quot;)
+async def get_accounts():
+    context = sdk.get_client_context()
+
+    query = &quot;SELECT Id, Name FROM Account&quot;
+    result = await context.data_api.query(query)
+
+    return {&quot;accounts&quot;: [record.get(&quot;Name&quot;) for record in result.records]}
+</code></pre></div>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="heroku_applink.Authorization"><code class="flex name class">
+<span>class <span class="ident">Authorization</span></span>
+<span>(</span><span>connection: <a title="heroku_applink.connection.Connection" href="connection.html#heroku_applink.connection.Connection">Connection</a>,<br>data_api: <a title="heroku_applink.data_api.DataAPI" href="data_api/index.html#heroku_applink.data_api.DataAPI">DataAPI</a>,<br>id: str,<br>status: str,<br>org: <a title="heroku_applink.authorization.Org" href="authorization.html#heroku_applink.authorization.Org">Org</a>,<br>created_at: datetime.datetime,<br>created_by: str,<br>created_via_app: str | None,<br>last_modified_at: datetime.datetime,<br>last_modified_by: str | None,<br>redirect_uri: str | None)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class Authorization:
+    &#34;&#34;&#34;
+    Authorization information for a Salesforce org with access to a Data API for
+    making SOQL queries.
+    &#34;&#34;&#34;
+
+    connection: Connection
+    &#34;&#34;&#34;
+    Object responsible for making HTTP requests to the Salesforce API.
+    &#34;&#34;&#34;
+
+    data_api: DataAPI
+    &#34;&#34;&#34;
+    An initialized data API client instance for interacting with data in the org.
+
+    Example usage:
+
+    ```python
+    authorization = await Authorization.find(developer_name)
+    result = await authorization.data_api.query(&#34;SELECT Id, Name FROM Account&#34;)
+
+    for record in result.records:
+        print(f&#34;Account: {record}&#34;)
+    ```
+    &#34;&#34;&#34;
+
+    id: str
+    &#34;&#34;&#34;
+    The ID of the authorization in UUID format.
+
+    For example: `e27e9be0-6dc4-430f-974d-584f5ff8e9e6`
+    &#34;&#34;&#34;
+
+    status: str
+    &#34;&#34;&#34;
+    The status of the authorization.
+
+    Possible values:
+    * &#34;authorized&#34;
+    * &#34;authorizing&#34;
+    * &#34;disconnected&#34;
+    * &#34;error&#34;
+    &#34;&#34;&#34;
+
+    org: Org
+    &#34;&#34;&#34;
+    The Salesforce Org associated with the authorization.
+    &#34;&#34;&#34;
+
+    created_at: datetime
+    &#34;&#34;&#34;
+    The date and time the authorization was created.
+
+    For example: `2025-03-06T18:20:42.226577Z`
+    &#34;&#34;&#34;
+
+    created_by: str
+    &#34;&#34;&#34;
+    The user who created the authorization.
+
+    For example: `user@example.tld`
+    &#34;&#34;&#34;
+
+    created_via_app: str|None
+    &#34;&#34;&#34;
+    The app that created the authorization.
+
+    For example: `sushi`
+    &#34;&#34;&#34;
+
+    last_modified_at: datetime
+    &#34;&#34;&#34;
+    The date and time the authorization was last modified.
+
+    For example: `2025-03-06T18:20:42.226577Z`
+    &#34;&#34;&#34;
+
+    last_modified_by: str|None
+    &#34;&#34;&#34;
+    The user who last modified the authorization.
+
+    For example: `user@example.tld`
+    &#34;&#34;&#34;
+
+    redirect_uri: str|None
+    &#34;&#34;&#34;
+    The redirect URI for the authorization.
+    &#34;&#34;&#34;
+
+    @staticmethod
+    async def find(
+        developer_name: str,
+        attachment_or_url: str|None=None,
+        config: Config=Config.default()
+    ) -&gt; &#34;Authorization&#34;:
+        &#34;&#34;&#34;
+        Fetch authorization for a given Heroku AppLink developer.
+        Uses GET {apiUrl}/authorizations/{developer_name}
+        with a Bearer token from the add-on config.
+
+        Example usage:
+
+        ```python
+        authorization = await Authorization.find(developer_name)
+        result = await authorization.data_api.query(&#34;SELECT Id, Name FROM Account&#34;)
+
+        # Or use the attachment or URL of the add-on
+        authorization = await Authorization.find(developer_name, attachment_or_url=&#34;HEROKU_APPLINK_PURPLE&#34;)
+        result = await authorization.data_api.query(&#34;SELECT Id, Name FROM Account&#34;)
+        ```
+
+        This function will raise aiohttp-specific exceptions for HTTP errors and
+        any HTTP response other than 200 OK.
+
+        For a list of exceptions, see:
+        * https://docs.aiohttp.org/en/stable/client_reference.html
+        &#34;&#34;&#34;
+
+        if not developer_name:
+            raise ValueError(&#34;Developer name must be provided&#34;)
+
+        connection = Connection(config)
+        auth_bundle = _resolve_attachment_or_url(attachment_or_url)
+        request_url = URL(auth_bundle.api_url) / f&#34;authorizations/{developer_name}&#34;
+
+        headers = {
+            &#34;Authorization&#34;: f&#34;Bearer {auth_bundle.token}&#34;,
+            &#34;Content-Type&#34;: &#34;application/json&#34;,
+            &#34;X-App-UUID&#34;: auth_bundle.app_uuid,
+        }
+
+        response = await connection.request(&#34;GET&#34;, request_url, headers=headers)
+        payload = await response.json()
+
+        return Authorization._build_authorization(connection, payload)
+
+    @staticmethod
+    def _build_authorization(connection: Connection, payload: dict) -&gt; &#34;Authorization&#34;:
+        &#34;&#34;&#34;
+        Build an Authorization object from a payload. Some fields are optional,
+        so we use get() to handle the case where they are not present.
+        &#34;&#34;&#34;
+        return Authorization(
+            connection=connection,
+            data_api=DataAPI(
+                org_domain_url=payload[&#34;org&#34;][&#34;instance_url&#34;],
+                api_version=payload[&#34;org&#34;][&#34;api_version&#34;],
+                access_token=payload[&#34;org&#34;][&#34;user_auth&#34;][&#34;access_token&#34;],
+                connection=connection,
+            ),
+            id=payload[&#34;id&#34;],
+            status=payload[&#34;status&#34;],
+            org=Org(
+                id=payload[&#34;org&#34;][&#34;id&#34;],
+                developer_name=payload[&#34;org&#34;][&#34;developer_name&#34;],
+                instance_url=payload[&#34;org&#34;][&#34;instance_url&#34;],
+                type=payload[&#34;org&#34;][&#34;type&#34;],
+                api_version=payload[&#34;org&#34;][&#34;api_version&#34;],
+                user_auth=UserAuth(
+                    username=payload[&#34;org&#34;][&#34;user_auth&#34;][&#34;username&#34;],
+                    user_id=payload[&#34;org&#34;][&#34;user_auth&#34;][&#34;user_id&#34;],
+                    access_token=payload[&#34;org&#34;][&#34;user_auth&#34;][&#34;access_token&#34;],
+                ),
+            ),
+            created_at=_parse_datetime(payload[&#34;created_at&#34;]),
+            created_by=payload[&#34;created_by&#34;],
+            created_via_app=payload.get(&#34;created_via_app&#34;),
+            last_modified_at=_parse_datetime(payload[&#34;last_modified_at&#34;]),
+            last_modified_by=payload.get(&#34;last_modified_by&#34;),
+            redirect_uri=payload.get(&#34;redirect_uri&#34;),
+        )</code></pre>
+</details>
+<div class="desc"><p>Authorization information for a Salesforce org with access to a Data API for
+making SOQL queries.</p></div>
+<h3>Static methods</h3>
+<dl>
+<dt id="heroku_applink.Authorization.find"><code class="name flex">
+<span>async def <span class="ident">find</span></span>(<span>developer_name: str,<br>attachment_or_url: str | None = None,<br>config: <a title="heroku_applink.config.Config" href="config.html#heroku_applink.config.Config">Config</a> = Config(request_timeout=5, connect_timeout=None, socket_connect=None, socket_read=None, user_agent='heroku-applink-python-sdk/0.1.0')) ‑> <a title="heroku_applink.authorization.Authorization" href="authorization.html#heroku_applink.authorization.Authorization">Authorization</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+async def find(
+    developer_name: str,
+    attachment_or_url: str|None=None,
+    config: Config=Config.default()
+) -&gt; &#34;Authorization&#34;:
+    &#34;&#34;&#34;
+    Fetch authorization for a given Heroku AppLink developer.
+    Uses GET {apiUrl}/authorizations/{developer_name}
+    with a Bearer token from the add-on config.
+
+    Example usage:
+
+    ```python
+    authorization = await Authorization.find(developer_name)
+    result = await authorization.data_api.query(&#34;SELECT Id, Name FROM Account&#34;)
+
+    # Or use the attachment or URL of the add-on
+    authorization = await Authorization.find(developer_name, attachment_or_url=&#34;HEROKU_APPLINK_PURPLE&#34;)
+    result = await authorization.data_api.query(&#34;SELECT Id, Name FROM Account&#34;)
+    ```
+
+    This function will raise aiohttp-specific exceptions for HTTP errors and
+    any HTTP response other than 200 OK.
+
+    For a list of exceptions, see:
+    * https://docs.aiohttp.org/en/stable/client_reference.html
+    &#34;&#34;&#34;
+
+    if not developer_name:
+        raise ValueError(&#34;Developer name must be provided&#34;)
+
+    connection = Connection(config)
+    auth_bundle = _resolve_attachment_or_url(attachment_or_url)
+    request_url = URL(auth_bundle.api_url) / f&#34;authorizations/{developer_name}&#34;
+
+    headers = {
+        &#34;Authorization&#34;: f&#34;Bearer {auth_bundle.token}&#34;,
+        &#34;Content-Type&#34;: &#34;application/json&#34;,
+        &#34;X-App-UUID&#34;: auth_bundle.app_uuid,
+    }
+
+    response = await connection.request(&#34;GET&#34;, request_url, headers=headers)
+    payload = await response.json()
+
+    return Authorization._build_authorization(connection, payload)</code></pre>
+</details>
+<div class="desc"><p>Fetch authorization for a given Heroku AppLink developer.
+Uses GET {apiUrl}/authorizations/{developer_name}
+with a Bearer token from the add-on config.</p>
+<p>Example usage:</p>
+<pre><code class="language-python">authorization = await Authorization.find(developer_name)
+result = await authorization.data_api.query(&quot;SELECT Id, Name FROM Account&quot;)
+
+# Or use the attachment or URL of the add-on
+authorization = await Authorization.find(developer_name, attachment_or_url=&quot;HEROKU_APPLINK_PURPLE&quot;)
+result = await authorization.data_api.query(&quot;SELECT Id, Name FROM Account&quot;)
+</code></pre>
+<p>This function will raise aiohttp-specific exceptions for HTTP errors and
+any HTTP response other than 200 OK.</p>
+<p>For a list of exceptions, see:
+* <a href="https://docs.aiohttp.org/en/stable/client_reference.html">https://docs.aiohttp.org/en/stable/client_reference.html</a></p></div>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="heroku_applink.Authorization.connection"><code class="name">var <span class="ident">connection</span> : <a title="heroku_applink.connection.Connection" href="connection.html#heroku_applink.connection.Connection">Connection</a></code></dt>
+<dd>
+<div class="desc"><p>Object responsible for making HTTP requests to the Salesforce API.</p></div>
+</dd>
+<dt id="heroku_applink.Authorization.created_at"><code class="name">var <span class="ident">created_at</span> : datetime.datetime</code></dt>
+<dd>
+<div class="desc"><p>The date and time the authorization was created.</p>
+<p>For example: <code>2025-03-06T18:20:42.226577Z</code></p></div>
+</dd>
+<dt id="heroku_applink.Authorization.created_by"><code class="name">var <span class="ident">created_by</span> : str</code></dt>
+<dd>
+<div class="desc"><p>The user who created the authorization.</p>
+<p>For example: <code>user@example.tld</code></p></div>
+</dd>
+<dt id="heroku_applink.Authorization.created_via_app"><code class="name">var <span class="ident">created_via_app</span> : str | None</code></dt>
+<dd>
+<div class="desc"><p>The app that created the authorization.</p>
+<p>For example: <code>sushi</code></p></div>
+</dd>
+<dt id="heroku_applink.Authorization.data_api"><code class="name">var <span class="ident">data_api</span> : <a title="heroku_applink.data_api.DataAPI" href="data_api/index.html#heroku_applink.data_api.DataAPI">DataAPI</a></code></dt>
+<dd>
+<div class="desc"><p>An initialized data API client instance for interacting with data in the org.</p>
+<p>Example usage:</p>
+<pre><code class="language-python">authorization = await Authorization.find(developer_name)
+result = await authorization.data_api.query(&quot;SELECT Id, Name FROM Account&quot;)
+
+for record in result.records:
+    print(f&quot;Account: {record}&quot;)
+</code></pre></div>
+</dd>
+<dt id="heroku_applink.Authorization.id"><code class="name">var <span class="ident">id</span> : str</code></dt>
+<dd>
+<div class="desc"><p>The ID of the authorization in UUID format.</p>
+<p>For example: <code>e27e9be0-6dc4-430f-974d-584f5ff8e9e6</code></p></div>
+</dd>
+<dt id="heroku_applink.Authorization.last_modified_at"><code class="name">var <span class="ident">last_modified_at</span> : datetime.datetime</code></dt>
+<dd>
+<div class="desc"><p>The date and time the authorization was last modified.</p>
+<p>For example: <code>2025-03-06T18:20:42.226577Z</code></p></div>
+</dd>
+<dt id="heroku_applink.Authorization.last_modified_by"><code class="name">var <span class="ident">last_modified_by</span> : str | None</code></dt>
+<dd>
+<div class="desc"><p>The user who last modified the authorization.</p>
+<p>For example: <code>user@example.tld</code></p></div>
+</dd>
+<dt id="heroku_applink.Authorization.org"><code class="name">var <span class="ident">org</span> : <a title="heroku_applink.authorization.Org" href="authorization.html#heroku_applink.authorization.Org">Org</a></code></dt>
+<dd>
+<div class="desc"><p>The Salesforce Org associated with the authorization.</p></div>
+</dd>
+<dt id="heroku_applink.Authorization.redirect_uri"><code class="name">var <span class="ident">redirect_uri</span> : str | None</code></dt>
+<dd>
+<div class="desc"><p>The redirect URI for the authorization.</p></div>
+</dd>
+<dt id="heroku_applink.Authorization.status"><code class="name">var <span class="ident">status</span> : str</code></dt>
+<dd>
+<div class="desc"><p>The status of the authorization.</p>
+<p>Possible values:
+* "authorized"
+* "authorizing"
+* "disconnected"
+* "error"</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="heroku_applink.ClientContext"><code class="flex name class">
+<span>class <span class="ident">ClientContext</span></span>
+<span>(</span><span>*,<br>org: <a title="heroku_applink.context.Org" href="context.html#heroku_applink.context.Org">Org</a>,<br>data_api: <a title="heroku_applink.data_api.DataAPI" href="data_api/index.html#heroku_applink.data_api.DataAPI">DataAPI</a>,<br>request_id: str,<br>access_token: str,<br>api_version: str,<br>namespace: str)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class ClientContext:
+    &#34;&#34;&#34;Information about the Salesforce org that made the request.&#34;&#34;&#34;
+
+    org: Org
+    &#34;&#34;&#34;Information about the Salesforce org and the user that made the request.&#34;&#34;&#34;
+    data_api: DataAPI
+    &#34;&#34;&#34;An initialized data API client instance for interacting with data in the org.&#34;&#34;&#34;
+    request_id: str
+    &#34;&#34;&#34;Request ID from the Salesforce org.&#34;&#34;&#34;
+    access_token: str
+    &#34;&#34;&#34;Valid access token for the current context org/user.&#34;&#34;&#34;
+    api_version: str
+    &#34;&#34;&#34;API version of the Salesforce component that made the request.&#34;&#34;&#34;
+    namespace: str
+    &#34;&#34;&#34;Namespace of the Salesforce component that made the request.&#34;&#34;&#34;
+
+    @classmethod
+    def from_header(cls, header: str, connection: Connection):
+        decoded = base64.b64decode(header)
+        data = json.loads(decoded)
+
+        return cls(
+            org=Org(
+                id=data[&#34;orgId&#34;],
+                domain_url=data[&#34;orgDomainUrl&#34;],
+                user=User(
+                    id=data[&#34;userContext&#34;][&#34;userId&#34;],
+                    username=data[&#34;userContext&#34;][&#34;username&#34;],
+                ),
+            ),
+            request_id=data[&#34;requestId&#34;],
+            access_token=data[&#34;accessToken&#34;],
+            api_version=data[&#34;apiVersion&#34;],
+            namespace=data[&#34;namespace&#34;],
+            data_api=DataAPI(
+                org_domain_url=data[&#34;orgDomainUrl&#34;],
+                api_version=data[&#34;apiVersion&#34;],
+                access_token=data[&#34;accessToken&#34;],
+                connection=connection,
+            ),
+        )</code></pre>
+</details>
+<div class="desc"><p>Information about the Salesforce org that made the request.</p></div>
+<h3>Static methods</h3>
+<dl>
+<dt id="heroku_applink.ClientContext.from_header"><code class="name flex">
+<span>def <span class="ident">from_header</span></span>(<span>header: str,<br>connection: <a title="heroku_applink.connection.Connection" href="connection.html#heroku_applink.connection.Connection">Connection</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="heroku_applink.ClientContext.access_token"><code class="name">var <span class="ident">access_token</span> : str</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class ClientContext:
+    &#34;&#34;&#34;Information about the Salesforce org that made the request.&#34;&#34;&#34;
+
+    org: Org
+    &#34;&#34;&#34;Information about the Salesforce org and the user that made the request.&#34;&#34;&#34;
+    data_api: DataAPI
+    &#34;&#34;&#34;An initialized data API client instance for interacting with data in the org.&#34;&#34;&#34;
+    request_id: str
+    &#34;&#34;&#34;Request ID from the Salesforce org.&#34;&#34;&#34;
+    access_token: str
+    &#34;&#34;&#34;Valid access token for the current context org/user.&#34;&#34;&#34;
+    api_version: str
+    &#34;&#34;&#34;API version of the Salesforce component that made the request.&#34;&#34;&#34;
+    namespace: str
+    &#34;&#34;&#34;Namespace of the Salesforce component that made the request.&#34;&#34;&#34;
+
+    @classmethod
+    def from_header(cls, header: str, connection: Connection):
+        decoded = base64.b64decode(header)
+        data = json.loads(decoded)
+
+        return cls(
+            org=Org(
+                id=data[&#34;orgId&#34;],
+                domain_url=data[&#34;orgDomainUrl&#34;],
+                user=User(
+                    id=data[&#34;userContext&#34;][&#34;userId&#34;],
+                    username=data[&#34;userContext&#34;][&#34;username&#34;],
+                ),
+            ),
+            request_id=data[&#34;requestId&#34;],
+            access_token=data[&#34;accessToken&#34;],
+            api_version=data[&#34;apiVersion&#34;],
+            namespace=data[&#34;namespace&#34;],
+            data_api=DataAPI(
+                org_domain_url=data[&#34;orgDomainUrl&#34;],
+                api_version=data[&#34;apiVersion&#34;],
+                access_token=data[&#34;accessToken&#34;],
+                connection=connection,
+            ),
+        )</code></pre>
+</details>
+<div class="desc"><p>Valid access token for the current context org/user.</p></div>
+</dd>
+<dt id="heroku_applink.ClientContext.api_version"><code class="name">var <span class="ident">api_version</span> : str</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class ClientContext:
+    &#34;&#34;&#34;Information about the Salesforce org that made the request.&#34;&#34;&#34;
+
+    org: Org
+    &#34;&#34;&#34;Information about the Salesforce org and the user that made the request.&#34;&#34;&#34;
+    data_api: DataAPI
+    &#34;&#34;&#34;An initialized data API client instance for interacting with data in the org.&#34;&#34;&#34;
+    request_id: str
+    &#34;&#34;&#34;Request ID from the Salesforce org.&#34;&#34;&#34;
+    access_token: str
+    &#34;&#34;&#34;Valid access token for the current context org/user.&#34;&#34;&#34;
+    api_version: str
+    &#34;&#34;&#34;API version of the Salesforce component that made the request.&#34;&#34;&#34;
+    namespace: str
+    &#34;&#34;&#34;Namespace of the Salesforce component that made the request.&#34;&#34;&#34;
+
+    @classmethod
+    def from_header(cls, header: str, connection: Connection):
+        decoded = base64.b64decode(header)
+        data = json.loads(decoded)
+
+        return cls(
+            org=Org(
+                id=data[&#34;orgId&#34;],
+                domain_url=data[&#34;orgDomainUrl&#34;],
+                user=User(
+                    id=data[&#34;userContext&#34;][&#34;userId&#34;],
+                    username=data[&#34;userContext&#34;][&#34;username&#34;],
+                ),
+            ),
+            request_id=data[&#34;requestId&#34;],
+            access_token=data[&#34;accessToken&#34;],
+            api_version=data[&#34;apiVersion&#34;],
+            namespace=data[&#34;namespace&#34;],
+            data_api=DataAPI(
+                org_domain_url=data[&#34;orgDomainUrl&#34;],
+                api_version=data[&#34;apiVersion&#34;],
+                access_token=data[&#34;accessToken&#34;],
+                connection=connection,
+            ),
+        )</code></pre>
+</details>
+<div class="desc"><p>API version of the Salesforce component that made the request.</p></div>
+</dd>
+<dt id="heroku_applink.ClientContext.data_api"><code class="name">var <span class="ident">data_api</span> : <a title="heroku_applink.data_api.DataAPI" href="data_api/index.html#heroku_applink.data_api.DataAPI">DataAPI</a></code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class ClientContext:
+    &#34;&#34;&#34;Information about the Salesforce org that made the request.&#34;&#34;&#34;
+
+    org: Org
+    &#34;&#34;&#34;Information about the Salesforce org and the user that made the request.&#34;&#34;&#34;
+    data_api: DataAPI
+    &#34;&#34;&#34;An initialized data API client instance for interacting with data in the org.&#34;&#34;&#34;
+    request_id: str
+    &#34;&#34;&#34;Request ID from the Salesforce org.&#34;&#34;&#34;
+    access_token: str
+    &#34;&#34;&#34;Valid access token for the current context org/user.&#34;&#34;&#34;
+    api_version: str
+    &#34;&#34;&#34;API version of the Salesforce component that made the request.&#34;&#34;&#34;
+    namespace: str
+    &#34;&#34;&#34;Namespace of the Salesforce component that made the request.&#34;&#34;&#34;
+
+    @classmethod
+    def from_header(cls, header: str, connection: Connection):
+        decoded = base64.b64decode(header)
+        data = json.loads(decoded)
+
+        return cls(
+            org=Org(
+                id=data[&#34;orgId&#34;],
+                domain_url=data[&#34;orgDomainUrl&#34;],
+                user=User(
+                    id=data[&#34;userContext&#34;][&#34;userId&#34;],
+                    username=data[&#34;userContext&#34;][&#34;username&#34;],
+                ),
+            ),
+            request_id=data[&#34;requestId&#34;],
+            access_token=data[&#34;accessToken&#34;],
+            api_version=data[&#34;apiVersion&#34;],
+            namespace=data[&#34;namespace&#34;],
+            data_api=DataAPI(
+                org_domain_url=data[&#34;orgDomainUrl&#34;],
+                api_version=data[&#34;apiVersion&#34;],
+                access_token=data[&#34;accessToken&#34;],
+                connection=connection,
+            ),
+        )</code></pre>
+</details>
+<div class="desc"><p>An initialized data API client instance for interacting with data in the org.</p></div>
+</dd>
+<dt id="heroku_applink.ClientContext.namespace"><code class="name">var <span class="ident">namespace</span> : str</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class ClientContext:
+    &#34;&#34;&#34;Information about the Salesforce org that made the request.&#34;&#34;&#34;
+
+    org: Org
+    &#34;&#34;&#34;Information about the Salesforce org and the user that made the request.&#34;&#34;&#34;
+    data_api: DataAPI
+    &#34;&#34;&#34;An initialized data API client instance for interacting with data in the org.&#34;&#34;&#34;
+    request_id: str
+    &#34;&#34;&#34;Request ID from the Salesforce org.&#34;&#34;&#34;
+    access_token: str
+    &#34;&#34;&#34;Valid access token for the current context org/user.&#34;&#34;&#34;
+    api_version: str
+    &#34;&#34;&#34;API version of the Salesforce component that made the request.&#34;&#34;&#34;
+    namespace: str
+    &#34;&#34;&#34;Namespace of the Salesforce component that made the request.&#34;&#34;&#34;
+
+    @classmethod
+    def from_header(cls, header: str, connection: Connection):
+        decoded = base64.b64decode(header)
+        data = json.loads(decoded)
+
+        return cls(
+            org=Org(
+                id=data[&#34;orgId&#34;],
+                domain_url=data[&#34;orgDomainUrl&#34;],
+                user=User(
+                    id=data[&#34;userContext&#34;][&#34;userId&#34;],
+                    username=data[&#34;userContext&#34;][&#34;username&#34;],
+                ),
+            ),
+            request_id=data[&#34;requestId&#34;],
+            access_token=data[&#34;accessToken&#34;],
+            api_version=data[&#34;apiVersion&#34;],
+            namespace=data[&#34;namespace&#34;],
+            data_api=DataAPI(
+                org_domain_url=data[&#34;orgDomainUrl&#34;],
+                api_version=data[&#34;apiVersion&#34;],
+                access_token=data[&#34;accessToken&#34;],
+                connection=connection,
+            ),
+        )</code></pre>
+</details>
+<div class="desc"><p>Namespace of the Salesforce component that made the request.</p></div>
+</dd>
+<dt id="heroku_applink.ClientContext.org"><code class="name">var <span class="ident">org</span> : <a title="heroku_applink.context.Org" href="context.html#heroku_applink.context.Org">Org</a></code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class ClientContext:
+    &#34;&#34;&#34;Information about the Salesforce org that made the request.&#34;&#34;&#34;
+
+    org: Org
+    &#34;&#34;&#34;Information about the Salesforce org and the user that made the request.&#34;&#34;&#34;
+    data_api: DataAPI
+    &#34;&#34;&#34;An initialized data API client instance for interacting with data in the org.&#34;&#34;&#34;
+    request_id: str
+    &#34;&#34;&#34;Request ID from the Salesforce org.&#34;&#34;&#34;
+    access_token: str
+    &#34;&#34;&#34;Valid access token for the current context org/user.&#34;&#34;&#34;
+    api_version: str
+    &#34;&#34;&#34;API version of the Salesforce component that made the request.&#34;&#34;&#34;
+    namespace: str
+    &#34;&#34;&#34;Namespace of the Salesforce component that made the request.&#34;&#34;&#34;
+
+    @classmethod
+    def from_header(cls, header: str, connection: Connection):
+        decoded = base64.b64decode(header)
+        data = json.loads(decoded)
+
+        return cls(
+            org=Org(
+                id=data[&#34;orgId&#34;],
+                domain_url=data[&#34;orgDomainUrl&#34;],
+                user=User(
+                    id=data[&#34;userContext&#34;][&#34;userId&#34;],
+                    username=data[&#34;userContext&#34;][&#34;username&#34;],
+                ),
+            ),
+            request_id=data[&#34;requestId&#34;],
+            access_token=data[&#34;accessToken&#34;],
+            api_version=data[&#34;apiVersion&#34;],
+            namespace=data[&#34;namespace&#34;],
+            data_api=DataAPI(
+                org_domain_url=data[&#34;orgDomainUrl&#34;],
+                api_version=data[&#34;apiVersion&#34;],
+                access_token=data[&#34;accessToken&#34;],
+                connection=connection,
+            ),
+        )</code></pre>
+</details>
+<div class="desc"><p>Information about the Salesforce org and the user that made the request.</p></div>
+</dd>
+<dt id="heroku_applink.ClientContext.request_id"><code class="name">var <span class="ident">request_id</span> : str</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class ClientContext:
+    &#34;&#34;&#34;Information about the Salesforce org that made the request.&#34;&#34;&#34;
+
+    org: Org
+    &#34;&#34;&#34;Information about the Salesforce org and the user that made the request.&#34;&#34;&#34;
+    data_api: DataAPI
+    &#34;&#34;&#34;An initialized data API client instance for interacting with data in the org.&#34;&#34;&#34;
+    request_id: str
+    &#34;&#34;&#34;Request ID from the Salesforce org.&#34;&#34;&#34;
+    access_token: str
+    &#34;&#34;&#34;Valid access token for the current context org/user.&#34;&#34;&#34;
+    api_version: str
+    &#34;&#34;&#34;API version of the Salesforce component that made the request.&#34;&#34;&#34;
+    namespace: str
+    &#34;&#34;&#34;Namespace of the Salesforce component that made the request.&#34;&#34;&#34;
+
+    @classmethod
+    def from_header(cls, header: str, connection: Connection):
+        decoded = base64.b64decode(header)
+        data = json.loads(decoded)
+
+        return cls(
+            org=Org(
+                id=data[&#34;orgId&#34;],
+                domain_url=data[&#34;orgDomainUrl&#34;],
+                user=User(
+                    id=data[&#34;userContext&#34;][&#34;userId&#34;],
+                    username=data[&#34;userContext&#34;][&#34;username&#34;],
+                ),
+            ),
+            request_id=data[&#34;requestId&#34;],
+            access_token=data[&#34;accessToken&#34;],
+            api_version=data[&#34;apiVersion&#34;],
+            namespace=data[&#34;namespace&#34;],
+            data_api=DataAPI(
+                org_domain_url=data[&#34;orgDomainUrl&#34;],
+                api_version=data[&#34;apiVersion&#34;],
+                access_token=data[&#34;accessToken&#34;],
+                connection=connection,
+            ),
+        )</code></pre>
+</details>
+<div class="desc"><p>Request ID from the Salesforce org.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="heroku_applink.ClientError"><code class="flex name class">
+<span>class <span class="ident">ClientError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ClientError(Exception):
+    &#34;&#34;&#34;Raised when there is an error with the HTTP client.&#34;&#34;&#34;
+    pass</code></pre>
+</details>
+<div class="desc"><p>Raised when there is an error with the HTTP client.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="heroku_applink.Config"><code class="flex name class">
+<span>class <span class="ident">Config</span></span>
+<span>(</span><span>request_timeout: float = 5,<br>connect_timeout: float | None = None,<br>socket_connect: float | None = None,<br>socket_read: float | None = None,<br>user_agent: str = 'heroku-applink-python-sdk/0.1.0')</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class Config:
+    &#34;&#34;&#34;
+    Configuration for the Salesforce Data API client.
+    &#34;&#34;&#34;
+
+    request_timeout: float = 5
+    &#34;&#34;&#34;
+    Timeout for requests to the Salesforce Data API. In most cases, you&#39;ll only
+    need to set this value. Connection Timeout, Socket Connect, and Socket Read
+    are optional and only used in special cases.
+    &#34;&#34;&#34;
+
+    connect_timeout: float|None = None
+    &#34;&#34;&#34;
+    Timeout for connecting to the Salesforce Data API.
+    &#34;&#34;&#34;
+
+    socket_connect: float|None = None
+    &#34;&#34;&#34;
+    Timeout for connecting to the Salesforce Data API.
+    &#34;&#34;&#34;
+
+    socket_read: float|None = None
+    &#34;&#34;&#34;
+    Timeout for reading from the Salesforce Data API.
+    &#34;&#34;&#34;
+
+    user_agent: str = f&#34;heroku-applink-python-sdk/{__version__}&#34;
+    &#34;&#34;&#34;
+    User agent for the Salesforce Data API.
+    &#34;&#34;&#34;
+
+    @classmethod
+    def default(cls) -&gt; &#34;Config&#34;:
+        return cls(
+            request_timeout=5,
+            connect_timeout=None,
+            socket_connect=None,
+            socket_read=None,
+        )</code></pre>
+</details>
+<div class="desc"><p>Configuration for the Salesforce Data API client.</p></div>
+<h3>Static methods</h3>
+<dl>
+<dt id="heroku_applink.Config.default"><code class="name flex">
+<span>def <span class="ident">default</span></span>(<span>) ‑> <a title="heroku_applink.config.Config" href="config.html#heroku_applink.config.Config">Config</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="heroku_applink.Config.connect_timeout"><code class="name">var <span class="ident">connect_timeout</span> : float | None</code></dt>
+<dd>
+<div class="desc"><p>Timeout for connecting to the Salesforce Data API.</p></div>
+</dd>
+<dt id="heroku_applink.Config.request_timeout"><code class="name">var <span class="ident">request_timeout</span> : float</code></dt>
+<dd>
+<div class="desc"><p>Timeout for requests to the Salesforce Data API. In most cases, you'll only
+need to set this value. Connection Timeout, Socket Connect, and Socket Read
+are optional and only used in special cases.</p></div>
+</dd>
+<dt id="heroku_applink.Config.socket_connect"><code class="name">var <span class="ident">socket_connect</span> : float | None</code></dt>
+<dd>
+<div class="desc"><p>Timeout for connecting to the Salesforce Data API.</p></div>
+</dd>
+<dt id="heroku_applink.Config.socket_read"><code class="name">var <span class="ident">socket_read</span> : float | None</code></dt>
+<dd>
+<div class="desc"><p>Timeout for reading from the Salesforce Data API.</p></div>
+</dd>
+<dt id="heroku_applink.Config.user_agent"><code class="name">var <span class="ident">user_agent</span> : str</code></dt>
+<dd>
+<div class="desc"><p>User agent for the Salesforce Data API.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="heroku_applink.Connection"><code class="flex name class">
+<span>class <span class="ident">Connection</span></span>
+<span>(</span><span>config: <a title="heroku_applink.config.Config" href="config.html#heroku_applink.config.Config">Config</a>)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Connection:
+    &#34;&#34;&#34;
+    A connection for making asynchronous HTTP requests.
+    &#34;&#34;&#34;
+
+    def __init__(self, config: Config):
+        self._config = config
+        self._session = None
+
+    def request(
+        self,
+        method,
+        url,
+        params=None,
+        headers=None,
+        data=None,
+        timeout: float|None=None
+    ) -&gt; aiohttp.ClientResponse:
+        &#34;&#34;&#34;
+        Make an HTTP request to the given URL.
+
+        If a timeout is provided, it will be used to set the timeout for the request.
+        &#34;&#34;&#34;
+        if timeout is not None:
+            timeout = aiohttp.ClientTimeout(total=timeout)
+
+        default_headers = {
+            &#34;User-Agent&#34;: self._config.user_agent,
+        }
+
+        response = self._client().request(
+            method,
+            url,
+            params=params,
+            headers=default_headers | (headers or {}),
+            data=data,
+            timeout=timeout
+        )
+
+        return response
+
+    async def close(self):
+        &#34;&#34;&#34;
+        Close the connection.
+        &#34;&#34;&#34;
+        if self._session:
+            await self._session.close()
+            self._session = None
+
+    def __del__(self):
+        &#34;&#34;&#34;
+        Close the connection when the object is deleted.
+        &#34;&#34;&#34;
+        try:
+            loop = asyncio.get_running_loop()
+            loop.create_task(self.close())
+        except RuntimeError:
+            asyncio.run(self.close())
+
+    def _client(self) -&gt; aiohttp.ClientSession:
+        &#34;&#34;&#34;
+        Lazily get the underlying `aiohttp.ClientSession`. This session is
+        persisted so we can take advantage of connection pooling.
+        &#34;&#34;&#34;
+        if self._session is None:
+            self._session = aiohttp.ClientSession(
+                # Disable cookie storage using `DummyCookieJar`, given that we
+                # don&#39;t need cookie support.
+                cookie_jar=aiohttp.DummyCookieJar(),
+                raise_for_status=True,
+                timeout=aiohttp.ClientTimeout(
+                    total=self._config.request_timeout,
+                    connect=self._config.connect_timeout,
+                    sock_connect=self._config.socket_connect,
+                    sock_read=self._config.socket_read,
+                ),
+            )
+        return self._session</code></pre>
+</details>
+<div class="desc"><p>A connection for making asynchronous HTTP requests.</p></div>
+<h3>Methods</h3>
+<dl>
+<dt id="heroku_applink.Connection.close"><code class="name flex">
+<span>async def <span class="ident">close</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def close(self):
+    &#34;&#34;&#34;
+    Close the connection.
+    &#34;&#34;&#34;
+    if self._session:
+        await self._session.close()
+        self._session = None</code></pre>
+</details>
+<div class="desc"><p>Close the connection.</p></div>
+</dd>
+<dt id="heroku_applink.Connection.request"><code class="name flex">
+<span>def <span class="ident">request</span></span>(<span>self, method, url, params=None, headers=None, data=None, timeout: float | None = None) ‑> aiohttp.client_reqrep.ClientResponse</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def request(
+    self,
+    method,
+    url,
+    params=None,
+    headers=None,
+    data=None,
+    timeout: float|None=None
+) -&gt; aiohttp.ClientResponse:
+    &#34;&#34;&#34;
+    Make an HTTP request to the given URL.
+
+    If a timeout is provided, it will be used to set the timeout for the request.
+    &#34;&#34;&#34;
+    if timeout is not None:
+        timeout = aiohttp.ClientTimeout(total=timeout)
+
+    default_headers = {
+        &#34;User-Agent&#34;: self._config.user_agent,
+    }
+
+    response = self._client().request(
+        method,
+        url,
+        params=params,
+        headers=default_headers | (headers or {}),
+        data=data,
+        timeout=timeout
+    )
+
+    return response</code></pre>
+</details>
+<div class="desc"><p>Make an HTTP request to the given URL.</p>
+<p>If a timeout is provided, it will be used to set the timeout for the request.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="heroku_applink.IntegrationAsgiMiddleware"><code class="flex name class">
+<span>class <span class="ident">IntegrationAsgiMiddleware</span></span>
+<span>(</span><span>app,<br>config=Config(request_timeout=5, connect_timeout=None, socket_connect=None, socket_read=None, user_agent='heroku-applink-python-sdk/0.1.0'))</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class IntegrationAsgiMiddleware:
+    def __init__(self, app, config=Config.default()):
+        self.app = app
+        self.config = config
+        self.connection = Connection(self.config)
+
+    async def __call__(self, scope, receive, send):
+        if scope[&#34;type&#34;] != &#34;http&#34;:
+            await self.app(scope, receive, send)
+            return
+
+        headers = dict(scope[&#34;headers&#34;])
+        header = headers.get(b&#34;x-client-context&#34;)
+        if not header:
+            raise ValueError(&#34;x-client-context not set&#34;)
+
+        client_context.set(ClientContext.from_header(header, self.connection))
+
+        await self.app(scope, receive, send)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="heroku_applink.IntegrationWsgiMiddleware"><code class="flex name class">
+<span>class <span class="ident">IntegrationWsgiMiddleware</span></span>
+<span>(</span><span>app,<br>config=Config(request_timeout=5, connect_timeout=None, socket_connect=None, socket_read=None, user_agent='heroku-applink-python-sdk/0.1.0'))</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class IntegrationWsgiMiddleware:
+    def __init__(self, app, config=Config.default()):
+        self.app = app
+        self.config = config
+        self.connection = Connection(self.config)
+
+    def __call__(self, environ, start_response):
+        header = environ.get(&#34;HTTP_X_CLIENT_CONTEXT&#34;)
+
+        if not header:
+            raise ValueError(&#34;x-client-context not set&#34;)
+
+        client_context.set(ClientContext.from_header(header, self.connection))
+
+        return self.app(environ, start_response)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="heroku_applink.QueriedRecord"><code class="flex name class">
+<span>class <span class="ident">QueriedRecord</span></span>
+<span>(</span><span>*,<br>type: str,<br>fields: dict[str, typing.Any],<br>sub_query_results: dict[str, '<a title="heroku_applink.RecordQueryResult" href="#heroku_applink.RecordQueryResult">RecordQueryResult</a>'] = &lt;factory&gt;)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class QueriedRecord(Record):
+    &#34;&#34;&#34;
+    A Salesforce record that&#39;s the result of a SOQL query.
+
+    Extends `Record` with potential sub query results that can only exist when
+    a record was queried from the data API.
+    &#34;&#34;&#34;
+
+    sub_query_results: dict[str, &#34;RecordQueryResult&#34;] = field(default_factory=dict)
+    &#34;&#34;&#34;Additional query results from sub queries.&#34;&#34;&#34;</code></pre>
+</details>
+<div class="desc"><p>A Salesforce record that's the result of a SOQL query.</p>
+<p>Extends <code><a title="heroku_applink.Record" href="#heroku_applink.Record">Record</a></code> with potential sub query results that can only exist when
+a record was queried from the data API.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="heroku_applink.data_api.record.Record" href="data_api/record.html#heroku_applink.data_api.record.Record">Record</a></li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="heroku_applink.QueriedRecord.sub_query_results"><code class="name">var <span class="ident">sub_query_results</span> : dict[str, <a title="heroku_applink.data_api.record.RecordQueryResult" href="data_api/record.html#heroku_applink.data_api.record.RecordQueryResult">RecordQueryResult</a>]</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class QueriedRecord(Record):
+    &#34;&#34;&#34;
+    A Salesforce record that&#39;s the result of a SOQL query.
+
+    Extends `Record` with potential sub query results that can only exist when
+    a record was queried from the data API.
+    &#34;&#34;&#34;
+
+    sub_query_results: dict[str, &#34;RecordQueryResult&#34;] = field(default_factory=dict)
+    &#34;&#34;&#34;Additional query results from sub queries.&#34;&#34;&#34;</code></pre>
+</details>
+<div class="desc"><p>Additional query results from sub queries.</p></div>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="heroku_applink.data_api.record.Record" href="data_api/record.html#heroku_applink.data_api.record.Record">Record</a></b></code>:
+<ul class="hlist">
+<li><code><a title="heroku_applink.data_api.record.Record.fields" href="data_api/record.html#heroku_applink.data_api.record.Record.fields">fields</a></code></li>
+<li><code><a title="heroku_applink.data_api.record.Record.get" href="data_api/record.html#heroku_applink.data_api.record.Record.get">get</a></code></li>
+<li><code><a title="heroku_applink.data_api.record.Record.type" href="data_api/record.html#heroku_applink.data_api.record.Record.type">type</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="heroku_applink.Record"><code class="flex name class">
+<span>class <span class="ident">Record</span></span>
+<span>(</span><span>*, type: str, fields: dict[str, typing.Any])</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class Record:
+    &#34;&#34;&#34;
+    A Salesforce record.
+
+    A record describes a particular occurrence of a Salesforce object, such as a
+    specific account &#34;Acme Company&#34; from the Account standard object. A record is
+    analogous to a row in a database table.
+    &#34;&#34;&#34;
+
+    type: str
+    &#34;&#34;&#34;
+    The Salesforce Object type.
+
+    For example: `Account`
+    &#34;&#34;&#34;
+    fields: dict[str, Any]
+    &#34;&#34;&#34;The fields belonging to the record.&#34;&#34;&#34;
+
+    def get(self, field_name: str) -&gt; Any:
+        &#34;&#34;&#34;
+        Get the value of a field from the record.
+        &#34;&#34;&#34;
+        return self.fields[field_name]</code></pre>
+</details>
+<div class="desc"><p>A Salesforce record.</p>
+<p>A record describes a particular occurrence of a Salesforce object, such as a
+specific account "Acme Company" from the Account standard object. A record is
+analogous to a row in a database table.</p></div>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="heroku_applink.data_api.record.QueriedRecord" href="data_api/record.html#heroku_applink.data_api.record.QueriedRecord">QueriedRecord</a></li>
+<li><a title="heroku_applink.data_api.record.QueriedRecord" href="data_api/record.html#heroku_applink.data_api.record.QueriedRecord">QueriedRecord</a></li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="heroku_applink.Record.fields"><code class="name">var <span class="ident">fields</span> : dict[str, typing.Any]</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class Record:
+    &#34;&#34;&#34;
+    A Salesforce record.
+
+    A record describes a particular occurrence of a Salesforce object, such as a
+    specific account &#34;Acme Company&#34; from the Account standard object. A record is
+    analogous to a row in a database table.
+    &#34;&#34;&#34;
+
+    type: str
+    &#34;&#34;&#34;
+    The Salesforce Object type.
+
+    For example: `Account`
+    &#34;&#34;&#34;
+    fields: dict[str, Any]
+    &#34;&#34;&#34;The fields belonging to the record.&#34;&#34;&#34;
+
+    def get(self, field_name: str) -&gt; Any:
+        &#34;&#34;&#34;
+        Get the value of a field from the record.
+        &#34;&#34;&#34;
+        return self.fields[field_name]</code></pre>
+</details>
+<div class="desc"><p>The fields belonging to the record.</p></div>
+</dd>
+<dt id="heroku_applink.Record.type"><code class="name">var <span class="ident">type</span> : str</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class Record:
+    &#34;&#34;&#34;
+    A Salesforce record.
+
+    A record describes a particular occurrence of a Salesforce object, such as a
+    specific account &#34;Acme Company&#34; from the Account standard object. A record is
+    analogous to a row in a database table.
+    &#34;&#34;&#34;
+
+    type: str
+    &#34;&#34;&#34;
+    The Salesforce Object type.
+
+    For example: `Account`
+    &#34;&#34;&#34;
+    fields: dict[str, Any]
+    &#34;&#34;&#34;The fields belonging to the record.&#34;&#34;&#34;
+
+    def get(self, field_name: str) -&gt; Any:
+        &#34;&#34;&#34;
+        Get the value of a field from the record.
+        &#34;&#34;&#34;
+        return self.fields[field_name]</code></pre>
+</details>
+<div class="desc"><p>The Salesforce Object type.</p>
+<p>For example: <code>Account</code></p></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="heroku_applink.Record.get"><code class="name flex">
+<span>def <span class="ident">get</span></span>(<span>self, field_name: str) ‑> Any</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get(self, field_name: str) -&gt; Any:
+    &#34;&#34;&#34;
+    Get the value of a field from the record.
+    &#34;&#34;&#34;
+    return self.fields[field_name]</code></pre>
+</details>
+<div class="desc"><p>Get the value of a field from the record.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="heroku_applink.RecordQueryResult"><code class="flex name class">
+<span>class <span class="ident">RecordQueryResult</span></span>
+<span>(</span><span>*,<br>done: bool,<br>total_size: int,<br>records: list[<a title="heroku_applink.data_api.record.QueriedRecord" href="data_api/record.html#heroku_applink.data_api.record.QueriedRecord">QueriedRecord</a>],<br>next_records_url: str | None)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class RecordQueryResult:
+    &#34;&#34;&#34;The result of a record query.&#34;&#34;&#34;
+
+    done: bool
+    &#34;&#34;&#34;
+    Indicates whether all record results have been returned.
+
+    If true, no additional records can be retrieved from the query result.
+    If false, one or more records remain to be retrieved.
+    &#34;&#34;&#34;
+    total_size: int
+    &#34;&#34;&#34;
+    The total number of records returned by the query.
+
+    This number isn&#39;t necessarily the same as the number of records found in `records`.
+    &#34;&#34;&#34;
+    records: list[QueriedRecord]
+    &#34;&#34;&#34;
+    The list of `Record`s in this query result.
+
+    Use `done` to determine whether there are additional records to be
+    queried with `queryMore`.
+    &#34;&#34;&#34;
+    next_records_url: str | None
+    &#34;&#34;&#34;The URL for the next set of records, if any.&#34;&#34;&#34;</code></pre>
+</details>
+<div class="desc"><p>The result of a record query.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="heroku_applink.RecordQueryResult.done"><code class="name">var <span class="ident">done</span> : bool</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class RecordQueryResult:
+    &#34;&#34;&#34;The result of a record query.&#34;&#34;&#34;
+
+    done: bool
+    &#34;&#34;&#34;
+    Indicates whether all record results have been returned.
+
+    If true, no additional records can be retrieved from the query result.
+    If false, one or more records remain to be retrieved.
+    &#34;&#34;&#34;
+    total_size: int
+    &#34;&#34;&#34;
+    The total number of records returned by the query.
+
+    This number isn&#39;t necessarily the same as the number of records found in `records`.
+    &#34;&#34;&#34;
+    records: list[QueriedRecord]
+    &#34;&#34;&#34;
+    The list of `Record`s in this query result.
+
+    Use `done` to determine whether there are additional records to be
+    queried with `queryMore`.
+    &#34;&#34;&#34;
+    next_records_url: str | None
+    &#34;&#34;&#34;The URL for the next set of records, if any.&#34;&#34;&#34;</code></pre>
+</details>
+<div class="desc"><p>Indicates whether all record results have been returned.</p>
+<p>If true, no additional records can be retrieved from the query result.
+If false, one or more records remain to be retrieved.</p></div>
+</dd>
+<dt id="heroku_applink.RecordQueryResult.next_records_url"><code class="name">var <span class="ident">next_records_url</span> : str | None</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class RecordQueryResult:
+    &#34;&#34;&#34;The result of a record query.&#34;&#34;&#34;
+
+    done: bool
+    &#34;&#34;&#34;
+    Indicates whether all record results have been returned.
+
+    If true, no additional records can be retrieved from the query result.
+    If false, one or more records remain to be retrieved.
+    &#34;&#34;&#34;
+    total_size: int
+    &#34;&#34;&#34;
+    The total number of records returned by the query.
+
+    This number isn&#39;t necessarily the same as the number of records found in `records`.
+    &#34;&#34;&#34;
+    records: list[QueriedRecord]
+    &#34;&#34;&#34;
+    The list of `Record`s in this query result.
+
+    Use `done` to determine whether there are additional records to be
+    queried with `queryMore`.
+    &#34;&#34;&#34;
+    next_records_url: str | None
+    &#34;&#34;&#34;The URL for the next set of records, if any.&#34;&#34;&#34;</code></pre>
+</details>
+<div class="desc"><p>The URL for the next set of records, if any.</p></div>
+</dd>
+<dt id="heroku_applink.RecordQueryResult.records"><code class="name">var <span class="ident">records</span> : list[<a title="heroku_applink.data_api.record.QueriedRecord" href="data_api/record.html#heroku_applink.data_api.record.QueriedRecord">QueriedRecord</a>]</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class RecordQueryResult:
+    &#34;&#34;&#34;The result of a record query.&#34;&#34;&#34;
+
+    done: bool
+    &#34;&#34;&#34;
+    Indicates whether all record results have been returned.
+
+    If true, no additional records can be retrieved from the query result.
+    If false, one or more records remain to be retrieved.
+    &#34;&#34;&#34;
+    total_size: int
+    &#34;&#34;&#34;
+    The total number of records returned by the query.
+
+    This number isn&#39;t necessarily the same as the number of records found in `records`.
+    &#34;&#34;&#34;
+    records: list[QueriedRecord]
+    &#34;&#34;&#34;
+    The list of `Record`s in this query result.
+
+    Use `done` to determine whether there are additional records to be
+    queried with `queryMore`.
+    &#34;&#34;&#34;
+    next_records_url: str | None
+    &#34;&#34;&#34;The URL for the next set of records, if any.&#34;&#34;&#34;</code></pre>
+</details>
+<div class="desc"><p>The list of <code><a title="heroku_applink.Record" href="#heroku_applink.Record">Record</a></code>s in this query result.</p>
+<p>Use <code>done</code> to determine whether there are additional records to be
+queried with <code>queryMore</code>.</p></div>
+</dd>
+<dt id="heroku_applink.RecordQueryResult.total_size"><code class="name">var <span class="ident">total_size</span> : int</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class RecordQueryResult:
+    &#34;&#34;&#34;The result of a record query.&#34;&#34;&#34;
+
+    done: bool
+    &#34;&#34;&#34;
+    Indicates whether all record results have been returned.
+
+    If true, no additional records can be retrieved from the query result.
+    If false, one or more records remain to be retrieved.
+    &#34;&#34;&#34;
+    total_size: int
+    &#34;&#34;&#34;
+    The total number of records returned by the query.
+
+    This number isn&#39;t necessarily the same as the number of records found in `records`.
+    &#34;&#34;&#34;
+    records: list[QueriedRecord]
+    &#34;&#34;&#34;
+    The list of `Record`s in this query result.
+
+    Use `done` to determine whether there are additional records to be
+    queried with `queryMore`.
+    &#34;&#34;&#34;
+    next_records_url: str | None
+    &#34;&#34;&#34;The URL for the next set of records, if any.&#34;&#34;&#34;</code></pre>
+</details>
+<div class="desc"><p>The total number of records returned by the query.</p>
+<p>This number isn't necessarily the same as the number of records found in <code>records</code>.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="heroku_applink.ReferenceId"><code class="flex name class">
+<span>class <span class="ident">ReferenceId</span></span>
+<span>(</span><span>*, id: str)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class ReferenceId:
+    &#34;&#34;&#34;
+    A reference ID for an operation inside a `UnitOfWork`.
+
+    Used to reference results of other operations inside the same unit of work.
+    &#34;&#34;&#34;
+
+    id: str
+    &#34;&#34;&#34;The internal identifier of this `ReferenceId`.&#34;&#34;&#34;</code></pre>
+</details>
+<div class="desc"><p>A reference ID for an operation inside a <code><a title="heroku_applink.UnitOfWork" href="#heroku_applink.UnitOfWork">UnitOfWork</a></code>.</p>
+<p>Used to reference results of other operations inside the same unit of work.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="heroku_applink.ReferenceId.id"><code class="name">var <span class="ident">id</span> : str</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass(frozen=True, kw_only=True, slots=True)
+class ReferenceId:
+    &#34;&#34;&#34;
+    A reference ID for an operation inside a `UnitOfWork`.
+
+    Used to reference results of other operations inside the same unit of work.
+    &#34;&#34;&#34;
+
+    id: str
+    &#34;&#34;&#34;The internal identifier of this `ReferenceId`.&#34;&#34;&#34;</code></pre>
+</details>
+<div class="desc"><p>The internal identifier of this <code><a title="heroku_applink.ReferenceId" href="#heroku_applink.ReferenceId">ReferenceId</a></code>.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="heroku_applink.UnexpectedRestApiResponsePayload"><code class="flex name class">
+<span>class <span class="ident">UnexpectedRestApiResponsePayload</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class UnexpectedRestApiResponsePayload(Exception):
+    &#34;&#34;&#34;Raised when the API response is not in the expected format.&#34;&#34;&#34;
+    pass</code></pre>
+</details>
+<div class="desc"><p>Raised when the API response is not in the expected format.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="heroku_applink.UnitOfWork"><code class="flex name class">
+<span>class <span class="ident">UnitOfWork</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class UnitOfWork:
+    &#34;&#34;&#34;
+    Represents a `UnitOfWork`.
+
+    A `UnitOfWork` encapsulates a set of one or more Salesforce operations that must be
+    performed as a single atomic operation. Single atomic operations reduce the number of
+    requests back to the org, and are more efficient when working with larger data volumes.
+
+    First, register the create, update, or delete operations that make up the `UnitOfWork`
+    using their corresponding methods, such as `register_create`. Then submit the `UnitOfWork`
+    with the `commit_unit_of_work` method of `DataAPI`.
+
+    For example:
+
+    ```python
+    # Create a unit of work, against which multiple operations can be registered.
+    unit_of_work = UnitOfWork()
+
+    # Register a new Account for creation
+    account_reference_id = unit_of_work.register_create(
+        Record(
+            type=&#34;Account&#34;,
+            fields={
+                &#34;Name&#34;: &#34;Example Account&#34;,
+            },
+        )
+    )
+
+    # Register a new Contact for creation, that references the account above.
+    unit_of_work.register_create(
+        Record(
+            type=&#34;Contact&#34;,
+            fields={
+                &#34;FirstName&#34;: &#34;Joe&#34;,
+                &#34;LastName&#34;: &#34;Smith&#34;,
+                &#34;AccountId&#34;: account_reference_id,
+            },
+        )
+    )
+
+    # Commit the unit of work, executing all of the operations registered above.
+    result = await context.org.data_api.commit_unit_of_work(unit_of_work)
+    ```
+    &#34;&#34;&#34;
+
+    def __init__(self) -&gt; None:
+        self._sub_requests: dict[ReferenceId, RestApiRequest[str]] = {}
+        self._next_reference_id = 0
+
+    def register_create(self, record: Record) -&gt; ReferenceId:
+        &#34;&#34;&#34;
+        Register a record creation for the `UnitOfWork`.
+
+        Returns a `ReferenceId` that you can use to refer to the created record in subsequent operations in this
+        `UnitOfWork`.
+
+        For example:
+
+        ```python
+        unit_of_work = UnitOfWork()
+
+        reference_id = unit_of_work.register_create(
+            Record(
+                type=&#34;Account&#34;,
+                fields={
+                    &#34;Name&#34;: &#34;Example Account&#34;,
+                },
+            )
+        )
+        ```
+        &#34;&#34;&#34;
+        return self._register(CreateRecordRestApiRequest(record))
+
+    def register_update(self, record: Record) -&gt; ReferenceId:
+        &#34;&#34;&#34;
+        Register a record update for the `UnitOfWork`.
+
+        The given `Record` must contain an `Id` field.
+
+        Returns a `ReferenceId` that you can use to refer to the updated record in subsequent operations in this
+        `UnitOfWork`.
+
+        For example:
+
+        ```python
+        unit_of_work = UnitOfWork()
+
+        reference_id = unit_of_work.register_update(
+            Record(
+                type=&#34;Account&#34;,
+                fields={
+                    &#34;Id&#34;: &#34;001B000001Lp1FxIAJ&#34;,
+                    &#34;Name&#34;: &#34;New Name&#34;,
+                },
+            )
+        )
+        ```
+        &#34;&#34;&#34;
+        return self._register(UpdateRecordRestApiRequest(record))
+
+    def register_delete(self, object_type: str, record_id: str) -&gt; ReferenceId:
+        &#34;&#34;&#34;
+        Register a deletion of an existing record of the given type and ID.
+
+        Returns a `ReferenceId` that you can use to refer to the deleted record in subsequent operations in this
+        `UnitOfWork`.
+
+        For example:
+
+        ```python
+        unit_of_work = UnitOfWork()
+
+        reference_id = unit_of_work.register_delete(&#34;Account&#34;, &#34;001B000001Lp1FxIAJ&#34;)
+        ```
+        &#34;&#34;&#34;
+        return self._register(DeleteRecordRestApiRequest(object_type, record_id))
+
+    def _register(self, request: RestApiRequest[str]) -&gt; ReferenceId:
+        reference_id = ReferenceId(id=&#34;referenceId&#34; + str(self._next_reference_id))
+        self._next_reference_id += 1
+
+        self._sub_requests[reference_id] = request
+        return reference_id</code></pre>
+</details>
+<div class="desc"><p>Represents a <code><a title="heroku_applink.UnitOfWork" href="#heroku_applink.UnitOfWork">UnitOfWork</a></code>.</p>
+<p>A <code><a title="heroku_applink.UnitOfWork" href="#heroku_applink.UnitOfWork">UnitOfWork</a></code> encapsulates a set of one or more Salesforce operations that must be
+performed as a single atomic operation. Single atomic operations reduce the number of
+requests back to the org, and are more efficient when working with larger data volumes.</p>
+<p>First, register the create, update, or delete operations that make up the <code><a title="heroku_applink.UnitOfWork" href="#heroku_applink.UnitOfWork">UnitOfWork</a></code>
+using their corresponding methods, such as <code>register_create</code>. Then submit the <code><a title="heroku_applink.UnitOfWork" href="#heroku_applink.UnitOfWork">UnitOfWork</a></code>
+with the <code>commit_unit_of_work</code> method of <code>DataAPI</code>.</p>
+<p>For example:</p>
+<pre><code class="language-python"># Create a unit of work, against which multiple operations can be registered.
+unit_of_work = UnitOfWork()
+
+# Register a new Account for creation
+account_reference_id = unit_of_work.register_create(
+    Record(
+        type=&quot;Account&quot;,
+        fields={
+            &quot;Name&quot;: &quot;Example Account&quot;,
+        },
+    )
+)
+
+# Register a new Contact for creation, that references the account above.
+unit_of_work.register_create(
+    Record(
+        type=&quot;Contact&quot;,
+        fields={
+            &quot;FirstName&quot;: &quot;Joe&quot;,
+            &quot;LastName&quot;: &quot;Smith&quot;,
+            &quot;AccountId&quot;: account_reference_id,
+        },
+    )
+)
+
+# Commit the unit of work, executing all of the operations registered above.
+result = await context.org.data_api.commit_unit_of_work(unit_of_work)
+</code></pre></div>
+<h3>Methods</h3>
+<dl>
+<dt id="heroku_applink.UnitOfWork.register_create"><code class="name flex">
+<span>def <span class="ident">register_create</span></span>(<span>self,<br>record: <a title="heroku_applink.data_api.record.Record" href="data_api/record.html#heroku_applink.data_api.record.Record">Record</a>) ‑> <a title="heroku_applink.data_api.reference_id.ReferenceId" href="data_api/reference_id.html#heroku_applink.data_api.reference_id.ReferenceId">ReferenceId</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def register_create(self, record: Record) -&gt; ReferenceId:
+    &#34;&#34;&#34;
+    Register a record creation for the `UnitOfWork`.
+
+    Returns a `ReferenceId` that you can use to refer to the created record in subsequent operations in this
+    `UnitOfWork`.
+
+    For example:
+
+    ```python
+    unit_of_work = UnitOfWork()
+
+    reference_id = unit_of_work.register_create(
+        Record(
+            type=&#34;Account&#34;,
+            fields={
+                &#34;Name&#34;: &#34;Example Account&#34;,
+            },
+        )
+    )
+    ```
+    &#34;&#34;&#34;
+    return self._register(CreateRecordRestApiRequest(record))</code></pre>
+</details>
+<div class="desc"><p>Register a record creation for the <code><a title="heroku_applink.UnitOfWork" href="#heroku_applink.UnitOfWork">UnitOfWork</a></code>.</p>
+<p>Returns a <code><a title="heroku_applink.ReferenceId" href="#heroku_applink.ReferenceId">ReferenceId</a></code> that you can use to refer to the created record in subsequent operations in this
+<code><a title="heroku_applink.UnitOfWork" href="#heroku_applink.UnitOfWork">UnitOfWork</a></code>.</p>
+<p>For example:</p>
+<pre><code class="language-python">unit_of_work = UnitOfWork()
+
+reference_id = unit_of_work.register_create(
+    Record(
+        type=&quot;Account&quot;,
+        fields={
+            &quot;Name&quot;: &quot;Example Account&quot;,
+        },
+    )
+)
+</code></pre></div>
+</dd>
+<dt id="heroku_applink.UnitOfWork.register_delete"><code class="name flex">
+<span>def <span class="ident">register_delete</span></span>(<span>self, object_type: str, record_id: str) ‑> <a title="heroku_applink.data_api.reference_id.ReferenceId" href="data_api/reference_id.html#heroku_applink.data_api.reference_id.ReferenceId">ReferenceId</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def register_delete(self, object_type: str, record_id: str) -&gt; ReferenceId:
+    &#34;&#34;&#34;
+    Register a deletion of an existing record of the given type and ID.
+
+    Returns a `ReferenceId` that you can use to refer to the deleted record in subsequent operations in this
+    `UnitOfWork`.
+
+    For example:
+
+    ```python
+    unit_of_work = UnitOfWork()
+
+    reference_id = unit_of_work.register_delete(&#34;Account&#34;, &#34;001B000001Lp1FxIAJ&#34;)
+    ```
+    &#34;&#34;&#34;
+    return self._register(DeleteRecordRestApiRequest(object_type, record_id))</code></pre>
+</details>
+<div class="desc"><p>Register a deletion of an existing record of the given type and ID.</p>
+<p>Returns a <code><a title="heroku_applink.ReferenceId" href="#heroku_applink.ReferenceId">ReferenceId</a></code> that you can use to refer to the deleted record in subsequent operations in this
+<code><a title="heroku_applink.UnitOfWork" href="#heroku_applink.UnitOfWork">UnitOfWork</a></code>.</p>
+<p>For example:</p>
+<pre><code class="language-python">unit_of_work = UnitOfWork()
+
+reference_id = unit_of_work.register_delete(&quot;Account&quot;, &quot;001B000001Lp1FxIAJ&quot;)
+</code></pre></div>
+</dd>
+<dt id="heroku_applink.UnitOfWork.register_update"><code class="name flex">
+<span>def <span class="ident">register_update</span></span>(<span>self,<br>record: <a title="heroku_applink.data_api.record.Record" href="data_api/record.html#heroku_applink.data_api.record.Record">Record</a>) ‑> <a title="heroku_applink.data_api.reference_id.ReferenceId" href="data_api/reference_id.html#heroku_applink.data_api.reference_id.ReferenceId">ReferenceId</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def register_update(self, record: Record) -&gt; ReferenceId:
+    &#34;&#34;&#34;
+    Register a record update for the `UnitOfWork`.
+
+    The given `Record` must contain an `Id` field.
+
+    Returns a `ReferenceId` that you can use to refer to the updated record in subsequent operations in this
+    `UnitOfWork`.
+
+    For example:
+
+    ```python
+    unit_of_work = UnitOfWork()
+
+    reference_id = unit_of_work.register_update(
+        Record(
+            type=&#34;Account&#34;,
+            fields={
+                &#34;Id&#34;: &#34;001B000001Lp1FxIAJ&#34;,
+                &#34;Name&#34;: &#34;New Name&#34;,
+            },
+        )
+    )
+    ```
+    &#34;&#34;&#34;
+    return self._register(UpdateRecordRestApiRequest(record))</code></pre>
+</details>
+<div class="desc"><p>Register a record update for the <code><a title="heroku_applink.UnitOfWork" href="#heroku_applink.UnitOfWork">UnitOfWork</a></code>.</p>
+<p>The given <code><a title="heroku_applink.Record" href="#heroku_applink.Record">Record</a></code> must contain an <code>Id</code> field.</p>
+<p>Returns a <code><a title="heroku_applink.ReferenceId" href="#heroku_applink.ReferenceId">ReferenceId</a></code> that you can use to refer to the updated record in subsequent operations in this
+<code><a title="heroku_applink.UnitOfWork" href="#heroku_applink.UnitOfWork">UnitOfWork</a></code>.</p>
+<p>For example:</p>
+<pre><code class="language-python">unit_of_work = UnitOfWork()
+
+reference_id = unit_of_work.register_update(
+    Record(
+        type=&quot;Account&quot;,
+        fields={
+            &quot;Id&quot;: &quot;001B000001Lp1FxIAJ&quot;,
+            &quot;Name&quot;: &quot;New Name&quot;,
+        },
+    )
+)
+</code></pre></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<ul>
+<li><code><a title="heroku_applink.authorization" href="authorization.html">heroku_applink.authorization</a></code></li>
+<li><code><a title="heroku_applink.config" href="config.html">heroku_applink.config</a></code></li>
+<li><code><a title="heroku_applink.connection" href="connection.html">heroku_applink.connection</a></code></li>
+<li><code><a title="heroku_applink.context" href="context.html">heroku_applink.context</a></code></li>
+<li><code><a title="heroku_applink.data_api" href="data_api/index.html">heroku_applink.data_api</a></code></li>
+<li><code><a title="heroku_applink.exceptions" href="exceptions.html">heroku_applink.exceptions</a></code></li>
+<li><code><a title="heroku_applink.middleware" href="middleware.html">heroku_applink.middleware</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="heroku_applink.get_authorization" href="#heroku_applink.get_authorization">get_authorization</a></code></li>
+<li><code><a title="heroku_applink.get_client_context" href="#heroku_applink.get_client_context">get_client_context</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="heroku_applink.Authorization" href="#heroku_applink.Authorization">Authorization</a></code></h4>
+<ul class="two-column">
+<li><code><a title="heroku_applink.Authorization.connection" href="#heroku_applink.Authorization.connection">connection</a></code></li>
+<li><code><a title="heroku_applink.Authorization.created_at" href="#heroku_applink.Authorization.created_at">created_at</a></code></li>
+<li><code><a title="heroku_applink.Authorization.created_by" href="#heroku_applink.Authorization.created_by">created_by</a></code></li>
+<li><code><a title="heroku_applink.Authorization.created_via_app" href="#heroku_applink.Authorization.created_via_app">created_via_app</a></code></li>
+<li><code><a title="heroku_applink.Authorization.data_api" href="#heroku_applink.Authorization.data_api">data_api</a></code></li>
+<li><code><a title="heroku_applink.Authorization.find" href="#heroku_applink.Authorization.find">find</a></code></li>
+<li><code><a title="heroku_applink.Authorization.id" href="#heroku_applink.Authorization.id">id</a></code></li>
+<li><code><a title="heroku_applink.Authorization.last_modified_at" href="#heroku_applink.Authorization.last_modified_at">last_modified_at</a></code></li>
+<li><code><a title="heroku_applink.Authorization.last_modified_by" href="#heroku_applink.Authorization.last_modified_by">last_modified_by</a></code></li>
+<li><code><a title="heroku_applink.Authorization.org" href="#heroku_applink.Authorization.org">org</a></code></li>
+<li><code><a title="heroku_applink.Authorization.redirect_uri" href="#heroku_applink.Authorization.redirect_uri">redirect_uri</a></code></li>
+<li><code><a title="heroku_applink.Authorization.status" href="#heroku_applink.Authorization.status">status</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="heroku_applink.ClientContext" href="#heroku_applink.ClientContext">ClientContext</a></code></h4>
+<ul class="two-column">
+<li><code><a title="heroku_applink.ClientContext.access_token" href="#heroku_applink.ClientContext.access_token">access_token</a></code></li>
+<li><code><a title="heroku_applink.ClientContext.api_version" href="#heroku_applink.ClientContext.api_version">api_version</a></code></li>
+<li><code><a title="heroku_applink.ClientContext.data_api" href="#heroku_applink.ClientContext.data_api">data_api</a></code></li>
+<li><code><a title="heroku_applink.ClientContext.from_header" href="#heroku_applink.ClientContext.from_header">from_header</a></code></li>
+<li><code><a title="heroku_applink.ClientContext.namespace" href="#heroku_applink.ClientContext.namespace">namespace</a></code></li>
+<li><code><a title="heroku_applink.ClientContext.org" href="#heroku_applink.ClientContext.org">org</a></code></li>
+<li><code><a title="heroku_applink.ClientContext.request_id" href="#heroku_applink.ClientContext.request_id">request_id</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="heroku_applink.ClientError" href="#heroku_applink.ClientError">ClientError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="heroku_applink.Config" href="#heroku_applink.Config">Config</a></code></h4>
+<ul class="two-column">
+<li><code><a title="heroku_applink.Config.connect_timeout" href="#heroku_applink.Config.connect_timeout">connect_timeout</a></code></li>
+<li><code><a title="heroku_applink.Config.default" href="#heroku_applink.Config.default">default</a></code></li>
+<li><code><a title="heroku_applink.Config.request_timeout" href="#heroku_applink.Config.request_timeout">request_timeout</a></code></li>
+<li><code><a title="heroku_applink.Config.socket_connect" href="#heroku_applink.Config.socket_connect">socket_connect</a></code></li>
+<li><code><a title="heroku_applink.Config.socket_read" href="#heroku_applink.Config.socket_read">socket_read</a></code></li>
+<li><code><a title="heroku_applink.Config.user_agent" href="#heroku_applink.Config.user_agent">user_agent</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="heroku_applink.Connection" href="#heroku_applink.Connection">Connection</a></code></h4>
+<ul class="">
+<li><code><a title="heroku_applink.Connection.close" href="#heroku_applink.Connection.close">close</a></code></li>
+<li><code><a title="heroku_applink.Connection.request" href="#heroku_applink.Connection.request">request</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="heroku_applink.IntegrationAsgiMiddleware" href="#heroku_applink.IntegrationAsgiMiddleware">IntegrationAsgiMiddleware</a></code></h4>
+</li>
+<li>
+<h4><code><a title="heroku_applink.IntegrationWsgiMiddleware" href="#heroku_applink.IntegrationWsgiMiddleware">IntegrationWsgiMiddleware</a></code></h4>
+</li>
+<li>
+<h4><code><a title="heroku_applink.QueriedRecord" href="#heroku_applink.QueriedRecord">QueriedRecord</a></code></h4>
+<ul class="">
+<li><code><a title="heroku_applink.QueriedRecord.sub_query_results" href="#heroku_applink.QueriedRecord.sub_query_results">sub_query_results</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="heroku_applink.Record" href="#heroku_applink.Record">Record</a></code></h4>
+<ul class="">
+<li><code><a title="heroku_applink.Record.fields" href="#heroku_applink.Record.fields">fields</a></code></li>
+<li><code><a title="heroku_applink.Record.get" href="#heroku_applink.Record.get">get</a></code></li>
+<li><code><a title="heroku_applink.Record.type" href="#heroku_applink.Record.type">type</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="heroku_applink.RecordQueryResult" href="#heroku_applink.RecordQueryResult">RecordQueryResult</a></code></h4>
+<ul class="">
+<li><code><a title="heroku_applink.RecordQueryResult.done" href="#heroku_applink.RecordQueryResult.done">done</a></code></li>
+<li><code><a title="heroku_applink.RecordQueryResult.next_records_url" href="#heroku_applink.RecordQueryResult.next_records_url">next_records_url</a></code></li>
+<li><code><a title="heroku_applink.RecordQueryResult.records" href="#heroku_applink.RecordQueryResult.records">records</a></code></li>
+<li><code><a title="heroku_applink.RecordQueryResult.total_size" href="#heroku_applink.RecordQueryResult.total_size">total_size</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="heroku_applink.ReferenceId" href="#heroku_applink.ReferenceId">ReferenceId</a></code></h4>
+<ul class="">
+<li><code><a title="heroku_applink.ReferenceId.id" href="#heroku_applink.ReferenceId.id">id</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="heroku_applink.UnexpectedRestApiResponsePayload" href="#heroku_applink.UnexpectedRestApiResponsePayload">UnexpectedRestApiResponsePayload</a></code></h4>
+</li>
+<li>
+<h4><code><a title="heroku_applink.UnitOfWork" href="#heroku_applink.UnitOfWork">UnitOfWork</a></code></h4>
+<ul class="">
+<li><code><a title="heroku_applink.UnitOfWork.register_create" href="#heroku_applink.UnitOfWork.register_create">register_create</a></code></li>
+<li><code><a title="heroku_applink.UnitOfWork.register_delete" href="#heroku_applink.UnitOfWork.register_delete">register_delete</a></code></li>
+<li><code><a title="heroku_applink.UnitOfWork.register_update" href="#heroku_applink.UnitOfWork.register_update">register_update</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>
