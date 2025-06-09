@@ -38,7 +38,13 @@ update_pyproject_version() {
     fi
     
     # Update version in pyproject.toml
-    sed -i '' "s/^version = \".*\"/version = \"$version\"/" "$pyproject_file"
+    if [ "$(uname -s)" = "Darwin" ]; then
+        # macOS
+        sed -i '' "s/^version = \".*\"/version = \"$version\"/" "$pyproject_file"
+    else
+        # Linux
+        sed -i "s/^version = \".*\"/version = \"$version\"/" "$pyproject_file"
+    fi
     echo "Updated version to $version in $pyproject_file"
 }
 
