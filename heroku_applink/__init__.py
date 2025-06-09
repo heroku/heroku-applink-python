@@ -5,6 +5,8 @@ SPDX-License-Identifier: BSD-3-Clause
 For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
 """
 
+from contextvars import ContextVar
+
 from .authorization import Authorization
 from .config import Config
 from .context import ClientContext
@@ -14,7 +16,10 @@ from .data_api.unit_of_work import UnitOfWork
 from .middleware import IntegrationWsgiMiddleware, IntegrationAsgiMiddleware
 from .exceptions import ClientError, UnexpectedRestApiResponsePayload
 from .connection import Connection
-from .middleware import client_context
+
+# ContextVars for request-scoped data
+client_context: ContextVar[ClientContext] = ContextVar("client_context")
+request_id: ContextVar[str] = ContextVar("request_id")
 
 def get_client_context() -> ClientContext:
     """
@@ -74,6 +79,7 @@ __all__ = [
     "Config",
     "Connection",
     "client_context",
+    "request_id",
     "ClientContext",
     "QueriedRecord",
     "Record",
