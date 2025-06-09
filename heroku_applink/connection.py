@@ -34,6 +34,10 @@ class Connection:
 
         If a timeout is provided, it will be used to set the timeout for the request.
         """
+
+        # Import here to avoid circular imports
+        from . import request_id
+
         if timeout is not None:
             timeout = aiohttp.ClientTimeout(total=timeout)
 
@@ -43,7 +47,10 @@ class Connection:
             "User-Agent": self._config.user_agent(),
             # Always include a request-id header in all outbound requests.
             # This will be helpful for debugging and tracking requests.
-            "X-Request-Id": str(uuid.uuid4()),
+            #
+            # Using `request_id` we can get any request-id set by the middleware.
+            # If no request-id is set, we generate a new one.
+            "X-Request-Id": request_id.get(str(uuid.uuid4())),
         }
 
         headers = {**default_headers, **(headers or {})}
