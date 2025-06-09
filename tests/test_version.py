@@ -1,5 +1,6 @@
 import pytest
-from unittest.mock import patch, mock_open
+import sys
+from unittest.mock import patch, mock_open, MagicMock
 import importlib.metadata
 
 class TestGetVersion:
@@ -49,26 +50,27 @@ version = "2.0.0"
 description = "Test package"
 """
 
+        # Create a mock tomllib module for Python < 3.11
+        mock_tomllib = MagicMock()
+        mock_tomllib.load.return_value = {
+            "project": {
+                "version": "2.0.0"
+            }
+        }
+
         with patch('importlib.metadata.version') as mock_version, \
              patch('builtins.open', mock_open(read_data=pyproject_content)), \
-             patch('tomllib.load') as mock_tomllib:
+             patch.dict('sys.modules', {'tomllib': mock_tomllib}):
 
             # Make importlib.metadata fail
             mock_version.side_effect = importlib.metadata.PackageNotFoundError("heroku_applink")
-
-            # Mock tomllib.load return value
-            mock_tomllib.return_value = {
-                "project": {
-                    "version": "2.0.0"
-                }
-            }
 
             from heroku_applink import _get_version
             result = _get_version()
 
             assert result == "2.0.0"
             mock_version.assert_called_once_with("heroku_applink")
-            mock_tomllib.assert_called_once()
+            mock_tomllib.load.assert_called_once()
 
     def test_get_version_fallback_to_unknown(self):
         """Test fallback to 'unknown' when both methods fail."""
@@ -89,22 +91,23 @@ description = "Test package"
 
     def test_get_version_tomllib_parse_error(self):
         """Test fallback to 'unknown' when pyproject.toml exists but can't be parsed."""
+        # Create a mock tomllib module that raises an exception
+        mock_tomllib = MagicMock()
+        mock_tomllib.load.side_effect = Exception("Invalid TOML")
+
         with patch('importlib.metadata.version') as mock_version, \
              patch('builtins.open', mock_open(read_data=b"invalid toml")), \
-             patch('tomllib.load') as mock_tomllib:
+             patch.dict('sys.modules', {'tomllib': mock_tomllib}):
 
             # Make importlib.metadata fail
             mock_version.side_effect = importlib.metadata.PackageNotFoundError("heroku_applink")
-
-            # Make tomllib.load fail
-            mock_tomllib.side_effect = Exception("Invalid TOML")
 
             from heroku_applink import _get_version
             result = _get_version()
 
             assert result == "unknown"
             mock_version.assert_called_once_with("heroku_applink")
-            mock_tomllib.assert_called_once()
+            mock_tomllib.load.assert_called_once()
 
     def test_get_version_missing_version_in_pyproject(self):
         """Test fallback to 'unknown' when pyproject.toml doesn't have version field."""
@@ -114,26 +117,27 @@ name = "heroku_applink"
 description = "Test package"
 """
 
+        # Create a mock tomllib module
+        mock_tomllib = MagicMock()
+        mock_tomllib.load.return_value = {
+            "project": {
+                "name": "heroku_applink"
+            }
+        }
+
         with patch('importlib.metadata.version') as mock_version, \
              patch('builtins.open', mock_open(read_data=pyproject_content)), \
-             patch('tomllib.load') as mock_tomllib:
+             patch.dict('sys.modules', {'tomllib': mock_tomllib}):
 
             # Make importlib.metadata fail
             mock_version.side_effect = importlib.metadata.PackageNotFoundError("heroku_applink")
-
-            # Mock tomllib.load to return content without version
-            mock_tomllib.return_value = {
-                "project": {
-                    "name": "heroku_applink"
-                }
-            }
 
             from heroku_applink import _get_version
             result = _get_version()
 
             assert result == "unknown"
             mock_version.assert_called_once_with("heroku_applink")
-            mock_tomllib.assert_called_once()
+            mock_tomllib.load.assert_called_once()
 
     def test_get_version_keyerror_missing_project_section(self):
         """Test fallback to 'unknown' when pyproject.toml doesn't have project section."""
@@ -143,26 +147,54 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 """
 
+        # Create a mock tomllib module
+        mock_tomllib = MagicMock()
+        mock_tomllib.load.return_value = {
+            "build-system": {
+                "requires": ["hatchling"]
+            }
+        }
+
         with patch('importlib.metadata.version') as mock_version, \
              patch('builtins.open', mock_open(read_data=pyproject_content)), \
-             patch('tomllib.load') as mock_tomllib:
+             patch.dict('sys.modules', {'tomllib': mock_tomllib}):
 
             # Make importlib.metadata fail
             mock_version.side_effect = importlib.metadata.PackageNotFoundError("heroku_applink")
-
-            # Mock tomllib.load to return content without project section
-            mock_tomllib.return_value = {
-                "build-system": {
-                    "requires": ["hatchling"]
-                }
-            }
 
             from heroku_applink import _get_version
             result = _get_version()
 
             assert result == "unknown"
             mock_version.assert_called_once_with("heroku_applink")
-            mock_tomllib.assert_called_once()
+            mock_tomllib.load.assert_called_once()
+
+    def test_get_version_tomllib_import_error(self):
+        """Test fallback to 'unknown' when tomllib import fails (Python < 3.11)."""
+        with patch('importlib.metadata.version') as mock_version, \
+             patch('builtins.open') as mock_open_file:
+
+            # Make importlib.metadata fail
+            mock_version.side_effect = importlib.metadata.PackageNotFoundError("heroku_applink")
+
+            # Make file opening succeed but tomllib import fail by removing it from sys.modules
+            mock_open_file.return_value.__enter__.return_value = "mock file handle"
+
+            # Remove tomllib from sys.modules if it exists to simulate Python < 3.11
+            original_tomllib = sys.modules.get('tomllib')
+            if 'tomllib' in sys.modules:
+                del sys.modules['tomllib']
+
+            try:
+                from heroku_applink import _get_version
+                result = _get_version()
+
+                assert result == "unknown"
+                mock_version.assert_called_once_with("heroku_applink")
+            finally:
+                # Restore original state
+                if original_tomllib is not None:
+                    sys.modules['tomllib'] = original_tomllib
 
     def test_version_lazy_loading_via_getattr(self):
         """Test that __version__ is lazily loaded via module __getattr__."""
