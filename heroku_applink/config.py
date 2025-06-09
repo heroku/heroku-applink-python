@@ -7,7 +7,7 @@ For full license text, see the LICENSE file in the repo root or https://opensour
 
 from dataclasses import dataclass
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 @dataclass
 class Config:
