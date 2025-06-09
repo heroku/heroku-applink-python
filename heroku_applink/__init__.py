@@ -16,6 +16,58 @@ from .exceptions import ClientError, UnexpectedRestApiResponsePayload
 from .connection import Connection
 from .middleware import client_context
 
+__all__ = [
+    "__version__",
+    "get_client_context",
+    "get_authorization",
+    "Authorization",
+    "Config",
+    "Connection",
+    "client_context",
+    "ClientContext",
+    "QueriedRecord",
+    "Record",
+    "RecordQueryResult",
+    "ReferenceId",
+    "UnitOfWork",
+    "IntegrationWsgiMiddleware",
+    "IntegrationAsgiMiddleware",
+    "ClientError",
+    "UnexpectedRestApiResponsePayload",
+]
+
+# Lazy loading support - cached version
+_version = None
+
+def _get_version() -> str:
+    """Get the package version from installed metadata or pyproject.toml."""
+    global _version
+    if _version is not None:
+        return _version
+
+    try:
+        import importlib.metadata
+        _version = importlib.metadata.version("heroku_applink")
+        return _version
+    except importlib.metadata.PackageNotFoundError:
+        try:
+            import tomllib
+            from pathlib import Path
+            pyproject_path = Path(__file__).parent.parent / "pyproject.toml"
+            with open(pyproject_path, "rb") as f:
+                data = tomllib.load(f)
+            _version = data["project"]["version"]
+            return _version
+        except Exception:
+            _version = "unknown"
+            return _version
+
+def __getattr__(name: str):
+    """Lazy loading of module attributes."""
+    if name == "__version__":
+        return _get_version()
+    raise AttributeError(f"module '{__name__}' has no attribute '{name}'")
+
 def get_client_context() -> ClientContext:
     """
     Call `get_client_context` to get the client context for the current incoming
@@ -66,23 +118,4 @@ def get_authorization(developer_name: str, attachment_or_url: str|None=None) -> 
     ```
     """
     return Authorization.find(developer_name, attachment_or_url)
-
-__all__ = [
-    "get_client_context",
-    "get_authorization",
-    "Authorization",
-    "Config",
-    "Connection",
-    "client_context",
-    "ClientContext",
-    "QueriedRecord",
-    "Record",
-    "RecordQueryResult",
-    "ReferenceId",
-    "UnitOfWork",
-    "IntegrationWsgiMiddleware",
-    "IntegrationAsgiMiddleware",
-    "ClientError",
-    "UnexpectedRestApiResponsePayload",
-]
 

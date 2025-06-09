@@ -7,8 +7,6 @@ For full license text, see the LICENSE file in the repo root or https://opensour
 
 from dataclasses import dataclass
 
-__version__ = "0.1.0"
-
 @dataclass
 class Config:
     """
@@ -37,10 +35,24 @@ class Config:
     Timeout for reading from the Salesforce Data API.
     """
 
-    user_agent: str = f"heroku-applink-python-sdk/{__version__}"
+    _user_agent: str = None
     """
     User agent for the Salesforce Data API.
     """
+
+    @property
+    def user_agent(self) -> str:
+        """Get the user agent, lazily computed with version."""
+        if self._user_agent is None:
+            # Import here to avoid circular imports
+            from . import __version__
+            return f"heroku-applink-python-sdk/{__version__}"
+        return self._user_agent
+
+    @user_agent.setter
+    def user_agent(self, value: str):
+        """Set a custom user agent."""
+        self._user_agent = value
 
     @classmethod
     def default(cls) -> "Config":
