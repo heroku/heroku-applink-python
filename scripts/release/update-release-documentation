@@ -11,6 +11,7 @@ set -o pipefail
 #   1. Update the version in pyproject.toml
 #   2. Update CHANGELOG.md with all commits since the last tag
 #   3. Format the changelog with proper headers and commit references
+#   4. Generate documentation using pdoc3
 
 usage() {
     echo "Usage: $0 <new_version> [previous_version]"
@@ -46,6 +47,27 @@ update_pyproject_version() {
         sed -i "s/^version = \".*\"/version = \"$version\"/" "$pyproject_file"
     fi
     echo "Updated version to $version in $pyproject_file"
+}
+
+# Function to generate pdoc3 documentation
+generate_pdoc3_documentation() {
+    echo "Generating documentation with pdoc3..."
+    if ! command -v uv &> /dev/null; then
+        echo "Installing uv..."
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+    fi
+    
+    # Update version in config.py
+    if [ "$(uname -s)" = "Darwin" ]; then
+        # macOS
+        sed -i '' "s/^__version__ = \".*\"/__version__ = \"$NEW_VERSION\"/" heroku_applink/config.py
+    else
+        # Linux
+        sed -i "s/^__version__ = \".*\"/__version__ = \"$NEW_VERSION\"/" heroku_applink/config.py
+    fi
+    
+    uv run pdoc3 --template-dir templates/python heroku_applink -o docs --force
+    echo "Documentation generated in docs/"
 }
 
 # Function to categorize commit message
@@ -255,3 +277,6 @@ else
 fi
 
 echo "Updated CHANGELOG.md"
+
+# Generate documentation
+generate_pdoc3_documentation

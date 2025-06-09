@@ -158,7 +158,7 @@ if ! "$SCRIPT_DIR/update-release-documentation" "$NEW_VERSION" "$PREV_VERSION"; 
 fi
 
 # Commit changes
-if ! git add pyproject.toml CHANGELOG.md; then
+if ! git add pyproject.toml CHANGELOG.md docs/ heroku_applink/config.py; then
     echo "Error: Failed to stage changes"
     git checkout main
     git branch -D "$BRANCH_NAME"
@@ -209,12 +209,14 @@ if [ -f "$PR_TEMPLATE" ]; then
         # macOS
         sed -i '' "/^## Summary$/a\\
         - Updated version to $NEW_VERSION\\
-        - Updated CHANGELOG.md with all changes since the previous release." "$TEMP_PR_BODY"
+        - Updated CHANGELOG.md with all changes since the previous release\\
+        - Generated documentation using pdoc3" "$TEMP_PR_BODY"
     else
         # Linux
         sed -i "/^## Summary$/a\\
         - Updated version to $NEW_VERSION\\
-        - Updated CHANGELOG.md with all changes since the previous release." "$TEMP_PR_BODY"
+        - Updated CHANGELOG.md with all changes since the previous release\\
+        - Generated documentation using pdoc3" "$TEMP_PR_BODY"
     fi
 
     # Add git log to What Changed section
