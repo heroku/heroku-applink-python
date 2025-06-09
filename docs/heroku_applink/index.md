@@ -86,7 +86,7 @@ making SOQL queries.
 ## Static methods
 
 ```python
-def find(developer_name: str, attachment_or_url: str | None = None, config: heroku_applink.config.Config = Config(request_timeout=5, connect_timeout=None, socket_connect=None, socket_read=None, user_agent='heroku-applink-python-sdk/0.1.0')) ‑> heroku_applink.authorization.Authorization
+def find(developer_name: str, attachment_or_url: str | None = None, config: heroku_applink.config.Config = Config(request_timeout=5, connect_timeout=None, socket_connect=None, socket_read=None, user_agent='heroku-applink-python-sdk/0.2.0')) ‑> heroku_applink.authorization.Authorization
 ```
 Fetch authorization for a given Heroku AppLink developer.
 Uses GET {apiUrl}/authorizations/{developer_name}
@@ -218,7 +218,7 @@ Raised when there is an error with the HTTP client.
 # `Config`
 
 ```python
-class Config(request_timeout: float = 5, connect_timeout: float | None = None, socket_connect: float | None = None, socket_read: float | None = None, user_agent: str = 'heroku-applink-python-sdk/0.1.0')
+class Config(request_timeout: float = 5, connect_timeout: float | None = None, socket_connect: float | None = None, socket_read: float | None = None, user_agent: str = 'heroku-applink-python-sdk/0.2.0')
 ```
 Configuration for the Salesforce Data API client.
 
@@ -277,14 +277,14 @@ If a timeout is provided, it will be used to set the timeout for the request.
 # `IntegrationAsgiMiddleware`
 
 ```python
-class IntegrationAsgiMiddleware(app, config=Config(request_timeout=5, connect_timeout=None, socket_connect=None, socket_read=None, user_agent='heroku-applink-python-sdk/0.1.0'))
+class IntegrationAsgiMiddleware(app, config=Config(request_timeout=5, connect_timeout=None, socket_connect=None, socket_read=None, user_agent='heroku-applink-python-sdk/0.2.0'))
 ```
 
 <!-- python-integrationwsgimiddleware.md -->
 # `IntegrationWsgiMiddleware`
 
 ```python
-class IntegrationWsgiMiddleware(app, config=Config(request_timeout=5, connect_timeout=None, socket_connect=None, socket_read=None, user_agent='heroku-applink-python-sdk/0.1.0'))
+class IntegrationWsgiMiddleware(app, config=Config(request_timeout=5, connect_timeout=None, socket_connect=None, socket_read=None, user_agent='heroku-applink-python-sdk/0.2.0'))
 ```
 
 <!-- python-queriedrecord.md -->
