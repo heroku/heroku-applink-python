@@ -7,6 +7,7 @@ For full license text, see the LICENSE file in the repo root or https://opensour
 
 import aiohttp
 import asyncio
+import uuid
 
 from .config import Config
 
@@ -37,14 +38,21 @@ class Connection:
             timeout = aiohttp.ClientTimeout(total=timeout)
 
         default_headers = {
+            # Always include the user-agent header in all outbound requests.
+            # This is so we can track SDK versions across all of our customers.
             "User-Agent": self._config.user_agent(),
+            # Always include a request-id header in all outbound requests.
+            # This will be helpful for debugging and tracking requests.
+            "X-Request-Id": str(uuid.uuid4()),
         }
+
+        headers = {**default_headers, **(headers or {})}
 
         response = self._client().request(
             method,
             url,
             params=params,
-            headers=default_headers | (headers or {}),
+            headers=headers,
             data=data,
             timeout=timeout
         )
