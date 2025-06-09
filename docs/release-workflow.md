@@ -15,16 +15,6 @@ The release process is automated through GitHub Actions and consists of three ma
 
 ### 1. Creating a Release Branch
 
-There are two ways to start a release:
-
-#### Option 1: GitHub Actions Workflow
-1. Go to the "Actions" tab in GitHub
-2. Select "Draft Release Branch" workflow
-3. Click "Run workflow"
-4. Select the type of version bump (major, minor, patch)
-5. Optionally provide the previous version for changelog generation
-
-#### Option 2: Command Line Script
 Run the draft-release script locally:
 ```bash
 # For a minor version bump
@@ -34,7 +24,7 @@ Run the draft-release script locally:
 ./scripts/release/draft-release patch 1.2.2
 ```
 
-Both methods will:
+This method will:
 - Create a new release branch (e.g., `release-v1.0.0`)
 - Update version in `pyproject.toml`
 - Update `CHANGELOG.md` with all changes since the last release
@@ -98,7 +88,7 @@ When a new tag is pushed during the create tag workflow:
 
 ## Best Practices
 
-1. Always use the "Draft Release Branch" workflow to start releases
+1. Always use the "Draft Release" script to generate the release branch
 2. Review the changelog entries before merging
 3. Ensure all tests pass before merging
 4. Wait for the complete release process to finish before starting a new release
