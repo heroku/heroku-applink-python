@@ -53,7 +53,9 @@ class Connection:
             "X-Request-Id": request_id.get(str(uuid.uuid4())),
         }
 
-        headers = {**default_headers, **(headers or {})}
+        # Start with custom headers, then override with default headers
+        # This ensures our default headers (User-Agent, X-Request-Id) always take precedence
+        headers = {**(headers or {}), **default_headers}
 
         response = self._client().request(
             method,
