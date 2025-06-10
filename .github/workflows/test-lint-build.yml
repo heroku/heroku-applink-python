@@ -40,7 +40,12 @@ jobs:
           cache-dependency-glob: pyproject.toml
 
       - name: Install dependencies
-        run: uv sync --all-extras
+        run: |
+          uv sync --all-extras
+          echo "=== Verifying core dependencies installation ==="
+          uv pip install aiohttp>=3.11.12 orjson>=3.10.15 yarl>=1.20.0 --force-reinstall
+          echo "=== Final package list ==="
+          uv pip list
 
       - name: Install ruff
         run: uv pip install ruff
@@ -66,10 +71,19 @@ jobs:
           python -c "import sys; print('\\n'.join(sys.path))"
           echo "=== Installed packages ==="
           uv pip list | grep -E "(pytest|coverage|ruff|aiohttp|orjson|yarl|heroku)"
-          echo "=== Test version loading ==="
-          python -c "import heroku_applink; print('Version:', heroku_applink.__version__); print('Module path:', heroku_applink.__file__)"
-          echo "=== Test importlib.metadata ==="
-          python -c "import importlib.metadata; print('Metadata version:', importlib.metadata.version('heroku_applink'))" || echo "Failed to get metadata version"
+          echo "=== Testing individual imports ==="
+          python -c "import yarl; print('yarl imported successfully, version:', yarl.__version__)" || echo "Failed to import yarl"
+          python -c "import aiohttp; print('aiohttp imported successfully, version:', aiohttp.__version__)" || echo "Failed to import aiohttp"
+          python -c "import orjson; print('orjson imported successfully')" || echo "Failed to import orjson"
+          echo "=== Checking yarl installation location ==="
+          python -c "import yarl; print('yarl location:', yarl.__file__)" || echo "yarl not found"
+          echo "=== Python site-packages contents ==="
+          python -c "import site; print('Site packages:', site.getsitepackages())"
+          ls -la $(python -c "import site; print(site.getsitepackages()[0])") | grep -E "(yarl|aiohttp|orjson)" || echo "Dependencies not found in site-packages"
+          echo "=== Re-installing dependencies explicitly ==="
+          uv pip install yarl aiohttp orjson --force-reinstall
+          echo "=== Test version loading after reinstall ==="
+          python -c "import heroku_applink; print('Version:', heroku_applink.__version__); print('Module path:', heroku_applink.__file__)" || echo "Still failing after reinstall"
           echo "=== Current working directory ==="
           pwd
           ls -la
