@@ -55,8 +55,29 @@ jobs:
           echo "name=$TOX_ENV" >> $GITHUB_OUTPUT
           echo "Using tox environment: $TOX_ENV"
 
+      - name: Debug environment (Python 3.13 only)
+        if: matrix.python-version == '3.13'
+        run: |
+          echo "=== Python Version Details ==="
+          python --version
+          python -c "import sys; print('Python version:', sys.version)"
+          python -c "import platform; print('Platform:', platform.platform())"
+          echo "=== Python Path ==="
+          python -c "import sys; print('\\n'.join(sys.path))"
+          echo "=== Installed packages ==="
+          uv pip list | grep -E "(pytest|coverage|ruff|aiohttp|orjson|yarl|heroku)"
+          echo "=== Test version loading ==="
+          python -c "import heroku_applink; print('Version:', heroku_applink.__version__); print('Module path:', heroku_applink.__file__)"
+          echo "=== Test importlib.metadata ==="
+          python -c "import importlib.metadata; print('Metadata version:', importlib.metadata.version('heroku_applink'))" || echo "Failed to get metadata version"
+          echo "=== Current working directory ==="
+          pwd
+          ls -la
+          echo "=== Test directory ==="
+          ls -la tests/
+
       - name: Run tests
-        run: uv run tox -e ${{ steps.tox-env.outputs.name }}
+        run: uv run tox -e ${{ steps.tox-env.outputs.name }} -v
 
       - name: Build package
         run: uv build
