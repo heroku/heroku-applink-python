@@ -40,7 +40,7 @@ making SOQL queries.
 ## Static methods
 
 ```python
-def find(developer_name: str, attachment_or_url: str | None = None, config: heroku_applink.config.Config = Config(request_timeout=5, connect_timeout=None, socket_connect=None, socket_read=None, user_agent='heroku-applink-python-sdk/0.1.0')) ‑> heroku_applink.authorization.Authorization
+def find(developer_name: str, attachment_or_url: str | None = None, config: heroku_applink.config.Config = Config(request_timeout=5, connect_timeout=None, socket_connect=None, socket_read=None)) ‑> heroku_applink.authorization.Authorization
 ```
 Fetch authorization for a given Heroku AppLink developer.
 Uses GET {apiUrl}/authorizations/{developer_name}

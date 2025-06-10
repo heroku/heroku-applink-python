@@ -5,9 +5,9 @@ SPDX-License-Identifier: BSD-3-Clause
 For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
 """
 
-from dataclasses import dataclass
+import importlib.metadata
 
-__version__ = "0.1.0"
+from dataclasses import dataclass
 
 @dataclass
 class Config:
@@ -37,11 +37,6 @@ class Config:
     Timeout for reading from the Salesforce Data API.
     """
 
-    user_agent: str = f"heroku-applink-python-sdk/{__version__}"
-    """
-    User agent for the Salesforce Data API.
-    """
-
     @classmethod
     def default(cls) -> "Config":
         return cls(
@@ -50,3 +45,8 @@ class Config:
             socket_connect=None,
             socket_read=None,
         )
+
+    def user_agent(self) -> str:
+        version = importlib.metadata.version("heroku_applink")
+
+        return f"heroku-applink-python-sdk/{version}"
