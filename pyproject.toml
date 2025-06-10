@@ -71,10 +71,19 @@ skip_missing_interpreters = true
 
 [testenv]
 extras = test
+deps =
+    aiohttp>=3.11.12
+    orjson>=3.10.15
+    yarl>=1.20.0
 setenv =
     COVERAGE_FILE = .coverage.{envname}
 commands_pre =
     coverage erase
+    python -c "import sys; print('Python version in tox:', sys.version)"
+    python -c "import yarl; print('yarl version:', yarl.__version__)"
+    python -c "import aiohttp; print('aiohttp version:', aiohttp.__version__)"
+    python -c "import orjson; print('orjson version loaded successfully')"
+    python -c "import heroku_applink; print('heroku_applink version:', heroku_applink.__version__)"
 commands =
     ruff check .
     pytest
