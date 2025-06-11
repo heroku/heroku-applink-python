@@ -18,6 +18,7 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.10", "3.11", "3.12", "3.13"]
+        os: [ubuntu-latest, macos-latest, windows-latest]
       fail-fast: false
 
     steps:
@@ -44,12 +45,19 @@ jobs:
 
       - name: Install ruff
         run: uv pip install ruff
-        
+
       - name: Run linting
         run: uv run ruff check .
 
+      - name: Set tox environment name
+        id: tox-env
+        run: |
+          TOX_ENV="py$(echo '${{ matrix.python-version }}' | sed 's/\.//')"
+          echo "name=$TOX_ENV" >> $GITHUB_OUTPUT
+          echo "Using tox environment: $TOX_ENV"
+
       - name: Run tests
-        run: uv run tox
+        run: uv run tox -e ${{ steps.tox-env.outputs.name }} -v
 
       - name: Build package
         run: uv build
