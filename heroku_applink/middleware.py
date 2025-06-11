@@ -8,8 +8,8 @@ For full license text, see the LICENSE file in the repo root or https://opensour
 import uuid
 
 from .config import Config
-from .context import ClientContext
-from .connection import Connection
+from .context import ClientContext, set_client_context
+from .connection import Connection, set_request_id
 
 class IntegrationWsgiMiddleware:
     def __init__(self, app, config=Config.default()):
@@ -18,16 +18,13 @@ class IntegrationWsgiMiddleware:
         self.connection = Connection(self.config)
 
     def __call__(self, environ, start_response):
-        # Import here to avoid circular imports
-        from . import client_context, request_id
-
         header = environ.get("HTTP_X_CLIENT_CONTEXT")
 
         if not header:
             raise ValueError("x-client-context not set")
 
-        client_context.set(ClientContext.from_header(header, self.connection))
-        request_id.set(environ.get("HTTP_X_REQUEST_ID", str(uuid.uuid4())))
+        set_client_context(ClientContext.from_header(header, self.connection))
+        set_request_id(environ.get("HTTP_X_REQUEST_ID", str(uuid.uuid4())))
 
         return self.app(environ, start_response)
 
@@ -38,9 +35,6 @@ class IntegrationAsgiMiddleware:
         self.connection = Connection(self.config)
 
     async def __call__(self, scope, receive, send):
-        # Import here to avoid circular imports
-        from . import client_context, request_id
-
         if scope["type"] != "http":
             await self.app(scope, receive, send)
             return
@@ -50,7 +44,7 @@ class IntegrationAsgiMiddleware:
         if not header:
             raise ValueError("x-client-context not set")
 
-        client_context.set(ClientContext.from_header(header, self.connection))
-        request_id.set(headers.get(b"x-request-id", str(uuid.uuid4())))
+        set_client_context(ClientContext.from_header(header, self.connection))
+        set_request_id(headers.get(b"x-request-id", str(uuid.uuid4())))
 
         await self.app(scope, receive, send)

@@ -9,7 +9,23 @@ import aiohttp
 import asyncio
 import uuid
 
+from contextvars import ContextVar
+
 from .config import Config
+
+request_id: ContextVar[str] = ContextVar("request_id")
+
+def get_request_id() -> str:
+    """
+    Get the request ID for the current request.
+    """
+    return request_id.get(str(uuid.uuid4()))
+
+def set_request_id(new_request_id: str):
+    """
+    Set the request ID for the current request.
+    """
+    request_id.set(new_request_id)
 
 class Connection:
     """
@@ -35,9 +51,6 @@ class Connection:
         If a timeout is provided, it will be used to set the timeout for the request.
         """
 
-        # Import here to avoid circular imports
-        from . import request_id
-
         if timeout is not None:
             timeout = aiohttp.ClientTimeout(total=timeout)
 
@@ -50,7 +63,7 @@ class Connection:
             #
             # Using `request_id` we can get any request-id set by the middleware.
             # If no request-id is set, we generate a new one.
-            "X-Request-Id": request_id.get(str(uuid.uuid4())),
+            "X-Request-Id": get_request_id(),
         }
 
         # Start with custom headers, then override with default headers
