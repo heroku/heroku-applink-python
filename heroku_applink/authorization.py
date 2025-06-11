@@ -17,7 +17,7 @@ from yarl import URL
 from .config import Config
 from .connection import Connection
 from .data_api import DataAPI
-
+from .data_cloud_api import DataCloudAPI
 
 @dataclass(frozen=True, kw_only=True, slots=True)
 class AuthBundle:
@@ -75,6 +75,12 @@ class Authorization:
     for record in result.records:
         print(f"Account: {record}")
     ```
+    """
+
+    data_cloud_api: DataCloudAPI|None
+    """
+    An initialized data cloud API client instance for interacting with data in the org.
+    This is only available if the org has a Data Cloud enabled.
     """
 
     id: str
@@ -198,6 +204,11 @@ class Authorization:
             data_api=DataAPI(
                 org_domain_url=payload["org"]["instance_url"],
                 api_version=payload["org"]["api_version"],
+                access_token=payload["org"]["user_auth"]["access_token"],
+                connection=connection,
+            ),
+            data_cloud_api=DataCloudAPI(
+                org_domain_url=payload["org"]["instance_url"],
                 access_token=payload["org"]["user_auth"]["access_token"],
                 connection=connection,
             ),
