@@ -7,8 +7,25 @@ For full license text, see the LICENSE file in the repo root or https://opensour
 
 import aiohttp
 import asyncio
+import uuid
+
+from contextvars import ContextVar
 
 from .config import Config
+
+request_id: ContextVar[str] = ContextVar("request_id")
+
+def get_request_id() -> str:
+    """
+    Get the request ID for the current request.
+    """
+    return request_id.get(str(uuid.uuid4()))
+
+def set_request_id(new_request_id: str):
+    """
+    Set the request ID for the current request.
+    """
+    request_id.set(new_request_id)
 
 class Connection:
     """
@@ -33,18 +50,31 @@ class Connection:
 
         If a timeout is provided, it will be used to set the timeout for the request.
         """
+
         if timeout is not None:
             timeout = aiohttp.ClientTimeout(total=timeout)
 
         default_headers = {
+            # Always include the user-agent header in all outbound requests.
+            # This is so we can track SDK versions across all of our customers.
             "User-Agent": self._config.user_agent(),
+            # Always include a request-id header in all outbound requests.
+            # This will be helpful for debugging and tracking requests.
+            #
+            # Using `request_id` we can get any request-id set by the middleware.
+            # If no request-id is set, we generate a new one.
+            "X-Request-Id": get_request_id(),
         }
+
+        # Start with custom headers, then override with default headers
+        # This ensures our default headers (User-Agent, X-Request-Id) always take precedence
+        headers = {**(headers or {}), **default_headers}
 
         response = self._client().request(
             method,
             url,
             params=params,
-            headers=default_headers | (headers or {}),
+            headers=headers,
             data=data,
             timeout=timeout
         )

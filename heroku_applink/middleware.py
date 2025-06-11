@@ -5,13 +5,11 @@ SPDX-License-Identifier: BSD-3-Clause
 For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
 """
 
-from contextvars import ContextVar
+import uuid
 
 from .config import Config
-from .context import ClientContext
-from .connection import Connection
-
-client_context: ContextVar[ClientContext] = ContextVar("client_context")
+from .context import ClientContext, set_client_context
+from .connection import Connection, set_request_id
 
 class IntegrationWsgiMiddleware:
     def __init__(self, app, config=Config.default()):
@@ -25,7 +23,8 @@ class IntegrationWsgiMiddleware:
         if not header:
             raise ValueError("x-client-context not set")
 
-        client_context.set(ClientContext.from_header(header, self.connection))
+        set_client_context(ClientContext.from_header(header, self.connection))
+        set_request_id(environ.get("HTTP_X_REQUEST_ID", str(uuid.uuid4())))
 
         return self.app(environ, start_response)
 
@@ -45,6 +44,7 @@ class IntegrationAsgiMiddleware:
         if not header:
             raise ValueError("x-client-context not set")
 
-        client_context.set(ClientContext.from_header(header, self.connection))
+        set_client_context(ClientContext.from_header(header, self.connection))
+        set_request_id(headers.get(b"x-request-id", str(uuid.uuid4())))
 
         await self.app(scope, receive, send)

@@ -1,10 +1,12 @@
 import pytest
 import aiohttp
+import uuid
 
 from aioresponses import aioresponses
+from yarl import URL
 
 from heroku_applink.config import Config
-from heroku_applink.connection import Connection
+from heroku_applink.connection import Connection, set_request_id
 
 @pytest.fixture
 def config():
@@ -152,3 +154,99 @@ async def test_connection_multiple_requests(connection):
             {'id': '2'},
             {'id': '3'}
         ]
+
+@pytest.mark.asyncio
+async def test_connection_sets_request_id_header_when_contextvar_not_set(connection):
+    with aioresponses() as m:
+        m.get('https://example.com', status=200, payload={'success': True})
+
+        response = await connection.request("GET", "https://example.com")
+
+        assert response.status == 200
+
+        request_kwargs = m.requests[('GET', URL('https://example.com'))][0].kwargs
+        headers = request_kwargs['headers']
+        assert 'X-Request-Id' in headers
+
+        request_id_value = headers['X-Request-Id']
+        assert isinstance(request_id_value, str)
+
+        uuid.UUID(request_id_value)
+
+@pytest.mark.asyncio
+async def test_connection_uses_contextvar_request_id_when_set(connection):
+    test_request_id = "test-request-id-12345"
+
+    with aioresponses() as m:
+        m.get('https://example.com', status=200, payload={'success': True})
+
+        set_request_id(test_request_id)
+
+        response = await connection.request("GET", "https://example.com")
+
+        assert response.status == 200
+
+        request_kwargs = m.requests[('GET', URL('https://example.com'))][0].kwargs
+        headers = request_kwargs['headers']
+        assert headers['X-Request-Id'] == test_request_id
+
+@pytest.mark.asyncio
+async def test_connection_request_id_header_with_custom_headers(connection):
+    test_request_id = "custom-request-id-67890"
+    custom_headers = {'Authorization': 'Bearer token', 'Content-Type': 'application/json'}
+
+    with aioresponses() as m:
+        m.post('https://example.com', status=200, payload={'success': True})
+
+        set_request_id(test_request_id)
+
+        response = await connection.request(
+            "POST",
+            "https://example.com",
+            headers=custom_headers,
+            data={'key': 'value'}
+        )
+
+        assert response.status == 200
+
+        request_kwargs = m.requests[('POST', URL('https://example.com'))][0].kwargs
+        headers = request_kwargs['headers']
+
+        assert headers['Authorization'] == 'Bearer token'
+        assert headers['Content-Type'] == 'application/json'
+        assert headers['X-Request-Id'] == test_request_id
+
+@pytest.mark.asyncio
+async def test_connection_request_id_header_override_protection(connection):
+    contextvar_request_id = "contextvar-request-id"
+    custom_request_id = "custom-header-request-id"
+
+    with aioresponses() as m:
+        m.get('https://example.com', status=200, payload={'success': True})
+
+        set_request_id(contextvar_request_id)
+
+        response = await connection.request(
+            "GET",
+            "https://example.com",
+            headers={'X-Request-Id': custom_request_id}
+        )
+
+        assert response.status == 200
+
+        request_kwargs = m.requests[('GET', URL('https://example.com'))][0].kwargs
+        headers = request_kwargs['headers']
+        assert headers['X-Request-Id'] == contextvar_request_id
+
+@pytest.mark.asyncio
+async def test_connection_user_agent_header_always_set(connection):
+    with aioresponses() as m:
+        m.get('https://example.com', status=200, payload={'success': True})
+
+        response = await connection.request("GET", "https://example.com")
+
+        assert response.status == 200
+
+        request_kwargs = m.requests[('GET', URL('https://example.com'))][0].kwargs
+        headers = request_kwargs['headers']
+        assert headers['User-Agent'] == connection._config.user_agent()

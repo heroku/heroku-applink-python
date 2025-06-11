@@ -15,7 +15,7 @@ def index():
 
 @app.route("/client-context")
 def client_context():
-    data_api = sdk.client_context.get().data_api
+    data_api = sdk.get_client_context().data_api
 
     return jsonify({"data_api_populated": data_api is not None})
 

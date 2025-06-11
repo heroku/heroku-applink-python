@@ -7,6 +7,8 @@ For full license text, see the LICENSE file in the repo root or https://opensour
 
 import json
 import base64
+
+from contextvars import ContextVar
 from dataclasses import dataclass
 
 from .data_api import DataAPI
@@ -99,3 +101,41 @@ class ClientContext:
                 connection=connection,
             ),
         )
+
+# ContextVars for request-scoped data
+client_context: ContextVar[ClientContext] = ContextVar("client_context")
+
+def get_client_context() -> ClientContext:
+    """
+    Call `get_client_context` to get the client context for the current incoming
+    request from Salesforce. This will be set by the `IntegrationWsgiMiddleware` or
+    `IntegrationAsgiMiddleware` in your application and can only be used in requests
+    that are routed through one of these middlewares.
+
+    ```python
+    import heroku_applink as sdk
+    from fastapi import FastAPI
+
+    app = FastAPI()
+    app.add_middleware(sdk.IntegrationAsgiMiddleware, config=sdk.Config(request_timeout=5))
+
+    @app.get("/accounts")
+    async def get_accounts():
+        context = sdk.get_client_context()
+
+        query = "SELECT Id, Name FROM Account"
+        result = await context.data_api.query(query)
+
+        return {"accounts": [record.get("Name") for record in result.records]}
+    ```
+    """
+    try:
+      return client_context.get()
+    except LookupError:
+        raise ValueError("No client context found")
+
+def set_client_context(new_client_context: ClientContext):
+    """
+    Set the client context for the current request.
+    """
+    client_context.set(new_client_context)
