@@ -64,4 +64,6 @@ jobs:
         env:
           ACTOR_EMAIL: ${{ secrets.TPS_API_RELEASE_ACTOR_EMAIL }}
           TPS_API_TOKEN: ${{ secrets.TPS_API_TOKEN_PARAM }}
+        # Failure to record the release should not fail the workflow for now.
+        continue-on-error: true
         run: ./scripts/release/tps-record-release heroku-applink-python ${{ github.sha }}
