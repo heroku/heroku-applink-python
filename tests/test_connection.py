@@ -256,7 +256,7 @@ async def test_connection_user_agent_header_always_set(connection):
 
         request_kwargs = m.requests[('GET', URL('https://example.com'))][0].kwargs
         headers = request_kwargs['headers']
-        assert headers['User-Agent'] == connection._config.user_agent
+        assert headers['User-Agent'] == connection._config.user_agent()
 
 @pytest.mark.asyncio
 async def test_connection_default_headers_with_contextvar_reset(connection):
