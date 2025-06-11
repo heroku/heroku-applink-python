@@ -12,7 +12,7 @@ Classes
 # `Config`
 
 ```python
-class Config(request_timeout: float = 5, connect_timeout: float | None = None, socket_connect: float | None = None, socket_read: float | None = None, user_agent: str = 'heroku-applink-python-sdk/0.1.0')
+class Config(request_timeout: float = 5, connect_timeout: float | None = None, socket_connect: float | None = None, socket_read: float | None = None)
 ```
 Configuration for the Salesforce Data API client.
 
@@ -38,5 +38,10 @@ def default() ‑> heroku_applink.config.Config
 * `socket_read: float | None`
     Timeout for reading from the Salesforce Data API.
 
-* `user_agent: str`
-    User agent for the Salesforce Data API.
+## Methods
+
+### `user_agent`
+
+```python
+def user_agent(self) ‑> str
+```

@@ -37,7 +37,7 @@ class Connection:
             timeout = aiohttp.ClientTimeout(total=timeout)
 
         default_headers = {
-            "User-Agent": self._config.user_agent,
+            "User-Agent": self._config.user_agent(),
         }
 
         response = self._client().request(
