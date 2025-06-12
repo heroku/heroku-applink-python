@@ -80,7 +80,7 @@ def test_client_context_from_header_invalid():
     with pytest.raises(Exception):
         ClientContext.from_header("not-valid-base64")
 
-def test_client_context_from_header_without_namespace():
+def test_client_context_from_header_with_null_namespace():
     payload = {
         "orgId": "00DJS0000000123ABC",
         "orgDomainUrl": "https://example-domain.my.salesforce.com",
@@ -91,7 +91,7 @@ def test_client_context_from_header_without_namespace():
         "requestId": "req-456",
         "accessToken": "access-token-xyz",
         "apiVersion": "v57.0",
-        # namespace is intentionally omitted
+        "namespace": None,  # Explicitly set to None/null
     }
     encoded = base64.b64encode(json.dumps(payload).encode()).decode()
     connection = Connection(Config.default())
