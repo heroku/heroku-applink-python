@@ -149,9 +149,9 @@ def get_root():
 
 
 @app.get("/accounts")
-def get_accounts():
+async def get_accounts():
     data_api = sdk.get_client_context().data_api
-    result = asyncio.run(query_accounts(data_api))
+    result = await query_accounts(data_api)
     
     accounts = [
         {
@@ -161,6 +161,7 @@ def get_accounts():
         for record in result.records
     ]
     return accounts
+
 
 async def query_accounts(data_api):
     query = "SELECT Id, Name FROM Account"
