@@ -36,6 +36,19 @@ class Connection:
         self._config = config
         self._session = None
 
+    def _decode_headers(self, headers: dict) -> dict:
+        """
+        Decode headers from bytes to strings, similar to how Node.js handles headers automatically.
+        """
+        if not headers:
+            return {}
+
+        return {
+            k.decode('latin1') if isinstance(k, bytes) else k:
+            v.decode('latin1') if isinstance(v, bytes) else v
+            for k, v in headers.items()
+        }
+
     def request(
         self,
         method,
@@ -68,6 +81,8 @@ class Connection:
 
         # Start with custom headers, then override with default headers
         # This ensures our default headers (User-Agent, X-Request-Id) always take precedence
+        # Decode headers and merge with defaults
+        headers = self._decode_headers(headers)
         headers = {**(headers or {}), **default_headers}
 
         response = self._client().request(

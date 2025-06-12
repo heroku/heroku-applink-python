@@ -71,6 +71,14 @@ async def get_accounts():
     return {"accounts": [record.get("Name") for record in result.records]}
 ```
 
+<!-- python-set_client_context.md -->
+# `set_client_context`
+
+```python
+def set_client_context(new_client_context: heroku_applink.context.ClientContext)
+```
+Set the client context for the current request.
+
 Classes
 -------
 
@@ -176,7 +184,7 @@ For a list of exceptions, see:
 # `ClientContext`
 
 ```python
-class ClientContext(*, org: heroku_applink.context.Org, data_api: heroku_applink.data_api.DataAPI, request_id: str, access_token: str, api_version: str, namespace: str)
+class ClientContext(*, org: heroku_applink.context.Org, data_api: heroku_applink.data_api.DataAPI, request_id: str, access_token: str, api_version: str, namespace: str | None = None)
 ```
 Information about the Salesforce org that made the request.
 
@@ -197,7 +205,7 @@ def from_header(header: str, connection: heroku_applink.connection.Connection)
 * `data_api: heroku_applink.data_api.DataAPI`
     An initialized data API client instance for interacting with data in the org.
 
-* `namespace: str`
+* `namespace: str | None`
     Namespace of the Salesforce component that made the request.
 
 * `org: heroku_applink.context.Org`
