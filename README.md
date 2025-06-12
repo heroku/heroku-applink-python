@@ -151,7 +151,6 @@ def get_root():
 @app.get("/accounts")
 def get_accounts():
     data_api = sdk.get_client_context().data_api
-    
     result = asyncio.run(query_accounts(data_api))
     
     accounts = [
