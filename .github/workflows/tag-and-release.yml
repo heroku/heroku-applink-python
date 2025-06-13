@@ -13,6 +13,10 @@ on:
         description: 'PR number (e.g. 75)'
         required: true
         type: string
+      source_branch:
+        description: 'Source branch name (e.g. release-v0.2.0)'
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -34,17 +38,20 @@ jobs:
           echo "pr=$PR_NUM" >> $GITHUB_OUTPUT
 
       - name: Get source branch name from PR
+        if: github.event_name == 'workflow_run'
         id: source_branch
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if [ "${{ github.event_name }}" == "workflow_run" ]; then
-            PR_NUM=${{ steps.pr.outputs.pr }}
-          else
-            PR_NUM=${{ github.event.inputs.pr_number }}
-          fi
+          PR_NUM=${{ steps.pr.outputs.pr }}
           BRANCH=$(gh pr view $PR_NUM --json headRefName --jq .headRefName)
           echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+
+      - name: Set source branch from input
+        if: github.event_name == 'workflow_dispatch'
+        id: source_branch_input
+        run: |
+          echo "branch=${{ github.event.inputs.source_branch }}" >> $GITHUB_OUTPUT
 
   push-git-tag:
     needs: get-source-branch
