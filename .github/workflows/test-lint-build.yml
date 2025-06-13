@@ -6,7 +6,7 @@ permissions:
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "bj-manual-release" ]
   pull_request:
     branches: [ "main" ]
 
