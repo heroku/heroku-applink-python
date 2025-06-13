@@ -39,12 +39,14 @@ class IntegrationAsgiMiddleware:
             await self.app(scope, receive, send)
             return
 
-        headers = dict(scope["headers"])
-        header = headers.get(b"x-client-context")
+        # Use the Connection's header decoding
+        headers = self.connection._decode_headers(dict(scope["headers"]))
+        header = headers.get("x-client-context")
         if not header:
             raise ValueError("x-client-context not set")
 
         set_client_context(ClientContext.from_header(header, self.connection))
-        set_request_id(headers.get(b"x-request-id", str(uuid.uuid4())))
+        # No b prefix needed since headers are already decoded
+        set_request_id(headers.get("x-request-id", str(uuid.uuid4())))
 
         await self.app(scope, receive, send)

@@ -149,10 +149,18 @@ def get_root():
 
 
 @app.get("/accounts")
-def get_accounts():
+async def get_accounts():
     data_api = sdk.get_client_context().data_api
-    asyncio.run(query_accounts(data_api))
-    return {"Some": "Accounts"}
+    result = await query_accounts(data_api)
+    
+    accounts = [
+        {
+            "id": record.fields["Id"],
+            "name": record.fields["Name"]
+        }
+        for record in result.records
+    ]
+    return accounts
 
 
 async def query_accounts(data_api):
@@ -160,6 +168,7 @@ async def query_accounts(data_api):
     result = await data_api.query(query)
     for record in result.records:
         print("===== account record", record)
+    return result
 ```
 
 #### WSGI

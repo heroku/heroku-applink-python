@@ -79,3 +79,27 @@ def test_client_context_from_header_invalid():
     # Provide bad Base64 encoded string
     with pytest.raises(Exception):
         ClientContext.from_header("not-valid-base64")
+
+def test_client_context_from_header_with_null_namespace():
+    payload = {
+        "orgId": "00DJS0000000123ABC",
+        "orgDomainUrl": "https://example-domain.my.salesforce.com",
+        "userContext": {
+            "userId": "005JS000000H123",
+            "username": "user@example.tld",
+        },
+        "requestId": "req-456",
+        "accessToken": "access-token-xyz",
+        "apiVersion": "v57.0",
+        "namespace": None,  # Explicitly set to None/null
+    }
+    encoded = base64.b64encode(json.dumps(payload).encode()).decode()
+    connection = Connection(Config.default())
+    ctx = ClientContext.from_header(encoded, connection)
+
+    assert ctx.org.id == "00DJS0000000123ABC"
+    assert ctx.org.user.username == "user@example.tld"
+    assert ctx.request_id == "req-456"
+    assert ctx.access_token == "access-token-xyz"
+    assert ctx.api_version == "v57.0"
+    assert ctx.namespace is None

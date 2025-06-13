@@ -73,7 +73,7 @@ class ClientContext:
     """Valid access token for the current context org/user."""
     api_version: str
     """API version of the Salesforce component that made the request."""
-    namespace: str
+    namespace: str | None = None
     """Namespace of the Salesforce component that made the request."""
 
     @classmethod
@@ -93,7 +93,7 @@ class ClientContext:
             request_id=data["requestId"],
             access_token=data["accessToken"],
             api_version=data["apiVersion"],
-            namespace=data["namespace"],
+            namespace=data.get("namespace"),  # Use get() to handle None case
             data_api=DataAPI(
                 org_domain_url=data["orgDomainUrl"],
                 api_version=data["apiVersion"],

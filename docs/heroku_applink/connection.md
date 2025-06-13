@@ -5,6 +5,25 @@ All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
 
+Functions
+---------
+
+<!-- python-get_request_id.md -->
+# `get_request_id`
+
+```python
+def get_request_id() ‑> str
+```
+Get the request ID for the current request.
+
+<!-- python-set_request_id.md -->
+# `set_request_id`
+
+```python
+def set_request_id(new_request_id: str)
+```
+Set the request ID for the current request.
+
 Classes
 -------
 
