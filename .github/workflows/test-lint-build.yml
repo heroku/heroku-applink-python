@@ -9,6 +9,12 @@ on:
     branches: [ "main", "bj-manual-release" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number (e.g. 75)'
+        required: true
+        type: string
 
 jobs:
   test-lint-build:
@@ -63,7 +69,7 @@ jobs:
         run: uv build
 
       - name: Upload artifacts for release
-        if: ${{ matrix.python-version == steps.pyproject-version.outputs.version && github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, 'release-v') }}
+        if: ${{ matrix.python-version == steps.pyproject-version.outputs.version && github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/bj-manual-release') && contains(github.event.head_commit.message, 'release-v') }}
         uses: actions/upload-artifact@v4
         with:
           name: ${{ github.ref_name }}
