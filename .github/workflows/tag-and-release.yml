@@ -54,8 +54,7 @@ jobs:
           echo "branch=${{ github.event.inputs.source_branch }}" >> $GITHUB_OUTPUT
 
   push-git-tag:
-    needs: get-source-branch
-    if: startsWith(needs.get-source-branch.outputs.branch, 'release-v')
+    if: startsWith(github.event.inputs.source_branch, 'release-v')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -64,22 +63,12 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Download artifact using GitHub CLI
-        if: github.event_name == 'workflow_run'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          mkdir -p dist
-          gh run download ${{ github.event.workflow_run.id }} --name ${{ github.event.workflow_run.head_branch }} --dir dist/
-
       - name: Install uv
-        if: github.event_name == 'workflow_dispatch'
         uses: astral-sh/setup-uv@v5
         with:
           cache-dependency-glob: pyproject.toml
 
       - name: Build package
-        if: github.event_name == 'workflow_dispatch'
         run: |
           uv sync --all-extras
           uv build
@@ -87,7 +76,7 @@ jobs:
       - name: Extract version from branch name
         id: version
         run: |
-          VERSION=$(echo "${{ needs.get-source-branch.outputs.branch }}" | sed 's/release-v//')
+          VERSION=$(echo "${{ github.event.inputs.source_branch }}" | sed 's/release-v//')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Extracted version: $VERSION"
 
@@ -122,9 +111,8 @@ jobs:
           generate_release_notes: true
 
       - name: Upload artifacts for publish workflow
-        if: github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ github.ref_name }}
+          name: ${{ github.event.inputs.source_branch }}
           path: dist/
           retention-days: 90
