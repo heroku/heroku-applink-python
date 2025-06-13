@@ -39,11 +39,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 *  add x-app-uuid to headers for auth requests
 * Fixing a bug that caused URL paths to be excluded (#58) ([#58](https://github.com/heroku/heroku-applink-python/pull/58))
 *  add x-app-uuid to headers for auth requests
-* Fixing a bug that caused URL paths to be excluded (#58) ([#58](https://github.com/heroku/heroku-applink-python/pull/58))
-*  add x-app-uuid to headers for auth requests
-* Fixing a bug that caused URL paths to be excluded (#58) ([#58](https://github.com/heroku/heroku-applink-python/pull/58))
-* Fixing a bug that caused URL paths to be excluded (#58) ([#58](https://github.com/heroku/heroku-applink-python/pull/58))
-*  add x-app-uuid to headers for auth requests
 * fix indent
 * fix syntax
 * fix .toml
