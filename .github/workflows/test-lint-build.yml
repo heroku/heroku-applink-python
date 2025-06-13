@@ -15,6 +15,10 @@ on:
         description: 'PR number (e.g. 75)'
         required: true
         type: string
+      source_branch:
+        description: 'Source branch name (e.g. release-v0.2.0)'
+        required: true
+        type: string
 
 jobs:
   test-lint-build:
@@ -68,17 +72,8 @@ jobs:
       - name: Build package
         run: uv build
 
-      - name: Get source branch name
-        id: source_branch
-        if: github.event_name == 'workflow_dispatch'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          BRANCH=$(gh pr view ${{ github.event.inputs.pr_number }} --json headRefName --jq .headRefName)
-          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
-
       - name: Upload artifacts for release
-        if: ${{ matrix.python-version == steps.pyproject-version.outputs.version && ((github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/bj-manual-release') && contains(github.event.head_commit.message, 'release-v')) || (github.event_name == 'workflow_dispatch' && startsWith(steps.source_branch.outputs.branch, 'release-v'))) }}
+        if: ${{ matrix.python-version == steps.pyproject-version.outputs.version && ((github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/bj-manual-release') && contains(github.event.head_commit.message, 'release-v')) || (github.event_name == 'workflow_dispatch' && startsWith(github.event.inputs.source_branch, 'release-v'))) }}
         uses: actions/upload-artifact@v4
         with:
           name: ${{ github.ref_name }}
