@@ -40,42 +40,28 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Get latest build workflow run
-        if: github.event_name == 'workflow_run'
+      - name: Get latest tag-and-release workflow run
         id: get_workflow
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # Get the most recent successful build workflow run for this commit
-          RUN_ID=$(gh run list --workflow "test-lint-build.yml" --branch bj-manual-release --json databaseId,conclusion,headSha --jq ".[] | select(.headSha == \"${{ github.sha }}\" and .conclusion == \"success\") | .databaseId" | head -n 1)
+          # Get the most recent successful tag-and-release workflow run
+          RUN_ID=$(gh run list --workflow "tag-and-release.yml" --branch bj-manual-release --json databaseId,conclusion,headSha --jq ".[] | select(.headSha == \"${{ github.sha }}\" and .conclusion == \"success\") | .databaseId" | head -n 1)
           
           if [ -z "$RUN_ID" ]; then
-            echo "No successful build found for commit ${{ github.sha }}"
+            echo "No successful tag-and-release found for commit ${{ github.sha }}"
             exit 1
           fi
           
           echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
-          echo "Found build workflow run: $RUN_ID"
+          echo "Found tag-and-release workflow run: $RUN_ID"
 
       - name: Download build artifacts
-        if: github.event_name == 'workflow_run'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p dist
           gh run download ${{ steps.get_workflow.outputs.run_id }} --name bj-manual-release --dir dist/
-
-      - name: Install uv
-        if: github.event_name == 'workflow_dispatch'
-        uses: astral-sh/setup-uv@v5
-        with:
-          cache-dependency-glob: pyproject.toml
-
-      - name: Build package
-        if: github.event_name == 'workflow_dispatch'
-        run: |
-          uv sync --all-extras
-          uv build
 
       - name: Release to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
