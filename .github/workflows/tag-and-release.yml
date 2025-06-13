@@ -6,8 +6,13 @@ on:
     types:
       - completed
     branches:
-      - main
       - bj-manual-release
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number (e.g. 75)'
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -15,8 +20,35 @@ permissions:
   id-token: write
 
 jobs:
+  get-source-branch:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'bj-manual-release' || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    outputs:
+      branch: ${{ steps.source_branch.outputs.branch }}
+    steps:
+      - name: Get PR number from merge commit
+        if: github.event_name == 'workflow_run'
+        id: pr
+        run: |
+          PR_NUM=$(echo "${{ github.event.workflow_run.head_commit.message }}" | grep -o '#[0-9]*' | head -n1 | tr -d '#')
+          echo "pr=$PR_NUM" >> $GITHUB_OUTPUT
+
+      - name: Get source branch name from PR
+        id: source_branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_run" ]; then
+            PR_NUM=${{ steps.pr.outputs.pr }}
+          else
+            PR_NUM=${{ github.event.inputs.pr_number }}
+          fi
+          BRANCH=$(gh pr view $PR_NUM --json headRefName --jq .headRefName)
+          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+
   push-git-tag:
-    if: ${{ github.event.workflow_run.conclusion == 'success' && contains(github.event.workflow_run.head_commit.message, 'Merge pull request') && contains(github.event.workflow_run.head_commit.message, 'release-v') }}
+    needs: get-source-branch
+    if: startsWith(needs.get-source-branch.outputs.branch, 'release-v')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -26,16 +58,25 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Download artifact using GitHub CLI
+        if: github.event_name == 'workflow_run'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p dist
-          gh run download ${{ github.event.workflow_run.id }} --name release-artifacts-main --dir dist/
+          gh run download ${{ github.event.workflow_run.id }} --name ${{ github.event.workflow_run.head_branch }} --dir dist/
+
+      - name: Build package
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+          python -m build
 
       - name: Extract version from branch name
         id: version
         run: |
-          VERSION=$(echo "${{ github.event.workflow_run.head_commit.message }}" | grep -o 'release-v[0-9]\+\.[0-9]\+\.[0-9]\+' | sed 's/release-v//')
+          VERSION=$(echo "${{ needs.get-source-branch.outputs.branch }}" | sed 's/release-v//')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Extracted version: $VERSION"
 
