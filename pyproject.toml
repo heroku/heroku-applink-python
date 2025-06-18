@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "heroku_applink"
-version = "1.0.0"
+version = "0.2.0"
 description = "Simple SDK for Heroku AppLink and Salesforce development"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -52,7 +52,7 @@ dev = [
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 addopts = "--cov=heroku_applink --cov-report=term-missing -v"
-asyncio_mode = "auto"
+asyncio_mode = "strict"
 asyncio_default_fixture_loop_scope = "function"
 
 [tool.ruff]
@@ -77,7 +77,7 @@ commands_pre =
     coverage erase
 commands =
     ruff check .
-    pytest
+    uv run pytest
     coverage report --fail-under=80 --show-missing
     coverage erase
 """
