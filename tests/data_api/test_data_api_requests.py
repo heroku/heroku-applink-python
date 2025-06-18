@@ -1,5 +1,7 @@
 import pytest
 from unittest.mock import AsyncMock
+import asyncio
+import sys
 
 from heroku_applink.data_api._requests import (
     CreateRecordRestApiRequest,
@@ -346,3 +348,14 @@ async def test_parse_queried_record_with_unexpected_field_type():
     }
     result = await _parse_queried_record(json_body, lambda x: b"")
     assert result.fields["SomeField"] == 42
+
+
+@pytest.fixture(scope="session")
+def event_loop():
+    if sys.version_info[:2] == (3, 10):
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+    else:
+        loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
