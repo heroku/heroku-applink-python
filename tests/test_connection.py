@@ -250,3 +250,60 @@ async def test_connection_user_agent_header_always_set(connection):
         request_kwargs = m.requests[('GET', URL('https://example.com'))][0].kwargs
         headers = request_kwargs['headers']
         assert headers['User-Agent'] == connection._config.user_agent()
+
+def test_decode_headers_with_empty_input(connection):
+    """Test that empty or None headers return an empty dict."""
+    assert connection._decode_headers({}) == {}
+    assert connection._decode_headers(None) == {}
+
+def test_decode_headers_with_string_values(connection):
+    """Test that string headers are returned unchanged."""
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer token"
+    }
+    assert connection._decode_headers(headers) == headers
+
+def test_decode_headers_with_bytes_keys(connection):
+    """Test that byte keys are properly decoded to strings."""
+    headers = {
+        b"Content-Type": "application/json",
+        b"Authorization": "Bearer token"
+    }
+    decoded = connection._decode_headers(headers)
+    assert decoded["Content-Type"] == "application/json"
+    assert decoded["Authorization"] == "Bearer token"
+
+def test_decode_headers_with_bytes_values(connection):
+    """Test that byte values are properly decoded to strings."""
+    headers = {
+        "Content-Type": b"application/json",
+        "Authorization": b"Bearer token"
+    }
+    decoded = connection._decode_headers(headers)
+    assert decoded["Content-Type"] == "application/json"
+    assert decoded["Authorization"] == "Bearer token"
+
+def test_decode_headers_with_mixed_types(connection):
+    """Test that mixed byte and string headers are handled correctly."""
+    headers = {
+        b"Content-Type": b"application/json",
+        "Authorization": b"Bearer token",
+        b"Accept": "application/json",
+        "X-Custom": b"value"
+    }
+    decoded = connection._decode_headers(headers)
+    assert decoded["Content-Type"] == "application/json"
+    assert decoded["Authorization"] == "Bearer token"
+    assert decoded["Accept"] == "application/json"
+    assert decoded["X-Custom"] == "value"
+
+def test_decode_headers_with_non_ascii(connection):
+    """Test that non-ASCII characters are properly decoded using latin1."""
+    headers = {
+        b"X-Custom": b"v\xe4lue",  # 'välue' in latin1
+        "X-Other": b"v\xe4lue"
+    }
+    decoded = connection._decode_headers(headers)
+    assert decoded["X-Custom"] == "välue"
+    assert decoded["X-Other"] == "välue"
