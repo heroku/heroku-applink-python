@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0](https://github.com/heroku/heroku-applink-python/compare/v0.2.0...1.0.0) - 2025-06-19
+
+
+### Changes
+
+* major release v1.0.0
+
+### Other
+
 # [0.2.0](https://github.com/heroku/heroku-applink-python/compare/TDX...0.2.0) - 2025-06-13
 
 
