@@ -8,10 +8,9 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Changes
 
+* major release v1.0.0
 
 ### Other
-
-* cleanup tests (#77) ([#77](https://github.com/heroku/heroku-applink-python/pull/77))
 
 # [0.2.0](https://github.com/heroku/heroku-applink-python/compare/TDX...0.2.0) - 2025-06-13
 
