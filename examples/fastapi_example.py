@@ -1,3 +1,4 @@
+import asyncio
 import heroku_applink as sdk
 from fastapi import FastAPI
 

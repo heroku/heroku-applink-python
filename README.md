@@ -133,6 +133,7 @@ If you are using an ASGI framework (like FastAPI), you can use the `IntegrationA
 
 ```python
 # FastAPI example
+import asyncio
 import heroku_applink as sdk
 from fastapi import FastAPI
 
