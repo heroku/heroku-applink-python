@@ -132,7 +132,7 @@ Run script manually to check for moratorium and obtain release lock.
 
 ```bash
 # Get the latest SHA from the most recent tag
-export SHA="$(git rev-parse $(git describe --tags --abbrev=0))"
+export SHA="$(git rev-parse $(git tag --sort=-creatordate | head -n 1)^{commit})"
 
 ./scripts/release/tps-check-lock heroku-applink-python $SHA
 ```
