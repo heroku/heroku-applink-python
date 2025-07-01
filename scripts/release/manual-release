@@ -1,0 +1,367 @@
+#!/bin/bash
+
+# Manual Release Script for heroku-applink-python
+# This script handles the post-merge release steps (assumes release branch is already merged)
+#
+# Required environment variables:
+# export TPS_API_TOKEN="your_token_from_team_password_manager"
+#
+# Optional environment variables (can also be passed via command line):
+# export ACTOR_EMAIL="your.email@salesforce.com"
+# export PYPI_TOKEN="your_pypi_token"
+#
+# Example usage:
+# 1. Set up environment variables:
+#    export TPS_API_TOKEN="your_token_from_team_password_manager"
+#    export ACTOR_EMAIL="your.email@salesforce.com"
+#    export PYPI_TOKEN="your_pypi_token"
+#
+# 2. Run the script:
+#    ./scripts/release/manual-release -v 1.0.0
+#
+# 3. Or run individual steps:
+#    ./scripts/release/manual-release -s moratorium -v 1.0.0
+#    ./scripts/release/manual-release -s tag -v 1.0.0
+#    ./scripts/release/manual-release -s build -v 1.0.0
+#    ./scripts/release/manual-release -s release -v 1.0.0
+#    ./scripts/release/manual-release -s publish
+#    ./scripts/release/manual-release -s record -v 1.0.0
+
+set -e  # Exit on any error
+
+# Function to print output
+print_status() {
+    echo "[INFO] $1"
+}
+
+print_success() {
+    echo "[SUCCESS] $1"
+}
+
+print_warning() {
+    echo "[WARNING] $1"
+}
+
+print_error() {
+    echo "[ERROR] $1"
+}
+
+# Function to check if command exists
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+# Function to check required tools
+check_requirements() {
+    print_status "Checking requirements..."
+    
+    if ! command_exists git; then
+        print_error "git is not installed"
+        exit 1
+    fi
+    
+    if ! command_exists uv; then
+        print_error "uv is not installed"
+        exit 1
+    fi
+    
+    if ! command_exists gh; then
+        print_error "GitHub CLI (gh) is not installed"
+        exit 1
+    fi
+    
+    print_success "All requirements met"
+}
+
+# Function to get version from user
+get_version() {
+    if [ -z "$VERSION" ]; then
+        echo -n "Enter version (e.g., 1.0.0): "
+        read -r VERSION
+    fi
+    
+    if [ -z "$VERSION" ]; then
+        print_error "Version is required"
+        exit 1
+    fi
+    
+    print_status "Using version: $VERSION"
+}
+
+# Function to verify current state
+verify_state() {
+    print_status "Verifying current state..."
+    
+    # Check if we're on main branch
+    CURRENT_BRANCH=$(git branch --show-current)
+    if [ "$CURRENT_BRANCH" != "main" ]; then
+        print_error "You must be on the main branch. Current branch: $CURRENT_BRANCH"
+        print_status "Please checkout main: git checkout main"
+        exit 1
+    fi
+    
+    # Pull latest changes
+    print_status "Pulling latest changes from main..."
+    git pull origin main
+    
+    # Check if version exists in pyproject.toml
+    if [ -n "$VERSION" ]; then
+        PYPROJECT_VERSION=$(grep "^version = " pyproject.toml | sed 's/version = "\(.*\)"/\1/')
+        if [ "$PYPROJECT_VERSION" != "$VERSION" ]; then
+            print_warning "Version in pyproject.toml ($PYPROJECT_VERSION) doesn't match specified version ($VERSION)"
+            echo -n "Continue anyway? (y/N): "
+            read -r response
+            if [[ ! "$response" =~ ^[Yy]$ ]]; then
+                exit 1
+            fi
+        fi
+    fi
+    
+    print_success "State verified - ready to proceed with release"
+}
+
+# Function to check moratorium and obtain release lock
+check_moratorium() {
+    print_status "Checking moratorium and obtaining release lock..."
+    
+    # Get the latest SHA from the most recent tag
+    export SHA="$(git rev-parse $(git tag --sort=-creatordate | head -n 1)^{commit})"
+    print_status "Using SHA: $SHA"
+    
+    if [ -z "$TPS_API_TOKEN" ]; then
+        print_error "TPS_API_TOKEN environment variable is required"
+        print_status "You can find this in team password manager"
+        exit 1
+    fi
+    
+    ./scripts/release/tps-check-lock heroku-applink-python "$SHA"
+    print_success "Moratorium check passed and release lock obtained"
+}
+
+# Function to create and push tag
+create_tag() {
+    print_status "Creating and pushing tag..."
+    
+    # Check if tag already exists
+    if git tag -l | grep -q "^v$VERSION$"; then
+        print_warning "Tag v$VERSION already exists"
+        echo -n "Delete existing tag and recreate? (y/N): "
+        read -r response
+        if [[ "$response" =~ ^[Yy]$ ]]; then
+            git tag -d "v$VERSION"
+            git push origin ":refs/tags/v$VERSION" 2>/dev/null || true
+        else
+            print_status "Using existing tag v$VERSION"
+            return 0
+        fi
+    fi
+    
+    # Create signed tag
+    git tag -s "v$VERSION" -m "Release v$VERSION"
+    print_status "Tag v$VERSION created"
+    
+    # Push tag to origin
+    git push origin "v$VERSION"
+    print_success "Tag v$VERSION pushed to origin"
+}
+
+# Function to build package
+build_package() {
+    print_status "Building package..."
+    
+    # Checkout the latest tag
+    git checkout "$(git describe --tags --abbrev=0)"
+    
+    # Build the package
+    uv build
+    print_success "Package built successfully"
+    
+    # Show built files
+    print_status "Built files:"
+    ls -la dist/
+}
+
+# Function to create GitHub release
+create_github_release() {
+    print_status "Creating GitHub release..."
+    
+    # Check if dist files exist
+    if [ ! -f dist/*.whl ] || [ ! -f dist/*.tar.gz ]; then
+        print_error "Built files not found in dist/ directory"
+        exit 1
+    fi
+    
+    # Check if release already exists
+    if gh release view "v$VERSION" >/dev/null 2>&1; then
+        print_warning "GitHub release v$VERSION already exists"
+        echo -n "Delete existing release and recreate? (y/N): "
+        read -r response
+        if [[ "$response" =~ ^[Yy]$ ]]; then
+            gh release delete "v$VERSION" --yes
+        else
+            print_status "Using existing GitHub release v$VERSION"
+            return 0
+        fi
+    fi
+    
+    gh release create "v$VERSION" --generate-notes dist/*.whl dist/*.tar.gz
+    print_success "GitHub release created"
+}
+
+# Function to publish to PyPI
+publish_to_pypi() {
+    print_status "Publishing to PyPI..."
+    
+    # Check if PYPI_TOKEN is set
+    if [ -z "$PYPI_TOKEN" ]; then
+        print_warning "PYPI_TOKEN not set. You may be prompted for credentials."
+    fi
+    
+    uv publish
+    print_success "Package published to PyPI"
+}
+
+# Function to record release in change management
+record_release() {
+    print_status "Recording release in change management..."
+    
+    # Get the latest SHA from the most recent tag
+    export SHA="$(git rev-parse $(git tag --sort=-creatordate | head -n 1)^{commit})"
+    
+    # Set actor email if not provided
+    if [ -z "$ACTOR_EMAIL" ]; then
+        export ACTOR_EMAIL="brittany.jones@salesforce.com"
+    fi
+    
+    print_status "Using SHA: $SHA"
+    print_status "Using actor email: $ACTOR_EMAIL"
+    
+    ./scripts/release/tps-record-release heroku-applink-python "$SHA" "$ACTOR_EMAIL"
+    print_success "Release recorded in change management"
+}
+
+# Function to show usage
+show_usage() {
+    echo "Usage: $0 [OPTIONS]"
+    echo ""
+    echo "Manual Release Script - Post-Merge Steps"
+    echo "Assumes the release branch has already been merged into main"
+    echo ""
+    echo "Options:"
+    echo "  -v, --version VERSION    Version to release (e.g., 1.0.0)"
+    echo "  -e, --email EMAIL        Actor email for change management"
+    echo "  -s, --step STEP          Run specific step (moratorium|tag|build|release|publish|record)"
+    echo "  -h, --help               Show this help message"
+    echo ""
+    echo "Environment variables:"
+    echo "  VERSION                  Version to release"
+    echo "  ACTOR_EMAIL              Actor email for change management"
+    echo "  TPS_API_TOKEN            TPS API token (required for moratorium check)"
+    echo "  PYPI_TOKEN               PyPI token (optional, for publishing)"
+    echo ""
+    echo "Prerequisites:"
+    echo "  - Release branch must be merged into main"
+    echo "  - You must be on the main branch"
+    echo "  - Version must be updated in pyproject.toml"
+    echo ""
+    echo "Examples:"
+    echo "  $0 -v 1.0.0                              # Complete release process"
+    echo "  $0 -s moratorium -v 1.0.0                # Check moratorium only"
+    echo "  $0 -s tag -v 1.0.0                       # Create tag only"
+    echo "  $0 -s build -v 1.0.0                     # Build package only"
+    echo "  $0 -s release -v 1.0.0                   # Create GitHub release only"
+    echo "  $0 -s publish                            # Publish to PyPI only"
+    echo "  $0 -s record -v 1.0.0                    # Record in change management only"
+}
+
+# Main script
+main() {
+    # Parse command line arguments
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            -v|--version)
+                VERSION="$2"
+                shift 2
+                ;;
+            -e|--email)
+                ACTOR_EMAIL="$2"
+                shift 2
+                ;;
+            -s|--step)
+                STEP="$2"
+                shift 2
+                ;;
+            -h|--help)
+                show_usage
+                exit 0
+                ;;
+            *)
+                print_error "Unknown option: $1"
+                show_usage
+                exit 1
+                ;;
+        esac
+    done
+    
+    # Check requirements
+    check_requirements
+    
+    # If specific step is requested, run only that step
+    if [ -n "$STEP" ]; then
+        case $STEP in
+            moratorium)
+                check_moratorium
+                ;;
+            tag)
+                get_version
+                verify_state
+                create_tag
+                ;;
+            build)
+                get_version
+                verify_state
+                build_package
+                ;;
+            release)
+                get_version
+                verify_state
+                create_github_release
+                ;;
+            publish)
+                publish_to_pypi
+                ;;
+            record)
+                record_release
+                ;;
+            *)
+                print_error "Unknown step: $STEP"
+                print_status "Available steps: moratorium, tag, build, release, publish, record"
+                exit 1
+                ;;
+        esac
+        exit 0
+    fi
+    
+    # Complete release process
+    print_status "Starting complete manual release process..."
+    
+    # Get version if not provided
+    get_version
+    
+    # Verify current state
+    verify_state
+    
+    # Run all steps
+    check_moratorium
+    create_tag
+    build_package
+    create_github_release
+    publish_to_pypi
+    record_release
+    
+    print_success "Manual release process completed successfully!"
+    print_status "Version $VERSION has been released and published"
+}
+
+# Run main function with all arguments
+main "$@" 

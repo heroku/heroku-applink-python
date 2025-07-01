@@ -123,24 +123,54 @@ This "fix forward" approach ensures:
 
 # Manual Release Workflow
 
-The automated release process is new, and may need some debugging pending more runs in production. In the case you need to release a new version and the release workflow in github actions fails, you can do a manual release.
+The automated release process is new, and may need some debugging pending more runs in production. In the case you need to release a new version and the release workflow in github actions fails, you can do a manual release. You have two options, you can run the release process step by step, or you can use a few scripts instead. The scripts have not yet been thouroughly tested. 
 
 ## Manual Release Process
 
-### 1. Moratorium Check and Obtain Release Lock
-Run script manually to check for moratorium and obtain release lock.
+**Option 1**
+### Running the Manual Release script
+### 1. Creating a Release Branch
 
+Run the draft-release script locally:
 ```bash
-# Get the latest SHA from the most recent tag
-export SHA="$(git rev-parse $(git tag --sort=-creatordate | head -n 1)^{commit})"
+# For a minor version bump, auto generating the version
+./scripts/release/draft-release minor
 
-./scripts/release/tps-check-lock heroku-applink-python $SHA
+# You can also bump from a specific previous version
+./scripts/release/draft-release patch 1.2.2
 ```
 
-**Required environment variables**
-TPS_API_TOKEN - This can be found in team password manager
+This method will:
+- Create a new release branch (e.g., `release-v$VERSION`)
+- Update version in `pyproject.toml`
+- Update `CHANGELOG.md` with all changes since the last release
+- Create a draft pull request
 
-### 2. Creating a Release Branch
+**Requirements**
+- Review all changelog entries
+- The commit message for the release branch must include "Merge pull request" and "release-v$VERSION" to trigger the release workflows.
+```
+Merge pull request release-v$VERSION
+```
+### 2. Run the manual-release script
+1. Once the release branch has been merged into main, run the manual-release script to generate the release. You can run the script step by step, or as a whole.
+
+```bash
+# Set up necessary environment variables:
+# export TPS_API_TOKEN="your_token_from_team_password_manager"
+# export ACTOR_EMAIL="your.email@salesforce.com"
+
+# Individual Steps
+./scripts/release/manual-release -s moratorium -v 1.0.0
+./scripts/release/manual-release -s tag -v 1.0.0
+
+# All Steps
+./scripts/release/manual-release -v 1.0.0
+```
+
+**Option 2**
+### Running the Manual Release step by step
+### 1. Creating a Release Branch
 
 Run the draft-release script locally:
 ```bash
@@ -164,9 +194,22 @@ This method will:
 Merge pull request release-v$VERSION
 ```
 
-### 3. Pushing the tag to Github
+### 1. Moratorium Check and Obtain Release Lock
+Run script manually to check for moratorium and obtain release lock.
 
-Once the release branch as been merged into main, you will want to push the signed tag to github. 
+```bash
+# Get the latest SHA from the release branch commit (assuming it was the most recent)
+export SHA="$(git rev-parse HEAD)"
+
+./scripts/release/tps-check-lock heroku-applink-python $SHA
+```
+
+**Required environment variables**
+TPS_API_TOKEN - This can be found in team password manager
+
+### 2. Pushing the tag to Github
+
+Once the release branch as been merged into main and we have obtained our lock successfully, you will want to push the signed tag to github. 
 
 ```bash
 export VERSION="1.0.0"
