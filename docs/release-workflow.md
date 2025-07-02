@@ -1,17 +1,17 @@
-# Release Workflow
-updated: 05/16/2025
+# Manual and Automated Release Workflows
+updated: 06/20/2025
 
-This document describes the process for releasing new versions of the heroku-applink-python library.
+This document describes the process for releasing new versions of the heroku-applink-python library automatically through Github actions, or manually. 
 
 ## Overview
 
-The release process is automated through GitHub Actions and consists of three main workflows:
+The automated release process is automated through GitHub Actions and consists of three main workflows:
 
-1. Package Library (`package.yml`)
-2. Create Tag (`create-tag.yml`)
-3. Publish Release (`publish.yml`)
+1. Test, Lint, and Build (`test-lint-build.yml`)
+2. Create Github Tag and Release (`tag-and-release.yml`)
+3. Publish to PyPI and Change Management (`publish.yml`)
 
-## Release Process
+## Automated Release Process
 
 ### 1. Creating a Release Branch
 
@@ -25,57 +25,66 @@ Run the draft-release script locally:
 ```
 
 This method will:
-- Create a new release branch (e.g., `release-v1.0.0`)
+- Create a new release branch (e.g., `release-v$VERSION`)
 - Update version in `pyproject.toml`
 - Update `CHANGELOG.md` with all changes since the last release
 - Create a draft pull request
 
+**Requirements**
+- Review all changelog entries
+- The commit message for the release branch must include "Merge pull request" and "release-v$VERSION" to trigger the release workflows.
+
+ex.
+```
+Merge pull request release-v$VERSION
+```
+
 ### 2. Testing and Building
 
-When a pull request is pushed into main from a branch named "release-*:
+When a pull request is pushed into main from a branch named `release-*`, with commit message `Merge pull request release-*`:
 
-1. The Package Library workflow runs automatically and:
+1. The Test, Lint, and Build workflow runs automatically and:
    - Runs tests across Python 3.10, 3.11, 3.12, and 3.13
    - Runs linting with Ruff
    - Builds the package
-   - Uploads the build artifacts from the build
 
 ### 3. Creating a Release Tag
 
-After the release branch pull request is merged to main:
+After the release branch pull request is merged to main and the Test, Lint, and Build workflow completes successfully:
 
-1. The Create Tag workflow is triggered, and automatically:
+1. The Create Github Tag and Release workflow is triggered, and automatically:
    - Extracts the version from the release branch name
-   - Creates a new tag (e.g., `v1.0.0`)
+   - Creates a new tag (e.g., `v$VERSION`)
    - Pushes the tag to the repository
+   - Creates a Github release
 
 ### 4. Publishing the Release
 
-When a new tag is pushed during the create tag workflow:
+When the Create Github Tag and Release workflow completes successfully:
 
 1. The Publish Release workflow is triggered, and automatically:
-   - Checks for deployment moratorium using TPS
-   - Downloads the build artifacts from the build job
-   - Creates a GitHub release with the artifacts
+   - Checks for deployment moratorium using TPS and obtains release lock
+   - Checks out the new tag and builds the package
    - Publishes the package to PyPI
    - Records the release in Change Management
 
 ## Workflow Files
 
-### package.yml
+### test-lint-build.yml
 - Triggers on pushes to main and pull requests
 - Runs tests and linting
 - Builds the package
-- Uploads artifacts when merging from release branches
 
-### create-tag.yml
-- Triggers on successful completion of Package Library workflow if it is a release branch
+### tag-and-release.yml
+- Triggers on successful completion of Test, Lint, and Build workflow if it is a release branch and contains the necessary commit message
 - Creates and pushes version tags
+- Creates a Gihub release
 
 ### publish.yml
-- Triggers on new version tags pushed to main
+- Triggers on successful completion of Create Github Tag and Release
 - Handles the actual release process
-- Publishes to GitHub, PyPI, and Change Management
+- Checks for moratorium and obtains release locks
+- Publishes to PyPI, and Change Management
 
 ## Requirements
 
@@ -84,7 +93,9 @@ When a new tag is pushed during the create tag workflow:
   - `id-token: write` (for PyPI publishing)
 - Environment secrets:
   - `TPS_API_TOKEN_PARAM` - stored in token store
-  - `TPS_API_RELEASE_ACTOR_EMAIL` - brittany.jones@heroku.com
+  - `TPS_API_RELEASE_ACTOR_EMAIL` - brittany.jones@salesforce.com
+- Release Branch Commit Message
+   - The commit message for the release branch must include "Merge pull request" and "release-v$VERSION" to trigger the release workflows
 
 ## Best Practices
 
@@ -107,4 +118,95 @@ This "fix forward" approach ensures:
 - A clear audit trail of changes
 - Proper versioning of fixes
 - Consistent release history
-- No disruption to users who have already upgraded 
+- No disruption to users who have already upgraded
+
+
+# Manual Release Workflow
+
+The automated release process is new, and may need some debugging pending more runs in production. In the case you need to release a new version and the release workflow in github actions fails, you can do a manual release.
+
+## Manual Release Process
+
+### 1. Creating a Release Branch
+
+Run the draft-release script locally:
+```bash
+# For a minor version bump, auto generating the version
+./scripts/release/draft-release minor
+
+# You can also bump from a specific previous version
+./scripts/release/draft-release patch 1.2.2
+```
+
+This method will:
+- Create a new release branch (e.g., `release-v$VERSION`)
+- Update version in `pyproject.toml`
+- Update `CHANGELOG.md` with all changes since the last release
+- Create a draft pull request
+
+**Requirements**
+- Review all changelog entries
+- The commit message for the release branch must include "Merge pull request" and "release-v$VERSION" to trigger the release workflows.
+```
+Merge pull request release-v$VERSION
+```
+
+### 2. Moratorium Check and Obtain Release Lock
+Run script manually to check for moratorium and obtain release lock.
+
+```bash
+# Get the latest SHA from the most recent commit (ensure this commit is the release branch commit to main)
+export SHA="$(git rev-parse origin/main)"
+
+./scripts/release/tps-check-lock heroku-applink-python $SHA
+```
+
+**Required environment variables**
+TPS_API_TOKEN - This can be found in team password manager
+
+
+### 3. Pushing the tag to Github
+
+Once the release branch as been merged into main, you will want to push the signed tag to github. 
+
+```bash
+export VERSION="1.0.0"
+
+git tag -s v$VERSION -m "Release v$VERSION"
+```
+
+### 4. Build the package
+
+Check out the latest tag, and then run uv build to build the package. You should see the new version generated in the dist directory. 
+
+```bash
+git checkout $(git describe --tags --abbrev=0)
+
+uv build
+```
+
+### 5. Create the Github Release
+
+```bash
+gh release create v$VERSION --generate-notes dist/*.whl dist/*.tar.gz
+```
+
+### 6. Publish to PyPI
+Publish the package to pypi using __token__ as the username, and the shared team heroku applink manual publishing token as the token. 
+
+```bash
+uv publish
+```
+
+### 7. Publish to Change Management
+Run script manually to publish to change management. Ensure you are using '@salesforce' email address. 
+
+```bash
+export ACTOR_EMAIL="brittany.jones@salesforce.com"
+
+./scripts/release/tps-record-release heroku-applink-python $SHA $ACTOR_EMAIL
+```
+
+**Required environment variables**
+
+TPS_API_TOKEN - This can be found in team password manager
