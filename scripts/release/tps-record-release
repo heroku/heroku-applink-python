@@ -2,13 +2,13 @@
 set -eu
 set -o pipefail
 
-# Usage: ./scripts/release/tps_record_release
+# Usage: ./scripts/release/tps-record-release
 # Required env vars: TPS_API_TOKEN, COMPONENT_SLUG, RELEASE_SHA, ACTOR_EMAIL
 
-# Alternate Usage: ./scripts/release/tps_record_release <component-slug> <release-id>
+# Alternate Usage: ./scripts/release/tps-record-release <component-slug> <release-sha>
 # Required env vars: TPS_API_TOKEN, ACTOR_EMAIL
 
-# Alternate Usage: ./scripts/release/tps_record_release <component-slug> <release-id> <email>
+# Alternate Usage: ./scripts/release/tps-record-release <component-slug> <release-sha> <email>
 # Required env vars: TPS_API_TOKEN
 
 if [ -z "${TPS_HOSTNAME:-}" ]; then
@@ -33,6 +33,7 @@ if [ -z "$release_sha" ]; then
   exit 1
 fi
 
+# The actor email must be a Salesforce email address
 actor_email="${3:-$ACTOR_EMAIL}"
 if [ -z "$actor_email" ]; then
   echo "Requires third argument or env var ACTOR_EMAIL: email of actor performing the release" >&2
