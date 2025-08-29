@@ -124,7 +124,6 @@ class Connection:
                 # Disable cookie storage using `DummyCookieJar`, given that we
                 # don't need cookie support.
                 cookie_jar=aiohttp.DummyCookieJar(),
-                raise_for_status=True,
                 timeout=aiohttp.ClientTimeout(
                     total=self._config.request_timeout,
                     connect=self._config.connect_timeout,

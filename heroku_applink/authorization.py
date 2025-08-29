@@ -183,6 +183,7 @@ class Authorization:
         }
 
         response = await connection.request("GET", request_url, headers=headers)
+        response.raise_for_status()
         payload = await response.json()
 
         return Authorization._build_authorization(connection, payload)

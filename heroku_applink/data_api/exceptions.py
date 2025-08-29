@@ -7,7 +7,7 @@ For full license text, see the LICENSE file in the repo root or https://opensour
 
 from dataclasses import dataclass
 
-# The order in `__all__` is the in which pdoc3 will display the classes in the docs.
+# The order in `__all__` is the order in which pdoc3 will display the classes in the docs.
 __all__ = [
     "DataApiError",
     "SalesforceRestApiError",
