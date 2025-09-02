@@ -47,10 +47,14 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Extracted version: $VERSION"
 
-      - name: Configure Git
+      - name: Setup GPG and configure Git
         run: |
+          echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
           git config --global user.name "GitHub Actions"
           git config --global user.email "github-actions@github.com"
+          git config --global user.signingkey ${{ secrets.GPG_KEY_ID }}
+          git config --global commit.gpgsign true
+          git config --global tag.gpgsign true
 
       - name: Create and push Github tag
         run: |
