@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.1.0](https://github.com/heroku/heroku-applink-python/compare/v1.0.0...1.1.0) - 2025-09-02
+
+
+### Changes
+
+
+### Other
+
+* Don't use raise_for_status by default
+* building instead of downloading artifact (#80) ([#80](https://github.com/heroku/heroku-applink-python/pull/80))
+
 # [1.0.0](https://github.com/heroku/heroku-applink-python/compare/v0.2.0...1.0.0) - 2025-06-19
 
 
