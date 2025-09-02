@@ -85,10 +85,9 @@ async def test_connection_request_error(connection):
             payload={'error': 'Internal Server Error'}
         )
 
-        with pytest.raises(aiohttp.ClientResponseError) as exc_info:
-            await connection.request("GET", "https://example.com")
+        response = await connection.request("GET", "https://example.com")
 
-        assert exc_info.value.status == 500
+        assert response.status == 500
 
 @pytest.mark.asyncio
 async def test_connection_close(connection):
