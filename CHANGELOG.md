@@ -8,15 +8,10 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Changes
 
+* Errors from requests to the Salesforce REST API will now result in `SalesforceRestApiError` being raised, rather than `aiohttp.ClientResponseError`. (#82) ([#82](https://github.com/heroku/heroku-applink-python/pull/82)) -- this was from v1.1.0, which did not get released.
 
 ### Features
 
-* Update CHANGELOG.md
-* Update CHANGELOG.md
-* Update CHANGELOG.md
-* Update CHANGELOG.md
-* Update CHANGELOG.md
-* Update CHANGELOG.md
 
 ### Other
 
