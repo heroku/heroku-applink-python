@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.1.3](https://github.com/heroku/heroku-applink-python/compare/v1.0.0...1.1.3) - 2025-09-03
+
+
+### Changes
+
+* Errors from requests to the Salesforce REST API will now result in `SalesforceRestApiError` being raised, rather than `aiohttp.ClientResponseError`. (#82) ([#82](https://github.com/heroku/heroku-applink-python/pull/82)) -- this was from v1.1.0, which did not get released.
+
+
+### Features
+
+
+### Other
+
+*  sign with passphrase
+* release-v1.1.2 bump-patch
+* attempt to add gpg key with passphrase too
+* release-v1.1.1 bump-patch
+*  add GPG key to enable signed tags (#84) ([#84](https://github.com/heroku/heroku-applink-python/pull/84))
+* release-v1.1.0 bump-minor
+* Don't use raise_for_status by default
+* building instead of downloading artifact (#80) ([#80](https://github.com/heroku/heroku-applink-python/pull/80))
+
 # [1.1.2](https://github.com/heroku/heroku-applink-python/compare/v1.0.0...1.1.2) - 2025-09-03
 
 
