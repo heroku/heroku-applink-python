@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "heroku_applink"
-version = "1.1.0"
+version = "1.1.1"
 description = "Simple SDK for Heroku AppLink and Salesforce development"
 readme = "README.md"
 requires-python = ">=3.10"

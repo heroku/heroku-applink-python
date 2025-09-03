@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.1.1](https://github.com/heroku/heroku-applink-python/compare/v1.0.0...1.1.1) - 2025-09-03
+
+
+### Changes
+
+
+### Features
+
+* Update CHANGELOG.md
+
+### Other
+
+*  add GPG key to enable signed tags (#84) ([#84](https://github.com/heroku/heroku-applink-python/pull/84))
+* release-v1.1.0 bump-minor
+* Don't use raise_for_status by default
+* building instead of downloading artifact (#80) ([#80](https://github.com/heroku/heroku-applink-python/pull/80))
+
 # [1.1.0](https://github.com/heroku/heroku-applink-python/compare/v1.0.0...1.1.0) - 2025-09-02
 
 
