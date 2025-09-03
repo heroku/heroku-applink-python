@@ -12,10 +12,10 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
-* Update CHANGELOG.md
 
 ### Other
 
+* Update CHANGELOG.md
 *  add GPG key to enable signed tags (#84) ([#84](https://github.com/heroku/heroku-applink-python/pull/84))
 * release-v1.1.0 bump-minor
 * Don't use raise_for_status by default
