@@ -20,7 +20,7 @@ Classes
 # `DataAPI`
 
 ```python
-class DataAPI(*, org_domain_url: str, api_version: str, access_token: str, connection: heroku_applink.connection.Connection)
+class DataAPI(*, org_domain_url: str, api_version: str, access_token: str | None, connection: heroku_applink.connection.Connection)
 ```
 Data API client to interact with data in a Salesforce org.
 

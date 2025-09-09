@@ -103,3 +103,28 @@ def test_client_context_from_header_with_null_namespace():
     assert ctx.access_token == "access-token-xyz"
     assert ctx.api_version == "v57.0"
     assert ctx.namespace is None
+
+def test_client_context_from_header_missing_access_token():
+    payload = {
+        "orgId": "00DJS0000000123ABC",
+        "orgDomainUrl": "https://example-domain.my.salesforce.com",
+        "userContext": {
+            "userId": "005JS000000H123",
+            "username": "user@example.tld",
+        },
+        "requestId": "req-456",
+        # Note: accessToken is intentionally missing
+        "apiVersion": "v57.0",
+        "namespace": "ns",
+    }
+    encoded = base64.b64encode(json.dumps(payload).encode()).decode()
+    connection = Connection(Config.default())
+    ctx = ClientContext.from_header(encoded, connection)
+
+    assert ctx.org.id == "00DJS0000000123ABC"
+    assert ctx.org.user.username == "user@example.tld"
+    assert ctx.request_id == "req-456"
+    assert ctx.api_version == "v57.0"
+    assert ctx.namespace == "ns"
+    assert ctx.access_token is None  # Should be None when missing
+    assert ctx.data_api.access_token is None  # DataAPI should also have None access_token

@@ -69,7 +69,7 @@ class ClientContext:
     """An initialized data API client instance for interacting with data in the org."""
     request_id: str
     """Request ID from the Salesforce org."""
-    access_token: str
+    access_token: str | None
     """Valid access token for the current context org/user."""
     api_version: str
     """API version of the Salesforce component that made the request."""
@@ -91,13 +91,13 @@ class ClientContext:
                 ),
             ),
             request_id=data["requestId"],
-            access_token=data["accessToken"],
+            access_token=data.get("accessToken"),
             api_version=data["apiVersion"],
             namespace=data.get("namespace"),  # Use get() to handle None case
             data_api=DataAPI(
                 org_domain_url=data["orgDomainUrl"],
                 api_version=data["apiVersion"],
-                access_token=data["accessToken"],
+                access_token=data.get("accessToken"),
                 connection=connection,
             ),
         )

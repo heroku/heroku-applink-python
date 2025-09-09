@@ -45,7 +45,7 @@ class DataAPI:
         *,
         org_domain_url: str,
         api_version: str,
-        access_token: str,
+        access_token: str | None,
         connection: Connection,
     ) -> None:
         self._api_version = api_version
@@ -251,9 +251,10 @@ class DataAPI:
         return await response.read()
 
     def _default_headers(self) -> dict[str, str]:
-        return {
-            "Authorization": f"Bearer {self.access_token}",
-        }
+        headers = {}
+        if self.access_token is not None:
+            headers["Authorization"] = f"Bearer {self.access_token}"
+        return headers
 
 
 def _json_serialize(data: Any) -> BytesPayload:

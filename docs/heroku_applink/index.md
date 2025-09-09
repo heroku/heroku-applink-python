@@ -184,7 +184,7 @@ For a list of exceptions, see:
 # `ClientContext`
 
 ```python
-class ClientContext(*, org: heroku_applink.context.Org, data_api: heroku_applink.data_api.DataAPI, request_id: str, access_token: str, api_version: str, namespace: str | None = None)
+class ClientContext(*, org: heroku_applink.context.Org, data_api: heroku_applink.data_api.DataAPI, request_id: str, access_token: str | None, api_version: str, namespace: str | None = None)
 ```
 Information about the Salesforce org that made the request.
 
@@ -196,7 +196,7 @@ def from_header(header: str, connection: heroku_applink.connection.Connection)
 
 ## Instance variables
 
-* `access_token: str`
+* `access_token: str | None`
     Valid access token for the current context org/user.
 
 * `api_version: str`
