@@ -74,6 +74,8 @@ def test_client_context_from_header():
     assert ctx.access_token == "access-token-xyz"
     assert ctx.api_version == "v57.0"
     assert ctx.namespace == "ns"
+    assert ctx.data_api is not None  # DataAPI should be created when access token is present
+    assert ctx.data_api.access_token == "access-token-xyz"  # DataAPI should have the access token
 
 def test_client_context_from_header_invalid():
     # Provide bad Base64 encoded string
@@ -127,4 +129,4 @@ def test_client_context_from_header_missing_access_token():
     assert ctx.api_version == "v57.0"
     assert ctx.namespace == "ns"
     assert ctx.access_token is None  # Should be None when missing
-    assert ctx.data_api.access_token is None  # DataAPI should also have None access_token
+    assert ctx.data_api is None  # DataAPI should not be created when no access token

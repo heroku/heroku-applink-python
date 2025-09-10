@@ -65,8 +65,8 @@ class ClientContext:
 
     org: Org
     """Information about the Salesforce org and the user that made the request."""
-    data_api: DataAPI
-    """An initialized data API client instance for interacting with data in the org."""
+    data_api: DataAPI | None
+    """An initialized data API client instance for interacting with data in the org. None if no access token is available."""
     request_id: str
     """Request ID from the Salesforce org."""
     access_token: str | None
@@ -81,6 +81,19 @@ class ClientContext:
         decoded = base64.b64decode(header)
         data = json.loads(decoded)
 
+        access_token = data.get("accessToken")
+        
+        # Set data_api only if access token is available
+        if access_token is None:
+            data_api = None
+        else:
+            data_api = DataAPI(
+                org_domain_url=data["orgDomainUrl"],
+                api_version=data["apiVersion"],
+                access_token=access_token,
+                connection=connection,
+            )
+        
         return cls(
             org=Org(
                 id=data["orgId"],
@@ -91,15 +104,10 @@ class ClientContext:
                 ),
             ),
             request_id=data["requestId"],
-            access_token=data.get("accessToken"),
+            access_token=access_token,
             api_version=data["apiVersion"],
             namespace=data.get("namespace"),  # Use get() to handle None case
-            data_api=DataAPI(
-                org_domain_url=data["orgDomainUrl"],
-                api_version=data["apiVersion"],
-                access_token=data.get("accessToken"),
-                connection=connection,
-            ),
+            data_api=data_api,
         )
 
 # ContextVars for request-scoped data
@@ -114,7 +122,7 @@ def get_client_context() -> ClientContext:
 
     ```python
     import heroku_applink as sdk
-    from fastapi import FastAPI
+    from fastapi import FastAPI, HTTPException
 
     app = FastAPI()
     app.add_middleware(sdk.IntegrationAsgiMiddleware, config=sdk.Config(request_timeout=5))
@@ -122,6 +130,8 @@ def get_client_context() -> ClientContext:
     @app.get("/accounts")
     async def get_accounts():
         context = sdk.get_client_context()
+        if context.data_api is None:
+            raise HTTPException(status_code=401, detail="Data API not available")
 
         query = "SELECT Id, Name FROM Account"
         result = await context.data_api.query(query)
