@@ -122,7 +122,7 @@ def get_client_context() -> ClientContext:
 
     ```python
     import heroku_applink as sdk
-    from fastapi import FastAPI, HTTPException
+    from fastapi import FastAPI
 
     app = FastAPI()
     app.add_middleware(sdk.IntegrationAsgiMiddleware, config=sdk.Config(request_timeout=5))
