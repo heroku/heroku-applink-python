@@ -130,8 +130,6 @@ def get_client_context() -> ClientContext:
     @app.get("/accounts")
     async def get_accounts():
         context = sdk.get_client_context()
-        if context.data_api is None:
-            raise HTTPException(status_code=401, detail="Data API not available")
 
         query = "SELECT Id, Name FROM Account"
         result = await context.data_api.query(query)
