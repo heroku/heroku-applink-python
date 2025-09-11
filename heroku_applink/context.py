@@ -65,11 +65,11 @@ class ClientContext:
 
     org: Org
     """Information about the Salesforce org and the user that made the request."""
-    data_api: DataAPI
-    """An initialized data API client instance for interacting with data in the org."""
+    data_api: DataAPI | None
+    """An initialized data API client instance for interacting with data in the org. None if no access token is available."""
     request_id: str
     """Request ID from the Salesforce org."""
-    access_token: str
+    access_token: str | None
     """Valid access token for the current context org/user."""
     api_version: str
     """API version of the Salesforce component that made the request."""
@@ -81,6 +81,19 @@ class ClientContext:
         decoded = base64.b64decode(header)
         data = json.loads(decoded)
 
+        access_token = data.get("accessToken")
+        
+        # Set data_api only if access token is available
+        if access_token is None:
+            data_api = None
+        else:
+            data_api = DataAPI(
+                org_domain_url=data["orgDomainUrl"],
+                api_version=data["apiVersion"],
+                access_token=access_token,
+                connection=connection,
+            )
+        
         return cls(
             org=Org(
                 id=data["orgId"],
@@ -91,15 +104,10 @@ class ClientContext:
                 ),
             ),
             request_id=data["requestId"],
-            access_token=data["accessToken"],
+            access_token=access_token,
             api_version=data["apiVersion"],
             namespace=data.get("namespace"),  # Use get() to handle None case
-            data_api=DataAPI(
-                org_domain_url=data["orgDomainUrl"],
-                api_version=data["apiVersion"],
-                access_token=data["accessToken"],
-                connection=connection,
-            ),
+            data_api=data_api,
         )
 
 # ContextVars for request-scoped data
