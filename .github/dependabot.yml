@@ -4,7 +4,7 @@ updates:
     directory: "/"
     schedule:
       interval: "cron"
-      cronjob: "0 14 * * MON,WED"
+      cronjob: "0 11 * * MON,WED"
     labels:
       - "edit-on-call"
       - "dependencies"
