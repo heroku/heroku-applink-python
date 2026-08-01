@@ -359,9 +359,10 @@ pytest -m functional
 ### What are the contribution guidelines?
 1. Follow PEP 8 style guide
 2. Write clear commit messages
-3. Add tests for new features
-4. Update documentation
-5. Ensure all tests pass
+3. Follow guidance from [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) for PR names
+4. Add tests for new features
+5. Update documentation
+6. Ensure all tests pass
 
 ## Version History
 
@@ -394,6 +395,7 @@ pip install --upgrade heroku-applink
 - [API Reference](https://github.com/heroku/heroku-applink-python/docs/api.md)
 - [Examples](https://github.com/heroku/heroku-applink-python/docs/examples.md)
 - [Changelog](https://github.com/heroku/heroku-applink-python/CHANGELOG.md)
+- [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
 
 ### Related Projects
 - [Heroku Platform API](https://devcenter.heroku.com/articles/platform-api-reference)
