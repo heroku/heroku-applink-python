@@ -37,6 +37,16 @@ class UserAuth:
     username: str
     user_id: str
     access_token: str
+    expiration: Optional[int] = None
+    """
+    The absolute instant the access token expires, as Unix epoch milliseconds
+    (not a TTL/duration).
+
+    `None` when the expiration is unknown (for example, a locally decrypted
+    token), in which case the field is omitted from the add-on response.
+
+    For example: `1741285242226`
+    """
 
 @dataclass(frozen=True, kw_only=True, slots=True)
 class Org:
@@ -214,6 +224,7 @@ class Authorization:
                     username=payload["org"]["user_auth"]["username"],
                     user_id=payload["org"]["user_auth"]["user_id"],
                     access_token=payload["org"]["user_auth"]["access_token"],
+                    expiration=payload["org"]["user_auth"].get("expiration"),
                 ),
             ),
             created_at=_parse_datetime(payload["created_at"]),

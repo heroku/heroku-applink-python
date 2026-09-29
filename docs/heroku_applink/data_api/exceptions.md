@@ -63,7 +63,7 @@ Raised when the Salesforce REST API signalled error(s).
 
 ## Instance variables
 
-* `api_errors: list[heroku_applink.data_api.exceptions.InnerSalesforceRestApiError]`
+* `api_errors: list['InnerSalesforceRestApiError']`
     A list of one or more errors returned from Salesforce REST API.
 
 <!-- python-unexpectedrestapiresponsepayload.md -->

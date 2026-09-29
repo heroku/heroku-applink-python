@@ -12,7 +12,7 @@ Classes
 # `ClientContext`
 
 ```python
-class ClientContext(*, org: heroku_applink.context.Org, data_api: heroku_applink.data_api.DataAPI, request_id: str, access_token: str | None, api_version: str, namespace: str | None = None)
+class ClientContext(*, org: heroku_applink.context.Org, data_api: heroku_applink.data_api.DataAPI | None, request_id: str, access_token: str | None, api_version: str, namespace: str | None = None)
 ```
 Information about the Salesforce org that made the request.
 
@@ -30,8 +30,8 @@ def from_header(header: str, connection: heroku_applink.connection.Connection)
 * `api_version: str`
     API version of the Salesforce component that made the request.
 
-* `data_api: heroku_applink.data_api.DataAPI`
-    An initialized data API client instance for interacting with data in the org.
+* `data_api: heroku_applink.data_api.DataAPI | None`
+    An initialized data API client instance for interacting with data in the org. None if no access token is available.
 
 * `namespace: str | None`
     Namespace of the Salesforce component that made the request.

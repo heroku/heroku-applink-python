@@ -21,7 +21,7 @@ a record was queried from the data API.
 
 ## Instance variables
 
-* `sub_query_results: dict[str, heroku_applink.data_api.record.RecordQueryResult]`
+* `sub_query_results: dict[str, 'RecordQueryResult']`
     Additional query results from sub queries.
 
 <!-- python-record.md -->

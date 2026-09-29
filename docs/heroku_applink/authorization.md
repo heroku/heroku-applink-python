@@ -158,7 +158,7 @@ Salesforce org information.
 # `UserAuth`
 
 ```python
-class UserAuth(*, username: str, user_id: str, access_token: str)
+class UserAuth(*, username: str, user_id: str, access_token: str, expiration: int | None = None)
 ```
 User authentication information for the Salesforce org.
 
@@ -166,6 +166,15 @@ User authentication information for the Salesforce org.
 
 * `access_token: str`
     
+
+* `expiration: int | None`
+    The absolute instant the access token expires, as Unix epoch milliseconds
+    (not a TTL/duration).
+    
+    `None` when the expiration is unknown (for example, a locally decrypted
+    token), in which case the field is omitted from the add-on response.
+    
+    For example: `1741285242226`
 
 * `user_id: str`
     
