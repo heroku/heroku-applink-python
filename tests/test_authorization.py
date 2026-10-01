@@ -88,6 +88,32 @@ VALID_RESPONSE_WITH_EXPIRATION: Dict[str, Any] = {
     "redirect_uri": "https://test-app.herokuapp.com",
 }
 
+# A response where the add-on reports the access token's expiration as `0`,
+# which means the expiration is unknown (not the Unix epoch).
+VALID_RESPONSE_WITH_ZERO_EXPIRATION: Dict[str, Any] = {
+    "id": "b8bc7bcb-89c3-45c0-b7b7-4fb4427e598a",
+    "status": "authorized",
+    "org": {
+        "id": "00DSG00000DGEIr2AP",
+        "developer_name": "productionOrg2",
+        "instance_url": "https://dmomain.my.salesforce.com",
+        "type": "SalesforceOrg",
+        "api_version": "57.0",
+        "user_auth": {
+            "username": "admin@whatever.org",
+            "user_id": "005...",
+            "access_token": "00DSG00000DGEIr2AP!<token>",
+            "expiration": 0,
+        }
+    },
+    "created_at": "2025-03-06T18:20:42.226577Z",
+    "created_by": "foo@heroku.com",
+    "created_via_app": "test-app",
+    "last_modified_at": "2025-03-09T18:20:42.226577Z",
+    "last_modified_by": "foo@heroku.com",
+    "redirect_uri": "https://test-app.herokuapp.com",
+}
+
 @pytest.fixture
 def monkeypatch_app_id(monkeypatch):
     monkeypatch.setenv("HEROKU_APP_ID", "f208caa9-3d49-4660-a2cf-80cd8dde7492")
@@ -209,6 +235,26 @@ async def test_user_auth_expiration_absent_is_none(monkeypatch, monkeypatch_app_
 
         authorization = await Authorization.find(developer_name)
 
+        assert_authorization_is_valid(authorization)
+        assert authorization.org.user_auth.expiration is None
+
+@pytest.mark.asyncio
+async def test_user_auth_expiration_zero_is_none(monkeypatch, monkeypatch_app_id):
+    developer_name = "devName"
+
+    monkeypatch.setenv("HEROKU_APPLINK_API_URL", "https://api.test/")
+    monkeypatch.setenv("HEROKU_APPLINK_TOKEN", "TOKEN")
+
+    with aioresponses() as m:
+        m.get(
+            f"https://api.test/authorizations/{developer_name}",
+            status=200,
+            payload=VALID_RESPONSE_WITH_ZERO_EXPIRATION
+        )
+
+        authorization = await Authorization.find(developer_name)
+
+        assert_authorization_is_valid(authorization)
         assert authorization.org.user_auth.expiration is None
 
 @pytest.mark.asyncio

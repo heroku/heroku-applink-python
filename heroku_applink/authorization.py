@@ -43,7 +43,8 @@ class UserAuth:
     (not a TTL/duration).
 
     `None` when the expiration is unknown (for example, a locally decrypted
-    token), in which case the field is omitted from the add-on response.
+    token), in which case the add-on response omits the field or reports it
+    as `0`.
 
     For example: `1741285242226`
     """
@@ -224,7 +225,7 @@ class Authorization:
                     username=payload["org"]["user_auth"]["username"],
                     user_id=payload["org"]["user_auth"]["user_id"],
                     access_token=payload["org"]["user_auth"]["access_token"],
-                    expiration=payload["org"]["user_auth"].get("expiration"),
+                    expiration=_parse_expiration(payload["org"]["user_auth"].get("expiration")),
                 ),
             ),
             created_at=_parse_datetime(payload["created_at"]),
@@ -240,6 +241,16 @@ def _parse_datetime(datetime_str: str) -> datetime:
     Parse a datetime string into a datetime object.
     """
     return datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+
+def _parse_expiration(expiration: object) -> Optional[int]:
+    """
+    Treat the expiration as unknown unless it's a positive integer, matching
+    the Node SDK's `typeof expirationMs === "number" && expirationMs > 0` guard.
+    `0` is used by the add-on to mean "unknown", not the epoch.
+    """
+    if isinstance(expiration, bool) or not isinstance(expiration, int):
+        return None
+    return expiration if expiration > 0 else None
 
 def _resolve_attachment_or_url(attachment_or_url: Optional[str] = None) -> AuthBundle:
    if attachment_or_url:

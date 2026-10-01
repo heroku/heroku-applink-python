@@ -304,7 +304,7 @@ class IntegrationWsgiMiddleware(app, config=Config(request_timeout=5, connect_ti
 # `QueriedRecord`
 
 ```python
-class QueriedRecord(*, type: str, fields: dict[str, typing.Any], sub_query_results: dict[str, 'RecordQueryResult'] = <factory>)
+class QueriedRecord(*, type: str, fields: dict[str, typing.Any], sub_query_results: dict[str, heroku_applink.data_api.record.RecordQueryResult] = <factory>)
 ```
 A Salesforce record that's the result of a SOQL query.
 
@@ -313,7 +313,7 @@ a record was queried from the data API.
 
 ## Instance variables
 
-* `sub_query_results: dict[str, 'RecordQueryResult']`
+* `sub_query_results: dict[str, heroku_applink.data_api.record.RecordQueryResult]`
     Additional query results from sub queries.
 
 <!-- python-record.md -->
