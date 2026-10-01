@@ -8,7 +8,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
-* `Authorization.find` now exposes the Salesforce access token's expiration via `authorization.org.user_auth.expiration`. The value is Unix epoch milliseconds as returned by the AppLink add-on, or `None` when the add-on does not report it. ([#97](https://github.com/heroku/heroku-applink-python/pull/97))
+* `Authorization.find` now exposes the Salesforce access token's expiration via `authorization.org.user_auth.expiration`. The value is Unix epoch milliseconds as returned by the AppLink add-on, or `None` when the add-on does not report it. ([#98](https://github.com/heroku/heroku-applink-python/pull/98))
 
 
 # [1.1.4](https://github.com/heroku/heroku-applink-python/compare/v1.0.0...1.1.4) - 2025-09-03
