@@ -172,7 +172,8 @@ User authentication information for the Salesforce org.
     (not a TTL/duration).
     
     `None` when the expiration is unknown (for example, a locally decrypted
-    token), in which case the field is omitted from the add-on response.
+    token), in which case the add-on response omits the field or reports it
+    as `0`.
     
     For example: `1741285242226`
 

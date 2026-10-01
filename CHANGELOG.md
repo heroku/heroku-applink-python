@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [1.2.0](https://github.com/heroku/heroku-applink-python/compare/v1.1.4...1.2.0) - 2026-09-29
+# [1.2.0](https://github.com/heroku/heroku-applink-python/compare/v1.1.4...v1.2.0) - 2026-09-29
 
 
 ### Features
