@@ -12,7 +12,7 @@ Classes
 # `QueriedRecord`
 
 ```python
-class QueriedRecord(*, type: str, fields: dict[str, typing.Any], sub_query_results: dict[str, 'RecordQueryResult'] = <factory>)
+class QueriedRecord(*, type: str, fields: dict[str, typing.Any], sub_query_results: dict[str, heroku_applink.data_api.record.RecordQueryResult] = <factory>)
 ```
 A Salesforce record that's the result of a SOQL query.
 

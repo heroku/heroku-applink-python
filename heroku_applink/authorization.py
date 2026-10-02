@@ -5,6 +5,7 @@ SPDX-License-Identifier: BSD-3-Clause
 For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
 """
 
+import logging
 import os
 
 from dataclasses import dataclass
@@ -17,6 +18,8 @@ from yarl import URL
 from .config import Config
 from .connection import Connection
 from .data_api import DataAPI
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True, kw_only=True, slots=True)
@@ -37,6 +40,17 @@ class UserAuth:
     username: str
     user_id: str
     access_token: str
+    expiration: Optional[int] = None
+    """
+    The absolute instant the access token expires, as Unix epoch milliseconds
+    (not a TTL/duration).
+
+    `None` when the expiration is unknown (for example, a locally decrypted
+    token), in which case the add-on response omits the field or reports it
+    as `0`.
+
+    For example: `1741285242226`
+    """
 
 @dataclass(frozen=True, kw_only=True, slots=True)
 class Org:
@@ -194,12 +208,13 @@ class Authorization:
         Build an Authorization object from a payload. Some fields are optional,
         so we use get() to handle the case where they are not present.
         """
+        user_auth = payload["org"]["user_auth"]
         return Authorization(
             connection=connection,
             data_api=DataAPI(
                 org_domain_url=payload["org"]["instance_url"],
                 api_version=payload["org"]["api_version"],
-                access_token=payload["org"]["user_auth"]["access_token"],
+                access_token=user_auth["access_token"],
                 connection=connection,
             ),
             id=payload["id"],
@@ -211,9 +226,10 @@ class Authorization:
                 type=payload["org"]["type"],
                 api_version=payload["org"]["api_version"],
                 user_auth=UserAuth(
-                    username=payload["org"]["user_auth"]["username"],
-                    user_id=payload["org"]["user_auth"]["user_id"],
-                    access_token=payload["org"]["user_auth"]["access_token"],
+                    username=user_auth["username"],
+                    user_id=user_auth["user_id"],
+                    access_token=user_auth["access_token"],
+                    expiration=_parse_expiration(user_auth.get("expiration")),
                 ),
             ),
             created_at=_parse_datetime(payload["created_at"]),
@@ -229,6 +245,30 @@ def _parse_datetime(datetime_str: str) -> datetime:
     Parse a datetime string into a datetime object.
     """
     return datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+
+def _parse_expiration(expiration: object) -> Optional[int]:
+    """
+    Treat the expiration as unknown unless it's a positive integer, matching
+    the Node SDK's `typeof expirationMs === "number" && expirationMs > 0` guard.
+    `0` is used by the add-on to mean "unknown", not the epoch.
+
+    Whole-number floats (e.g. `1741285242226.0`, as produced by some JSON
+    decoders) are coerced to int rather than dropped, since Node's `typeof
+    expirationMs === "number"` guard accepts them too.
+    """
+    if isinstance(expiration, bool):
+        return None
+    if isinstance(expiration, float) and expiration.is_integer():
+        expiration = int(expiration)
+    if not isinstance(expiration, int):
+        if expiration is not None:
+            logger.debug(
+                "Ignoring access token expiration of unexpected type %s: %r",
+                type(expiration).__name__,
+                expiration,
+            )
+        return None
+    return expiration if expiration > 0 else None
 
 def _resolve_attachment_or_url(attachment_or_url: Optional[str] = None) -> AuthBundle:
    if attachment_or_url:

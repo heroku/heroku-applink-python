@@ -57,7 +57,7 @@ Raised when the given `Record` must contain a field, but no such field was found
 # `SalesforceRestApiError`
 
 ```python
-class SalesforceRestApiError(*, api_errors: list['InnerSalesforceRestApiError'])
+class SalesforceRestApiError(*, api_errors: list[heroku_applink.data_api.exceptions.InnerSalesforceRestApiError])
 ```
 Raised when the Salesforce REST API signalled error(s).
 
