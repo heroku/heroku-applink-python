@@ -35,7 +35,7 @@ This method will:
 When a pull request is pushed into main from a branch named "release-*:
 
 1. The Package Library workflow runs automatically and:
-   - Runs tests across Python 3.10, 3.11, 3.12, and 3.13
+   - Runs tests across Python 3.10, 3.11, 3.12, 3.13, 3.14, and 3.15
    - Runs linting with Ruff
    - Builds the package
    - Uploads the build artifacts from the build
