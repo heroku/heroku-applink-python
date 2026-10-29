@@ -1,5 +1,4 @@
 import pytest
-import aiohttp
 import uuid
 
 from aioresponses import aioresponses
