@@ -6,7 +6,7 @@
 Heroku Applink Python SDK is a Python package that provides integration between Heroku applications and Salesforce. It enables secure communication and data exchange between Heroku apps and Salesforce orgs.
 
 ### What are the system requirements?
-- Python 3.10 or higher
+- Python 3.11 or higher
 - A Heroku account
 - A Salesforce org
 - Required environment variables for authentication
@@ -38,7 +38,7 @@ To add it to your project's dependencies in pyproject.toml:
 name = "your-project-name"
 version = "0.1.0"
 description = "Your project description"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
     "heroku-applink>=0.1.0",
     "aiohttp>=3.11.12",

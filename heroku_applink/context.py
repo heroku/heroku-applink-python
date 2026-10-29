@@ -82,7 +82,7 @@ class ClientContext:
         data = json.loads(decoded)
 
         access_token = data.get("accessToken")
-        
+
         # Set data_api only if access token is available
         if access_token is None:
             data_api = None
@@ -93,7 +93,7 @@ class ClientContext:
                 access_token=access_token,
                 connection=connection,
             )
-        
+
         return cls(
             org=Org(
                 id=data["orgId"],

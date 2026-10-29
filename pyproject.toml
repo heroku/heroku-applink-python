@@ -7,7 +7,7 @@ name = "heroku_applink"
 version = "1.2.0"
 description = "Simple SDK for Heroku AppLink and Salesforce development"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
     "aiohttp>=3.11.12",
     "orjson>=3.10.15",
@@ -69,7 +69,7 @@ ignore = ["E501"]
 [tool.tox]
 legacy_tox_ini = """
 [tox]
-envlist = py310, py311, py312, py313
+envlist = py311, py312, py313, py314
 skip_missing_interpreters = true
 
 [testenv]

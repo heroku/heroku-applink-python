@@ -1,4 +1,3 @@
-import asyncio
 import heroku_applink as sdk
 from fastapi import FastAPI
 
@@ -16,7 +15,7 @@ def get_root():
 async def get_accounts():
     data_api = sdk.get_client_context().data_api
     result = await query_accounts(data_api)
-    
+
     accounts = [
         {
             "id": record.fields["Id"],
