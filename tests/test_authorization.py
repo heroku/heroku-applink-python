@@ -1,346 +1,101 @@
-import copy
+# Copyright (c) 2026, Salesforce, Inc.
+# All rights reserved.
+# SPDX-License-Identifier: BSD-3-Clause
+# For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+
+from typing import Any
+
 import pytest
-import datetime
-import aiohttp
 
-from aioresponses import aioresponses
-from typing import Any, Dict, Optional
-
-from heroku_applink.connection import Connection
-from heroku_applink.data_api import DataAPI
-from heroku_applink.authorization import (
-    Authorization,
-    _is_valid_url,
-    _parse_expiration,
-    _resolve_addon_config_by_attachment_or_color,
-    _resolve_addon_config_by_url,
-    _resolve_attachment_or_url,
+from heroku_applink import (
+    ConfigurationError,
+    OrgType,
+    UnexpectedResponseError,
+    UnusableAuthorizationError,
 )
-from heroku_applink.authorization import Org as AuthorizationOrg
-
-# A sample valid response payload from the add-on
-VALID_RESPONSE: Dict[str, Any] = {
-    "id": "b8bc7bcb-89c3-45c0-b7b7-4fb4427e598a",
-    "status": "authorized",
-    "org": {
-        "id": "00DSG00000DGEIr2AP",
-        "developer_name": "productionOrg2",
-        "instance_url": "https://dmomain.my.salesforce.com",
-        "type": "SalesforceOrg",
-        "api_version": "57.0",
-        "user_auth": {
-            "username": "admin@whatever.org",
-            "user_id": "005...",
-            "access_token": "00DSG00000DGEIr2AP!<token>"
-        }
-    },
-    "created_at": "2025-03-06T18:20:42.226577Z",
-    "created_by": "foo@heroku.com",
-    "created_via_app": "test-app",
-    "last_modified_at": "2025-03-09T18:20:42.226577Z",
-    "last_modified_by": "foo@heroku.com",
-    "redirect_uri": "https://test-app.herokuapp.com",
-}
-
-VALID_RESPONSE_NO_REDIRECT_URI: Dict[str, Any] = {
-    "id": "b8bc7bcb-89c3-45c0-b7b7-4fb4427e598a",
-    "status": "authorized",
-    "org": {
-        "id": "00DSG00000DGEIr2AP",
-        "developer_name": "productionOrg2",
-        "instance_url": "https://dmomain.my.salesforce.com",
-        "type": "SalesforceOrg",
-        "api_version": "57.0",
-        "user_auth": {
-            "username": "admin@whatever.org",
-            "user_id": "005...",
-            "access_token": "00DSG00000DGEIr2AP!<token>"
-        }
-    },
-    "created_at": "2025-03-06T18:20:42.226577Z",
-    "created_by": "foo@heroku.com",
-    "created_via_app": "test-app",
-    "last_modified_at": "2025-03-09T18:20:42.226577Z",
-    "last_modified_by": "foo@heroku.com",
-}
-
-def _valid_response_with_expiration(expiration: Optional[int]) -> Dict[str, Any]:
-    """
-    A copy of VALID_RESPONSE with org.user_auth.expiration overridden, so the
-    expiration-specific fixtures below can't drift from VALID_RESPONSE.
-    """
-    response = copy.deepcopy(VALID_RESPONSE)
-    response["org"]["user_auth"]["expiration"] = expiration
-    return response
-
-# A response where the add-on reports the access token's expiration as Unix
-# epoch milliseconds.
-VALID_RESPONSE_WITH_EXPIRATION: Dict[str, Any] = _valid_response_with_expiration(1741285242226)
-
-# A response where the add-on reports the access token's expiration as `0`,
-# which means the expiration is unknown (not the Unix epoch).
-VALID_RESPONSE_WITH_ZERO_EXPIRATION: Dict[str, Any] = _valid_response_with_expiration(0)
-
-@pytest.fixture
-def monkeypatch_app_id(monkeypatch):
-    monkeypatch.setenv("HEROKU_APP_ID", "f208caa9-3d49-4660-a2cf-80cd8dde7492")
-
-APPLINK_URL = "https://applink.staging.herokudev.com/addons/97a3472c-a724-4bb5-b02a-c55f94d25700"
-
-def assert_authorization_is_valid(authorization: Authorization):
-    assert isinstance(authorization, Authorization)
-    assert isinstance(authorization.connection, Connection)
-    assert isinstance(authorization.data_api, DataAPI)
-    assert isinstance(authorization.org, AuthorizationOrg)
-
-    assert authorization.id is not None
-    assert authorization.status is not None
-
-    assert isinstance(authorization.created_at, datetime.datetime)
-    assert isinstance(authorization.last_modified_at, datetime.datetime)
-
-    assert authorization.org.id is not None
-    assert authorization.org.developer_name is not None
-    assert authorization.org.instance_url is not None
-    assert authorization.org.type is not None
-    assert authorization.org.api_version is not None
-    assert authorization.org.user_auth is not None
-
-    assert authorization.org.user_auth.username is not None
-    assert authorization.org.user_auth.user_id is not None
-    assert authorization.org.user_auth.access_token is not None
-
-@pytest.mark.asyncio
-async def test_find_authorization(monkeypatch, monkeypatch_app_id):
-    developer_name = "TESTING_APPLINK_AUTHS"
-
-    monkeypatch.setenv("HEROKU_APPLINK_STAGING_API_URL", APPLINK_URL)
-    monkeypatch.setenv("HEROKU_APPLINK_STAGING_TOKEN", "1234567890")
-    monkeypatch.setenv("HEROKU_APP_ID", "1234567890")
-
-    with aioresponses() as m:
-        m.get(
-            f"{APPLINK_URL}/authorizations/{developer_name}",
-            status=200,
-            payload=VALID_RESPONSE
-        )
-
-        authorization = await Authorization.find(developer_name, "HEROKU_APPLINK_STAGING")
-
-        assert_authorization_is_valid(authorization)
-
-@pytest.mark.asyncio
-async def test_attachment_based_success(monkeypatch, monkeypatch_app_id):
-    developer_name = "devName"
-
-    # Call without trailing slash base, ensure rstrip
-    monkeypatch.setenv("HEROKU_APPLINK_API_URL", "https://api.test/")
-    monkeypatch.setenv("HEROKU_APPLINK_TOKEN", "TOKEN")
-
-    with aioresponses() as m:
-        m.get(
-            f"https://api.test/authorizations/{developer_name}",
-            status=200,
-            payload=VALID_RESPONSE
-        )
-
-        authorization = await Authorization.find(developer_name)
-
-        assert_authorization_is_valid(authorization)
-
-@pytest.mark.asyncio
-async def test_attachment_based_success_no_redirect_uri(monkeypatch, monkeypatch_app_id):
-    developer_name = "devName"
-
-    monkeypatch.setenv("HEROKU_APPLINK_API_URL", "https://api.test/")
-    monkeypatch.setenv("HEROKU_APPLINK_TOKEN", "TOKEN")
-
-    with aioresponses() as m:
-        m.get(
-            f"https://api.test/authorizations/{developer_name}",
-            status=200,
-            payload=VALID_RESPONSE_NO_REDIRECT_URI
-        )
-
-        authorization = await Authorization.find(developer_name)
-
-        assert_authorization_is_valid(authorization)
-        assert authorization.redirect_uri is None
-
-@pytest.mark.asyncio
-@pytest.mark.parametrize(
-    "payload,expected",
-    [
-        pytest.param(VALID_RESPONSE_WITH_EXPIRATION, 1741285242226, id="present"),
-        pytest.param(VALID_RESPONSE, None, id="absent"),
-        pytest.param(VALID_RESPONSE_WITH_ZERO_EXPIRATION, None, id="zero"),
-    ],
+from heroku_applink._authorization import (
+    authorization_path,
+    parse_authorization_response,
+    resolve_attachment,
 )
-async def test_user_auth_expiration(monkeypatch, monkeypatch_app_id, payload, expected):
-    developer_name = "devName"
 
-    monkeypatch.setenv("HEROKU_APPLINK_API_URL", "https://api.test/")
-    monkeypatch.setenv("HEROKU_APPLINK_TOKEN", "TOKEN")
+from .vectors import load_vectors, parse_instant
 
-    with aioresponses() as m:
-        m.get(
-            f"https://api.test/authorizations/{developer_name}",
-            status=200,
-            payload=payload
-        )
+RESPONSES = load_vectors("authorization-response.json")
+ATTACHMENTS = load_vectors("attachment-resolution.json")
+PATHS = load_vectors("request-path.json")
 
-        authorization = await Authorization.find(developer_name)
 
-        assert_authorization_is_valid(authorization)
-        assert authorization.org.user_auth.expiration == expected
+@pytest.mark.parametrize("vector", RESPONSES, ids=[v["name"] for v in RESPONSES])
+def test_response_vectors(vector: dict[str, Any]) -> None:
+    body = vector["body"].encode()
+    if vector.get("error") == "unusable_authorization":
+        with pytest.raises(UnusableAuthorizationError) as info:
+            parse_authorization_response(body)
+        assert info.value.status == vector["status"]
+        return
+    expected = vector.get("expected")
+    if expected is None:
+        with pytest.raises(UnexpectedResponseError) as unexpected:
+            parse_authorization_response(body)
+        assert unexpected.value.__context__ is None
+        return
 
-@pytest.mark.parametrize(
-    "value,expected",
-    [
-        pytest.param(1741285242226, 1741285242226, id="positive-int"),
-        pytest.param(0, None, id="zero"),
-        pytest.param(-1, None, id="negative-int"),
-        pytest.param(None, None, id="none"),
-        pytest.param(True, None, id="bool-true"),
-        pytest.param(False, None, id="bool-false"),
-        pytest.param(1741285242226.0, 1741285242226, id="whole-float"),
-        pytest.param(1741285242226.5, None, id="fractional-float"),
-        pytest.param("1741285242226", None, id="numeric-string"),
-    ],
-)
-def test_parse_expiration(value, expected):
-    assert _parse_expiration(value) == expected
+    try:
+        context = parse_authorization_response(body)
+    except UnexpectedResponseError as unexpected:
+        if "error" not in vector:
+            raise
+        assert unexpected.__context__ is None
+        return
+    metadata = context.authorization_metadata
+    expected_metadata = expected["authorizationMetadata"]
+    assert metadata.id == expected_metadata["id"]
+    assert metadata.developer_name == expected_metadata["developerName"]
+    assert metadata.created_at == parse_instant(expected_metadata["createdAt"])
+    assert metadata.created_at.utcoffset() is not None
+    assert metadata.created_at.utcoffset().total_seconds() == 0  # type: ignore[union-attr]
+    assert metadata.created_by == expected_metadata["createdBy"]
+    assert metadata.created_via_app == expected_metadata["createdViaApp"]
+    assert metadata.last_modified_at == parse_instant(
+        expected_metadata["lastModifiedAt"]
+    )
+    assert metadata.last_modified_by == expected_metadata["lastModifiedBy"]
+    assert metadata.redirect_uri == expected_metadata["redirectUri"]
+    assert context.org.id == expected["org"]["id"]
+    assert context.org.domain_url == expected["org"]["domainUrl"]
+    assert context.org.api_version == expected["org"]["apiVersion"]
+    assert context.org.type == OrgType(expected["org"]["type"])
+    assert context.user.id == expected["user"]["id"]
+    assert context.user.username == expected["user"]["username"]
+    assert context.credentials.access_token == expected["credentials"]["accessToken"]
+    assert context.credentials.expiration == parse_instant(
+        expected["credentials"]["expiration"]
+    )
 
-@pytest.mark.asyncio
-async def test_attachment_with_server_side_error(monkeypatch, monkeypatch_app_id):
-    developer_name = "devName"
 
-    monkeypatch.setenv("HEROKU_APPLINK_API_URL", "https://api.test/")
-    monkeypatch.setenv("HEROKU_APPLINK_TOKEN", "TOKEN")
+def test_response_errors_dont_leak_the_body() -> None:
+    body = (
+        b'{"status":"authorized","org":{"user_auth":{"access_token":"secret-token"}}}'
+    )
+    with pytest.raises(UnexpectedResponseError) as info:
+        parse_authorization_response(body)
+    assert "secret-token" not in str(info.value)
 
-    with aioresponses() as m:
-        m.get(
-            f"https://api.test/authorizations/{developer_name}",
-            status=500,
-            payload={"error": "Internal Server Error"}
-        )
 
-        with pytest.raises(aiohttp.client_exceptions.ClientResponseError) as exc_info:
-            await Authorization.find(developer_name)
+@pytest.mark.parametrize("vector", ATTACHMENTS, ids=[v["name"] for v in ATTACHMENTS])
+def test_attachment_vectors(vector: dict[str, Any]) -> None:
+    expected = vector.get("expected")
+    if expected is None:
+        with pytest.raises(ConfigurationError):
+            resolve_attachment(vector["env"], vector["attachment"])
+        return
+    resolved = resolve_attachment(vector["env"], vector["attachment"])
+    assert resolved.api_url == expected["apiUrl"]
+    assert resolved.token == expected["token"]
+    assert resolved.app_id == expected["appId"]
 
-        assert exc_info.value.status, 500
 
-@pytest.mark.asyncio
-async def test_attachment_with_client_side_error(monkeypatch, monkeypatch_app_id):
-    developer_name = "devName"
-
-    monkeypatch.setenv("HEROKU_APPLINK_API_URL", "https://api.test/")
-    monkeypatch.setenv("HEROKU_APPLINK_TOKEN", "TOKEN")
-
-    with aioresponses() as m:
-        m.get(
-            f"https://api.test/authorizations/{developer_name}",
-            status=400,
-            payload={"error": "Bad Request"}
-        )
-
-        with pytest.raises(aiohttp.client_exceptions.ClientResponseError) as exc_info:
-            await Authorization.find(developer_name)
-
-        assert exc_info.value.status, 400
-
-def test_resolve_attachment_or_url(monkeypatch, monkeypatch_app_id):
-    # Set URL env var and corresponding token
-    monkeypatch.setenv('EXAMPLE_API_URL', 'https://api.test.com')
-    monkeypatch.setenv('EXAMPLE_TOKEN', 'url-token')
-
-    auth = _resolve_attachment_or_url("EXAMPLE")
-
-    assert auth is not None
-    assert auth.api_url == "https://api.test.com"
-    assert auth.token == "url-token"
-
-    auth = _resolve_attachment_or_url("https://api.test.com")
-
-    assert auth is not None
-    assert auth.api_url == "https://api.test.com"
-    assert auth.token == "url-token"
-
-def test_resolve_addon_config_by_url(monkeypatch, monkeypatch_app_id):
-    # Set URL env var and corresponding token
-    monkeypatch.setenv('EXAMPLE_API_URL', 'https://api.test.com')
-    monkeypatch.setenv('EXAMPLE_TOKEN', 'url-token')
-
-    auth = _resolve_addon_config_by_url("https://api.test.com")
-
-    assert auth is not None
-    assert auth.api_url == "https://api.test.com"
-    assert auth.token == "url-token"
-
-def test_resolve_by_url_case_insensitive(monkeypatch, monkeypatch_app_id):
-    # URL matching should be case-insensitive
-    monkeypatch.setenv('CASE_API_URL', 'https://Case.Example.COM')
-    monkeypatch.setenv('CASE_TOKEN', 'case-token')
-
-    auth = _resolve_addon_config_by_url('https://case.example.com')
-
-    assert auth is not None
-    assert auth.api_url == 'https://Case.Example.COM'
-    assert auth.token == 'case-token'
-
-def test_resolve_by_url_missing(monkeypatch, monkeypatch_app_id):
-    monkeypatch.delenv('MISSING_API_URL', raising=False)
-
-    with pytest.raises(EnvironmentError) as exc_info:
-        _resolve_addon_config_by_url('https://doesnotexist')
-
-    assert 'Heroku Applink config not found for API URL' in str(exc_info.value)
-
-def test_resolve_by_url_missing_app_id(monkeypatch):
-    monkeypatch.delenv('HEROKU_APP_ID', raising=False)
-
-    with pytest.raises(EnvironmentError) as exc_info:
-        _resolve_addon_config_by_url('https://doesnotexist')
-
-    assert 'HEROKU_APP_ID is not set' in str(exc_info.value)
-
-def test_resolve_addon_config_by_attachment_or_color_direct(monkeypatch, monkeypatch_app_id):
-    # Set direct attachment env vars
-    monkeypatch.setenv('MYADDON_API_URL', 'https://api.example.com')
-    monkeypatch.setenv('MYADDON_TOKEN', 'secret-token')
-
-    auth = _resolve_addon_config_by_attachment_or_color('myaddon')
-
-    assert auth is not None
-    assert auth.api_url == "https://api.example.com"
-    assert auth.token == "secret-token"
-
-def test_resolve_by_attachment_or_color_missing(monkeypatch, monkeypatch_app_id):
-    monkeypatch.delenv('HEROKU_APPLINK_BLUE_API_URL', raising=False)
-    monkeypatch.delenv('HEROKU_APPLINK_BLUE_TOKEN', raising=False)
-
-    with pytest.raises(EnvironmentError) as exc_info:
-        _resolve_addon_config_by_attachment_or_color('HEROKU_APPLINK_BLUE')
-
-    assert 'Heroku Applink config not found for \'HEROKU_APPLINK_BLUE\'' in str(exc_info.value)
-
-def test_resolve_by_color_fallback(monkeypatch, monkeypatch_app_id):
-    # Remove direct and set fallback under HEROKU_APPLINK
-    monkeypatch.delenv('COLOR_API_URL', raising=False)
-    monkeypatch.delenv('COLOR_TOKEN', raising=False)
-    monkeypatch.setenv('HEROKU_APPLINK_COLOR_API_URL', 'https://color.example.com')
-    monkeypatch.setenv('HEROKU_APPLINK_COLOR_TOKEN', 'color-token')
-
-    auth = _resolve_addon_config_by_attachment_or_color("color")
-
-    assert auth is not None
-    assert auth.api_url == "https://color.example.com"
-    assert auth.token == "color-token"
-
-def test_is_valid_url():
-    assert _is_valid_url("https://api.test.com") is True
-    assert _is_valid_url("http://api.test.com") is True
-    assert _is_valid_url("api.test.com") is False
-    assert _is_valid_url("test") is False
-    assert _is_valid_url("https://") is False
-    assert _is_valid_url("https://api.test.com/") is True
+@pytest.mark.parametrize("vector", PATHS, ids=[v["developerName"] for v in PATHS])
+def test_path_vectors(vector: dict[str, Any]) -> None:
+    assert authorization_path(vector["developerName"]) == vector["path"]

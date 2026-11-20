@@ -1,250 +1,108 @@
-# Python SDK for Heroku AppLink
+# Heroku AppLink SDK for Python
 
-This library provides basic functionality for building Python apps that use
-Heroku AppLink to secure communication and credential sharing with a Salesforce
-org.
+The Heroku AppLink SDK lets Heroku apps find out who invoked them from Salesforce, and look up the credentials of stored [Heroku AppLink](https://devcenter.heroku.com/articles/heroku-applink) authorizations. Apps call Salesforce APIs with the Salesforce client of their choice, using the org and credentials the SDK returns.
 
-Though the interaction with AppLink is simple and easy to hand code, using the
-SDK will quickstart your project experience.
+## Installation
 
-Use of this project with Salesforce is subject to the [TERMS_OF_USE.md](TERMS_OF_USE.md) document.
-
-[Documentation](docs/heroku_applink/index.md) for the SDK is available and is generated
-from the source code.
-
-## Generate Documentation
-
-Install the doc dependency group.
-
-```shell
-$ uv sync --group docs
+```sh
+pip install heroku-applink
 ```
 
-Generate the documentation.
+Requires Python 3.12 or newer.
 
-```shell
-$ uv run pdoc3 --template-dir templates/python heroku_applink -o docs --force
+## Handling invocations from Salesforce
+
+When Salesforce invokes your app through AppLink, `parse_invocation_context` decodes the `x-client-context` header of the request:
+
+```python
+from flask import Flask, request
+
+from heroku_applink import InvalidInboundDataError, parse_invocation_context
+
+app = Flask(__name__)
+
+
+@app.post("/accounts")
+def accounts():
+    try:
+        context = parse_invocation_context(request.headers.get)
+    except InvalidInboundDataError:
+        return "Not an AppLink request", 400
+
+    print(f"Invoked by {context.user.username} in org {context.org.id}")
+    return {"requestId": context.request_id}
 ```
+
+`context.credentials` holds an access token for the invoking user if the invocation carries one.
+
+## Looking up an authorization
+
+`get_authorization` looks up a stored authorization through the AppLink API. Pass the org and credentials to a Salesforce client, for example [simple-salesforce](https://github.com/simple-salesforce/simple-salesforce):
+
+```python
+from simple_salesforce import Salesforce
+
+from heroku_applink import get_authorization
+
+context = get_authorization("<my-authorization>")
+
+salesforce = Salesforce(
+    instance_url=context.org.domain_url,
+    session_id=context.credentials.access_token,
+    version=context.org.api_version,
+)
+
+result = salesforce.query("SELECT Id, Name FROM Account")
+```
+
+To use another AppLink add-on attachment than the default `HEROKU_APPLINK`, pass its name, color, or API URL:
+
+```python
+# By name, reads HEROKU_APPLINK_PURPLE_API_URL and HEROKU_APPLINK_PURPLE_TOKEN
+context = get_authorization("<my-authorization>", attachment="HEROKU_APPLINK_PURPLE")
+
+# By color, reads the same config vars as the name
+context = get_authorization("<my-authorization>", attachment="purple")
+
+# By API URL, uses the attachment whose _API_URL config var holds that URL
+api_url = os.environ["HEROKU_APPLINK_PURPLE_API_URL"]
+context = get_authorization("<my-authorization>", attachment=api_url)
+```
+
+An API URL must match the value of exactly one of the app's config vars ending in `_API_URL`.
+
+Every lookup sends a request to the AppLink API. You can keep a context and reuse it until `context.credentials.expiration`, then look it up again for a new access token.
+
+### Async apps
+
+`get_authorization` is blocking. It makes a network request and, if the request fails, retries it, which can take up to about 22 seconds in total. In an async app, such as one built with FastAPI or Starlette, run it in a worker thread so it doesn't block the event loop:
+
+```python
+import asyncio
+
+context = await asyncio.to_thread(get_authorization, "<my-authorization>")
+```
+
+## Errors
+
+All errors are subclasses of `AppLinkError`:
+
+| Error                        | Cause                                                             |
+| ---------------------------- | ----------------------------------------------------------------- |
+| `InvalidInboundDataError`    | The `x-client-context` header is missing or malformed.            |
+| `ConfigurationError`         | The input or the AppLink config vars are missing or invalid.      |
+| `TransportError`             | The request to the AppLink API didn't complete.                   |
+| `HTTPError`                  | The AppLink API responded with a non-2xx `status`, such as `404`. |
+| `UnusableAuthorizationError` | The authorization's `status` isn't `authorized`.                  |
+| `UnexpectedResponseError`    | The AppLink API response doesn't have the expected content.       |
 
 ## Development
 
-### Setting Up the Development Environment
-
-1. Clone the repository:
-
-    ```bash
-    git clone https://github.com/heroku/heroku-applink-python.git
-    cd heroku-applink-python
-    ```
-
-2. Install Dependencies:
-
-    Install the `uv` package manager:
-
-    ```bash
-    curl -LsSf https://astral.sh/uv/install.sh | sh
-    ```
-
-    Sync all dependencies:
-
-    ```bash
-    uv sync --all-extras
-    ```
-
-3. Sync Development Dependencies:
-
-    ```bash
-    uv sync --all-extras --dev
-    ```
-
-### Running Tests
-
-1. Run the full test suite:
-
-    ```bash
-    # Run all tests
-    uv run pytest
-
-    # Run all tests with coverage
-    uv run pytest --cov=heroku_applink.data_api --cov-report=term-missing -v
-    ```
-
-2. Run a single test:
-
-    ```bash
-    # Run a specific test file
-    uv run pytest <path_to_test_file>/test_specific_file.py
-
-    # Run a specific test file with coverage
-    uv run pytest tests/data_api/test_data_api_record.py::test_some_specific_case \
-        --cov=heroku_applink.data_api
-    ```
-
-3. Run tests with a specific Python version:
-
-    ```bash
-    pyenv shell 3.12.2  # Or any installed version
-    uv venv
-    source .venv/bin/activate
-    uv sync --all-extras --dev
-    uv run pytest
-    ```
-
-4. Run tests across multiple Python versions with Tox:
-
-    ```bash
-    uv sync --all-extras --dev
-    uv run tox
-    ```
-
-### Linting and Code Quality
-
-1. Run the Ruff linter:
-
-    ```bash
-    # Check the code for issues
-    uv run ruff check .
-
-    # Automatically fix issues
-    uv run ruff check . --fix
-
-    # Check a specific directory (e.g., heroku_applink)
-    uv run ruff check heroku_applink/
-
-    # Format the codebase
-    uv run ruff format .
-    ```
-
-## Usage Examples
-
-For more detailed information about the SDK's capabilities, please refer to the [full documentation](docs/heroku_applink/index.md).
-
-### Basic Setup
-
-Install the package.
-
-```shell
-$ uv pip install heroku_applink
+```sh
+uv run pytest
+uv run ruff check
+uv run ruff format
+uv run mypy src tests
 ```
 
-#### ASGI
-
-If you are using an ASGI framework (like FastAPI), you can use the `IntegrationAsgiMiddleware` to automatically populate the `client-context` in the request scope.
-
-```python
-# FastAPI example
-import asyncio
-import heroku_applink as sdk
-from fastapi import FastAPI
-
-config = sdk.Config(request_timeout=5)
-
-app = FastAPI()
-app.add_middleware(sdk.IntegrationAsgiMiddleware, config=config)
-
-
-@app.get("/")
-def get_root():
-    return {"root": "page"}
-
-
-@app.get("/accounts")
-async def get_accounts():
-    data_api = sdk.get_client_context().data_api
-    result = await query_accounts(data_api)
-    
-    accounts = [
-        {
-            "id": record.fields["Id"],
-            "name": record.fields["Name"]
-        }
-        for record in result.records
-    ]
-    return accounts
-
-
-async def query_accounts(data_api):
-    query = "SELECT Id, Name FROM Account"
-    result = await data_api.query(query)
-    for record in result.records:
-        print("===== account record", record)
-    return result
-```
-
-#### WSGI
-
-If you are using a WSGI framework (like Flask), you can use the `IntegrationWsgiMiddleware` to automatically populate the `client-context` in the request environment.
-
-```python
-from flask import Flask, jsonify, request
-
-import heroku_applink as sdk
-
-config = sdk.Config(request_timeout=5)
-app = Flask(__name__)
-app.wsgi_app = sdk.IntegrationWsgiMiddleware(app.wsgi_app, config=config)
-
-
-@app.route("/")
-def index():
-    return jsonify({"message": "Hello, World!"})
-
-
-@app.route("/accounts")
-def get_accounts():
-    data_api = sdk.get_client_context().data_api
-    query = "SELECT Id, Name FROM Account"
-    result = data_api.query(query)
-
-    return jsonify({"accounts": [record.get("Name") for record in result.records]})
-```
-
-#### Directly from the x-client-context header
-
-If you are not using a framework, you can manually extract the `x-client-context`
-header and use the `DataAPI` class to query the Salesforce org.
-
-```python
-from heroku_applink.data_api import DataAPI
-
-header = request.headers.get("x-client-context")
-decoded = base64.b64decode(header)
-data = json.loads(decoded)
-
-data_api = DataAPI(
-    org_domain_url=data["orgDomainUrl"],
-    api_version=data["apiVersion"],
-    access_token=data["accessToken"],
-)
-
-result = data_api.query("SELECT Id, Name FROM Account")
-```
-
-#### Directly using the get_authorization function
-
-```python
-import asyncio
-import heroku_applink as sdk
-
-
-async def main():
-    # Get authorization for a developer
-    authorization = await sdk.get_authorization(
-        developer_name="your_developer_name",
-        attachment_or_url="HEROKU_APPLINK"
-    )
-
-    # Access the context properties
-    print(f"Organization ID: {authorization.org.id}")
-    print(f"User ID: {authorization.org.user.id}")
-    print(f"Username: {authorization.org.user.username}")
-
-    # Use the DataAPI to make queries
-    query = "SELECT Id, Name FROM Account"
-    result = await authorization.data_api.query(query)
-    for record in result.records:
-        print(f"Account: {record}")
-
-# Run the async function
-asyncio.run(main())
-```
+The tests read the shared [test vectors](https://github.com/heroku/heroku-applink-sdks) from the `test-vectors` submodule. Run `git submodule update --init` after cloning to fetch them.

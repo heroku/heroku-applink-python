@@ -1,10 +1,21 @@
 version: 2
 updates:
-  - package-ecosystem: "pip"
+  - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "cron"
-      cronjob: "0 11 * * MON,WED"
-    labels:
-      - "edit-on-call"
-      - "dependencies"
+      interval: "monthly"
+    groups:
+      github-actions:
+        update-types:
+          - "minor"
+          - "patch"
+
+  - package-ecosystem: "uv"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    groups:
+      python:
+        update-types:
+          - "minor"
+          - "patch"
